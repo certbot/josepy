@@ -1,1 +1,0 @@
-.. literalinclude:: ../cli-help.txt

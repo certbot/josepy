@@ -1,5 +1,5 @@
 JSON Web Algorithms
 -------------------
 
-.. automodule:: acme.jose.jwa
+.. automodule:: josepy.jwa
    :members:

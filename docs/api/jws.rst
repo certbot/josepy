@@ -1,5 +1,5 @@
 JSON Web Signature
 ------------------
 
-.. automodule:: acme.jose.jws
+.. automodule:: josepy.jws
    :members:

@@ -1,5 +1,5 @@
 JSON utilities
 --------------
 
-.. automodule:: acme.jose.json_util
+.. automodule:: josepy.json_util
    :members:

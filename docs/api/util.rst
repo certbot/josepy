@@ -1,5 +1,5 @@
 Utilities
 ---------
 
-.. automodule:: acme.jose.util
+.. automodule:: josepy.util
    :members:

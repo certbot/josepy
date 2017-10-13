@@ -1,5 +1,5 @@
 JOSE Base64
 -----------
 
-.. automodule:: acme.jose.b64
+.. automodule:: josepy.b64
    :members:

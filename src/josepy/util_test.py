@@ -1,14 +1,14 @@
-"""Tests for acme.jose.util."""
+"""Tests for josepy.util."""
 import functools
 import unittest
 
 import six
 
-from acme import test_util
+from josepy import test_util
 
 
 class ComparableX509Test(unittest.TestCase):
-    """Tests for acme.jose.util.ComparableX509."""
+    """Tests for josepy.util.ComparableX509."""
 
     def setUp(self):
         # test_util.load_comparable_{csr,cert} return ComparableX509
@@ -49,7 +49,7 @@ class ComparableX509Test(unittest.TestCase):
 
 
 class ComparableRSAKeyTest(unittest.TestCase):
-    """Tests for acme.jose.util.ComparableRSAKey."""
+    """Tests for josepy.util.ComparableRSAKey."""
 
     def setUp(self):
         # test_utl.load_rsa_private_key return ComparableRSAKey
@@ -74,7 +74,7 @@ class ComparableRSAKeyTest(unittest.TestCase):
         self.assertNotEqual(self.key, self.key_same._wrapped)
 
     def test_ne_no_serialization(self):
-        from acme.jose.util import ComparableRSAKey
+        from josepy.util import ComparableRSAKey
         self.assertNotEqual(ComparableRSAKey(5), ComparableRSAKey(5))
 
     def test_hash(self):
@@ -87,17 +87,17 @@ class ComparableRSAKeyTest(unittest.TestCase):
             '<ComparableRSAKey(<cryptography.hazmat.'))
 
     def test_public_key(self):
-        from acme.jose.util import ComparableRSAKey
+        from josepy.util import ComparableRSAKey
         self.assertTrue(isinstance(self.key.public_key(), ComparableRSAKey))
 
 
 class ImmutableMapTest(unittest.TestCase):
-    """Tests for acme.jose.util.ImmutableMap."""
+    """Tests for josepy.util.ImmutableMap."""
 
     def setUp(self):
         # pylint: disable=invalid-name,too-few-public-methods
         # pylint: disable=missing-docstring
-        from acme.jose.util import ImmutableMap
+        from josepy.util import ImmutableMap
 
         class A(ImmutableMap):
             __slots__ = ('x', 'y')
@@ -160,18 +160,18 @@ class ImmutableMapTest(unittest.TestCase):
 
 
 class frozendictTest(unittest.TestCase):  # pylint: disable=invalid-name
-    """Tests for acme.jose.util.frozendict."""
+    """Tests for josepy.util.frozendict."""
 
     def setUp(self):
-        from acme.jose.util import frozendict
+        from josepy.util import frozendict
         self.fdict = frozendict(x=1, y='2')
 
     def test_init_dict(self):
-        from acme.jose.util import frozendict
+        from josepy.util import frozendict
         self.assertEqual(self.fdict, frozendict({'x': 1, 'y': '2'}))
 
     def test_init_other_raises_type_error(self):
-        from acme.jose.util import frozendict
+        from josepy.util import frozendict
         # specifically fail for generators...
         self.assertRaises(TypeError, frozendict, six.iteritems({'a': 'b'}))
 

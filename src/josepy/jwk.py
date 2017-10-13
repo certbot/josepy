@@ -5,18 +5,14 @@ import json
 import logging
 
 import cryptography.exceptions
+import six
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes  # type: ignore
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec  # type: ignore
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-import six
-
-from acme.jose import errors
-from acme.jose import json_util
-from acme.jose import util
-
+from josepy import errors, json_util, util
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +43,7 @@ class JWK(json_util.TypedJSONObjectWithFields):
 
         https://tools.ietf.org/html/rfc7638
 
-        :returns bytes:
+        :returns: bytes
 
         """
         digest = hashes.Hash(hash_function(), backend=default_backend())
@@ -174,9 +170,9 @@ class JWKOct(JWK):
 class JWKRSA(JWK):
     """RSA JWK.
 
-    :ivar key: `cryptography.hazmat.primitives.rsa.RSAPrivateKey`
-        or `cryptography.hazmat.primitives.rsa.RSAPublicKey` wrapped
-        in `.ComparableRSAKey`
+    :ivar key: :class:`~cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey` wrapped
+        in :class:`~josepy.util.ComparableRSAKey`
 
     """
     typ = 'RSA'

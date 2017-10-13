@@ -1,4 +1,4 @@
-In order for acme.test_util._guess_loader to work properly, make sure
+In order for josepy.test_util._guess_loader to work properly, make sure
 to use appropriate extension for vector filenames: .pem for PEM and
 .der for DER.
 

@@ -1,26 +1,21 @@
-"""Tests for acme.jose.json_util."""
+"""Tests for josepy.json_util."""
 import itertools
 import unittest
 
 import mock
 import six
 
-from acme import test_util
-
-from acme.jose import errors
-from acme.jose import interfaces
-from acme.jose import util
-
+from josepy import errors, interfaces, test_util, util
 
 CERT = test_util.load_comparable_cert('cert.pem')
 CSR = test_util.load_comparable_csr('csr.pem')
 
 
 class FieldTest(unittest.TestCase):
-    """Tests for acme.jose.json_util.Field."""
+    """Tests for josepy.json_util.Field."""
 
     def test_no_omit_boolean(self):
-        from acme.jose.json_util import Field
+        from josepy.json_util import Field
         for default, omitempty, value in itertools.product(
                 [True, False], [True, False], [True, False]):
             self.assertFalse(
@@ -37,7 +32,7 @@ class FieldTest(unittest.TestCase):
         def encoder(unused_value):
             return 'e'
 
-        from acme.jose.json_util import Field
+        from josepy.json_util import Field
         field = Field('foo')
 
         field = field.encoder(encoder)
@@ -58,38 +53,38 @@ class FieldTest(unittest.TestCase):
                 pass  # pragma: no cover
         mock_field = MockField()
 
-        from acme.jose.json_util import Field
+        from josepy.json_util import Field
         self.assertTrue(Field.default_encoder(mock_field) is mock_field)
         # in particular...
         self.assertNotEqual('foo', Field.default_encoder(mock_field))
 
     def test_default_encoder_passthrough(self):
         mock_value = mock.MagicMock()
-        from acme.jose.json_util import Field
+        from josepy.json_util import Field
         self.assertTrue(Field.default_encoder(mock_value) is mock_value)
 
     def test_default_decoder_list_to_tuple(self):
-        from acme.jose.json_util import Field
+        from josepy.json_util import Field
         self.assertEqual((1, 2, 3), Field.default_decoder([1, 2, 3]))
 
     def test_default_decoder_dict_to_frozendict(self):
-        from acme.jose.json_util import Field
+        from josepy.json_util import Field
         obj = Field.default_decoder({'x': 2})
         self.assertTrue(isinstance(obj, util.frozendict))
         self.assertEqual(obj, util.frozendict(x=2))
 
     def test_default_decoder_passthrough(self):
         mock_value = mock.MagicMock()
-        from acme.jose.json_util import Field
+        from josepy.json_util import Field
         self.assertTrue(Field.default_decoder(mock_value) is mock_value)
 
 
 class JSONObjectWithFieldsMetaTest(unittest.TestCase):
-    """Tests for acme.jose.json_util.JSONObjectWithFieldsMeta."""
+    """Tests for josepy.json_util.JSONObjectWithFieldsMeta."""
 
     def setUp(self):
-        from acme.jose.json_util import Field
-        from acme.jose.json_util import JSONObjectWithFieldsMeta
+        from josepy.json_util import Field
+        from josepy.json_util import JSONObjectWithFieldsMeta
         self.field = Field('Baz')
         self.field2 = Field('Baz2')
         # pylint: disable=invalid-name,missing-docstring,too-few-public-methods
@@ -130,12 +125,12 @@ class JSONObjectWithFieldsMetaTest(unittest.TestCase):
 
 
 class JSONObjectWithFieldsTest(unittest.TestCase):
-    """Tests for acme.jose.json_util.JSONObjectWithFields."""
+    """Tests for josepy.json_util.JSONObjectWithFields."""
     # pylint: disable=protected-access
 
     def setUp(self):
-        from acme.jose.json_util import JSONObjectWithFields
-        from acme.jose.json_util import Field
+        from josepy.json_util import JSONObjectWithFields
+        from josepy.json_util import Field
 
         class MockJSONObjectWithFields(JSONObjectWithFields):
             # pylint: disable=invalid-name,missing-docstring,no-self-argument
@@ -249,23 +244,23 @@ class DeEncodersTest(unittest.TestCase):
         )
 
     def test_encode_b64jose(self):
-        from acme.jose.json_util import encode_b64jose
+        from josepy.json_util import encode_b64jose
         encoded = encode_b64jose(b'x')
         self.assertTrue(isinstance(encoded, six.string_types))
         self.assertEqual(u'eA', encoded)
 
     def test_decode_b64jose(self):
-        from acme.jose.json_util import decode_b64jose
+        from josepy.json_util import decode_b64jose
         decoded = decode_b64jose(u'eA')
         self.assertTrue(isinstance(decoded, six.binary_type))
         self.assertEqual(b'x', decoded)
 
     def test_decode_b64jose_padding_error(self):
-        from acme.jose.json_util import decode_b64jose
+        from josepy.json_util import decode_b64jose
         self.assertRaises(errors.DeserializationError, decode_b64jose, u'x')
 
     def test_decode_b64jose_size(self):
-        from acme.jose.json_util import decode_b64jose
+        from josepy.json_util import decode_b64jose
         self.assertEqual(b'foo', decode_b64jose(u'Zm9v', size=3))
         self.assertRaises(
             errors.DeserializationError, decode_b64jose, u'Zm9v', size=2)
@@ -273,52 +268,52 @@ class DeEncodersTest(unittest.TestCase):
             errors.DeserializationError, decode_b64jose, u'Zm9v', size=4)
 
     def test_decode_b64jose_minimum_size(self):
-        from acme.jose.json_util import decode_b64jose
+        from josepy.json_util import decode_b64jose
         self.assertEqual(b'foo', decode_b64jose(u'Zm9v', size=3, minimum=True))
         self.assertEqual(b'foo', decode_b64jose(u'Zm9v', size=2, minimum=True))
         self.assertRaises(errors.DeserializationError, decode_b64jose,
                           u'Zm9v', size=4, minimum=True)
 
     def test_encode_hex16(self):
-        from acme.jose.json_util import encode_hex16
+        from josepy.json_util import encode_hex16
         encoded = encode_hex16(b'foo')
         self.assertEqual(u'666f6f', encoded)
         self.assertTrue(isinstance(encoded, six.string_types))
 
     def test_decode_hex16(self):
-        from acme.jose.json_util import decode_hex16
+        from josepy.json_util import decode_hex16
         decoded = decode_hex16(u'666f6f')
         self.assertEqual(b'foo', decoded)
         self.assertTrue(isinstance(decoded, six.binary_type))
 
     def test_decode_hex16_minimum_size(self):
-        from acme.jose.json_util import decode_hex16
+        from josepy.json_util import decode_hex16
         self.assertEqual(b'foo', decode_hex16(u'666f6f', size=3, minimum=True))
         self.assertEqual(b'foo', decode_hex16(u'666f6f', size=2, minimum=True))
         self.assertRaises(errors.DeserializationError, decode_hex16,
                           u'666f6f', size=4, minimum=True)
 
     def test_decode_hex16_odd_length(self):
-        from acme.jose.json_util import decode_hex16
+        from josepy.json_util import decode_hex16
         self.assertRaises(errors.DeserializationError, decode_hex16, u'x')
 
     def test_encode_cert(self):
-        from acme.jose.json_util import encode_cert
+        from josepy.json_util import encode_cert
         self.assertEqual(self.b64_cert, encode_cert(CERT))
 
     def test_decode_cert(self):
-        from acme.jose.json_util import decode_cert
+        from josepy.json_util import decode_cert
         cert = decode_cert(self.b64_cert)
         self.assertTrue(isinstance(cert, util.ComparableX509))
         self.assertEqual(cert, CERT)
         self.assertRaises(errors.DeserializationError, decode_cert, u'')
 
     def test_encode_csr(self):
-        from acme.jose.json_util import encode_csr
+        from josepy.json_util import encode_csr
         self.assertEqual(self.b64_csr, encode_csr(CSR))
 
     def test_decode_csr(self):
-        from acme.jose.json_util import decode_csr
+        from josepy.json_util import decode_csr
         csr = decode_csr(self.b64_csr)
         self.assertTrue(isinstance(csr, util.ComparableX509))
         self.assertEqual(csr, CSR)
@@ -328,7 +323,7 @@ class DeEncodersTest(unittest.TestCase):
 class TypedJSONObjectWithFieldsTest(unittest.TestCase):
 
     def setUp(self):
-        from acme.jose.json_util import TypedJSONObjectWithFields
+        from josepy.json_util import TypedJSONObjectWithFields
 
         # pylint: disable=missing-docstring,abstract-method
         # pylint: disable=too-few-public-methods

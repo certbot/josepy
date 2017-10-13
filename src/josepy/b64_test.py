@@ -1,8 +1,7 @@
-"""Tests for acme.jose.b64."""
+"""Tests for josepy.b64."""
 import unittest
 
 import six
-
 
 # https://en.wikipedia.org/wiki/Base64#Examples
 B64_PADDING_EXAMPLES = {
@@ -21,11 +20,11 @@ B64_URL_UNSAFE_EXAMPLES = {
 
 
 class B64EncodeTest(unittest.TestCase):
-    """Tests for acme.jose.b64.b64encode."""
+    """Tests for josepy.b64.b64encode."""
 
     @classmethod
     def _call(cls, data):
-        from acme.jose.b64 import b64encode
+        from josepy.b64 import b64encode
         return b64encode(data)
 
     def test_empty(self):
@@ -44,11 +43,11 @@ class B64EncodeTest(unittest.TestCase):
 
 
 class B64DecodeTest(unittest.TestCase):
-    """Tests for acme.jose.b64.b64decode."""
+    """Tests for josepy.b64.b64decode."""
 
     @classmethod
     def _call(cls, data):
-        from acme.jose.b64 import b64decode
+        from josepy.b64 import b64decode
         return b64decode(data)
 
     def test_unsafe_url(self):

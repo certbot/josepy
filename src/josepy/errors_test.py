@@ -1,10 +1,10 @@
-"""Tests for acme.jose.errors."""
+"""Tests for josepy.errors."""
 import unittest
 
 
 class UnrecognizedTypeErrorTest(unittest.TestCase):
     def setUp(self):
-        from acme.jose.errors import UnrecognizedTypeError
+        from josepy.errors import UnrecognizedTypeError
         self.error = UnrecognizedTypeError('foo', {'type': 'foo'})
 
     def test_str(self):

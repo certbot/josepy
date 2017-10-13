@@ -1,13 +1,14 @@
-"""Javascript Object Signing and Encryption (jose).
+"""Javascript Object Signing and Encryption (JOSE).
 
 This package is a Python implementation of the standards developed by
 IETF `Javascript Object Signing and Encryption (Active WG)`_, in
 particular the following RFCs:
 
-  - `JSON Web Algorithms (JWA)`_
-  - `JSON Web Key (JWK)`_
-  - `JSON Web Signature (JWS)`_
+- `JSON Web Algorithms (JWA)`_
+- `JSON Web Key (JWK)`_
+- `JSON Web Signature (JWS)`_
 
+Originally developed as part of the ACME_ protocol implementation.
 
 .. _`Javascript Object Signing and Encryption (Active WG)`:
   https://tools.ietf.org/wg/jose/
@@ -21,22 +22,25 @@ particular the following RFCs:
 .. _`JSON Web Signature (JWS)`:
   https://datatracker.ietf.org/doc/draft-ietf-jose-json-web-signature/
 
+.. _ACME: https://pypi.python.org/pypi/acme
+
 """
-from acme.jose.b64 import (
+# flake8: noqa
+from josepy.b64 import (
     b64decode,
     b64encode,
 )
 
-from acme.jose.errors import (
+from josepy.errors import (
     DeserializationError,
     SerializationError,
     Error,
     UnrecognizedTypeError,
 )
 
-from acme.jose.interfaces import JSONDeSerializable
+from josepy.interfaces import JSONDeSerializable
 
-from acme.jose.json_util import (
+from josepy.json_util import (
     Field,
     JSONObjectWithFields,
     TypedJSONObjectWithFields,
@@ -50,7 +54,7 @@ from acme.jose.json_util import (
     encode_hex16,
 )
 
-from acme.jose.jwa import (
+from josepy.jwa import (
     HS256,
     HS384,
     HS512,
@@ -63,18 +67,18 @@ from acme.jose.jwa import (
     RS512,
 )
 
-from acme.jose.jwk import (
+from josepy.jwk import (
     JWK,
     JWKRSA,
 )
 
-from acme.jose.jws import (
+from josepy.jws import (
     Header,
     JWS,
     Signature,
 )
 
-from acme.jose.util import (
+from josepy.util import (
     ComparableX509,
     ComparableKey,
     ComparableRSAKey,

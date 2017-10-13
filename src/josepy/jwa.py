@@ -1,4 +1,4 @@
-"""JSON Web Algorithm.
+"""JSON Web Algorithms.
 
 https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
 
@@ -13,10 +13,7 @@ from cryptography.hazmat.primitives import hashes  # type: ignore
 from cryptography.hazmat.primitives import hmac  # type: ignore
 from cryptography.hazmat.primitives.asymmetric import padding  # type: ignore
 
-from acme.jose import errors
-from acme.jose import interfaces
-from acme.jose import jwk
-
+from josepy import errors, interfaces, jwk
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +26,7 @@ class JWA(interfaces.JSONDeSerializable):  # pylint: disable=abstract-method
 
 
 class JWASignature(JWA, collections.Hashable):  # type: ignore
-    """JSON Web Signature Algorithm."""
+    """Base class for JSON Web Signature Algorithms."""
     SIGNATURES = {}  # type: dict
 
     def __init__(self, name):
@@ -66,7 +63,7 @@ class JWASignature(JWA, collections.Hashable):  # type: ignore
 
     @abc.abstractmethod
     def verify(self, key, msg, sig):  # pragma: no cover
-        """Verify the ``msg` and ``sig`` using ``key``."""
+        """Verify the ``msg`` and ``sig`` using ``key``."""
         raise NotImplementedError()
 
     def __repr__(self):
@@ -163,18 +160,30 @@ class _JWAES(JWASignature):  # pylint: disable=abstract-class-not-used
         raise NotImplementedError()
 
 
+#: HMAC using SHA-256
 HS256 = JWASignature.register(_JWAHS('HS256', hashes.SHA256))
+#: HMAC using SHA-384
 HS384 = JWASignature.register(_JWAHS('HS384', hashes.SHA384))
+#: HMAC using SHA-512
 HS512 = JWASignature.register(_JWAHS('HS512', hashes.SHA512))
 
+#: RSASSA-PKCS-v1_5 using SHA-256
 RS256 = JWASignature.register(_JWARS('RS256', hashes.SHA256))
+#: RSASSA-PKCS-v1_5 using SHA-384
 RS384 = JWASignature.register(_JWARS('RS384', hashes.SHA384))
+#: RSASSA-PKCS-v1_5 using SHA-512
 RS512 = JWASignature.register(_JWARS('RS512', hashes.SHA512))
 
+#: RSASSA-PSS using SHA-256 and MGF1 with SHA-256
 PS256 = JWASignature.register(_JWAPS('PS256', hashes.SHA256))
+#: RSASSA-PSS using SHA-384 and MGF1 with SHA-384
 PS384 = JWASignature.register(_JWAPS('PS384', hashes.SHA384))
+#: RSASSA-PSS using SHA-512 and MGF1 with SHA-512
 PS512 = JWASignature.register(_JWAPS('PS512', hashes.SHA512))
 
+#: ECDSA using P-256 and SHA-256
 ES256 = JWASignature.register(_JWAES('ES256'))
+#: ECDSA using P-384 and SHA-384
 ES384 = JWASignature.register(_JWAES('ES384'))
+#: ECDSA using P-521 and SHA-512
 ES512 = JWASignature.register(_JWAES('ES512'))

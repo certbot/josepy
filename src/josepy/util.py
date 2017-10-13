@@ -1,9 +1,9 @@
 """JOSE utilities."""
 import collections
 
-from cryptography.hazmat.primitives.asymmetric import rsa
 import OpenSSL
 import six
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 
 class abstractclassmethod(classmethod):
@@ -76,7 +76,7 @@ class ComparableX509(object):  # pylint: disable=too-few-public-methods
 
 
 class ComparableKey(object):  # pylint: disable=too-few-public-methods
-    """Comparable wrapper for `cryptography` keys.
+    """Comparable wrapper for ``cryptography`` keys.
 
     See https://github.com/pyca/cryptography/issues/2122.
 
@@ -113,11 +113,12 @@ class ComparableKey(object):  # pylint: disable=too-few-public-methods
 
 
 class ComparableRSAKey(ComparableKey):  # pylint: disable=too-few-public-methods
-    """Wrapper for `cryptography` RSA keys.
+    """Wrapper for ``cryptography`` RSA keys.
 
     Wraps around:
-    - `cryptography.hazmat.primitives.asymmetric.RSAPrivateKey`
-    - `cryptography.hazmat.primitives.asymmetric.RSAPublicKey`
+
+    - :class:`~cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey`
 
     """
 

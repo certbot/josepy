@@ -1,4 +1,4 @@
-"""Tests for acme.jose.interfaces."""
+"""Tests for josepy.interfaces."""
 import unittest
 
 
@@ -6,7 +6,7 @@ class JSONDeSerializableTest(unittest.TestCase):
     # pylint: disable=too-many-instance-attributes
 
     def setUp(self):
-        from acme.jose.interfaces import JSONDeSerializable
+        from josepy.interfaces import JSONDeSerializable
 
         # pylint: disable=missing-docstring,invalid-name
 
@@ -75,7 +75,7 @@ class JSONDeSerializableTest(unittest.TestCase):
         self.assertEqual(self.tuple.to_json(), (('foo', )))
 
     def test_from_json_not_implemented(self):
-        from acme.jose.interfaces import JSONDeSerializable
+        from josepy.interfaces import JSONDeSerializable
         self.assertRaises(TypeError, JSONDeSerializable.from_json, 'xxx')
 
     def test_json_loads(self):
@@ -94,7 +94,7 @@ class JSONDeSerializableTest(unittest.TestCase):
                          '[\n    "foo1",\n    "foo2"\n]')
 
     def test_json_dump_default(self):
-        from acme.jose.interfaces import JSONDeSerializable
+        from josepy.interfaces import JSONDeSerializable
 
         self.assertEqual(
             'foo1', JSONDeSerializable.json_dump_default(self.basic1))
@@ -105,7 +105,7 @@ class JSONDeSerializableTest(unittest.TestCase):
         self.assertTrue(jobj[1] is self.basic2)
 
     def test_json_dump_default_type_error(self):
-        from acme.jose.interfaces import JSONDeSerializable
+        from josepy.interfaces import JSONDeSerializable
         self.assertRaises(
             TypeError, JSONDeSerializable.json_dump_default, object())
 

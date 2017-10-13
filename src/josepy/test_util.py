@@ -4,14 +4,14 @@
 
 """
 import os
-import pkg_resources
 import unittest
 
+import OpenSSL
+import pkg_resources
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
-import OpenSSL
 
-from acme import jose
+from josepy import ComparableRSAKey, ComparableX509
 
 
 def vector_path(*names):
@@ -46,7 +46,7 @@ def load_cert(*names):
 
 def load_comparable_cert(*names):
     """Load ComparableX509 cert."""
-    return jose.ComparableX509(load_cert(*names))
+    return ComparableX509(load_cert(*names))
 
 
 def load_csr(*names):
@@ -58,14 +58,14 @@ def load_csr(*names):
 
 def load_comparable_csr(*names):
     """Load ComparableX509 certificate request."""
-    return jose.ComparableX509(load_csr(*names))
+    return ComparableX509(load_csr(*names))
 
 
 def load_rsa_private_key(*names):
     """Load RSA private key."""
     loader = _guess_loader(names[-1], serialization.load_pem_private_key,
                            serialization.load_der_private_key)
-    return jose.ComparableRSAKey(loader(
+    return ComparableRSAKey(loader(
         load_vector(*names), password=None, backend=default_backend()))
 
 

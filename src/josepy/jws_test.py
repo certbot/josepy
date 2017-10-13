@@ -1,51 +1,45 @@
-"""Tests for acme.jose.jws."""
+"""Tests for josepy.jws."""
 import base64
 import unittest
 
 import mock
 import OpenSSL
 
-from acme import test_util
-
-from acme.jose import errors
-from acme.jose import json_util
-from acme.jose import jwa
-from acme.jose import jwk
-
+from josepy import errors, json_util, jwa, jwk, test_util
 
 CERT = test_util.load_comparable_cert('cert.pem')
 KEY = jwk.JWKRSA.load(test_util.load_vector('rsa512_key.pem'))
 
 
 class MediaTypeTest(unittest.TestCase):
-    """Tests for acme.jose.jws.MediaType."""
+    """Tests for josepy.jws.MediaType."""
 
     def test_decode(self):
-        from acme.jose.jws import MediaType
+        from josepy.jws import MediaType
         self.assertEqual('application/app', MediaType.decode('application/app'))
         self.assertEqual('application/app', MediaType.decode('app'))
         self.assertRaises(
             errors.DeserializationError, MediaType.decode, 'app;foo')
 
     def test_encode(self):
-        from acme.jose.jws import MediaType
+        from josepy.jws import MediaType
         self.assertEqual('app', MediaType.encode('application/app'))
         self.assertEqual('application/app;foo',
                          MediaType.encode('application/app;foo'))
 
 
 class HeaderTest(unittest.TestCase):
-    """Tests for acme.jose.jws.Header."""
+    """Tests for josepy.jws.Header."""
 
     def setUp(self):
-        from acme.jose.jws import Header
+        from josepy.jws import Header
         self.header1 = Header(jwk='foo')
         self.header2 = Header(jwk='bar')
         self.crit = Header(crit=('a', 'b'))
         self.empty = Header()
 
     def test_add_non_empty(self):
-        from acme.jose.jws import Header
+        from josepy.jws import Header
         self.assertEqual(Header(jwk='foo', crit=('a', 'b')),
                          self.header1 + self.crit)
 
@@ -60,12 +54,12 @@ class HeaderTest(unittest.TestCase):
         self.assertRaises(TypeError, self.header1.__add__, 'xxx')
 
     def test_crit_decode_always_errors(self):
-        from acme.jose.jws import Header
+        from josepy.jws import Header
         self.assertRaises(errors.DeserializationError, Header.from_json,
                           {'crit': ['a', 'b']})
 
     def test_x5c_decoding(self):
-        from acme.jose.jws import Header
+        from josepy.jws import Header
         header = Header(x5c=(CERT, CERT))
         jobj = header.to_partial_json()
         cert_asn1 = OpenSSL.crypto.dump_certificate(
@@ -83,30 +77,30 @@ class HeaderTest(unittest.TestCase):
 
 
 class SignatureTest(unittest.TestCase):
-    """Tests for acme.jose.jws.Signature."""
+    """Tests for josepy.jws.Signature."""
 
     def test_from_json(self):
-        from acme.jose.jws import Header
-        from acme.jose.jws import Signature
+        from josepy.jws import Header
+        from josepy.jws import Signature
         self.assertEqual(
             Signature(signature=b'foo', header=Header(alg=jwa.RS256)),
             Signature.from_json(
                 {'signature': 'Zm9v', 'header': {'alg': 'RS256'}}))
 
     def test_from_json_no_alg_error(self):
-        from acme.jose.jws import Signature
+        from josepy.jws import Signature
         self.assertRaises(errors.DeserializationError,
                           Signature.from_json, {'signature': 'foo'})
 
 
 class JWSTest(unittest.TestCase):
-    """Tests for acme.jose.jws.JWS."""
+    """Tests for josepy.jws.JWS."""
 
     def setUp(self):
         self.privkey = KEY
         self.pubkey = self.privkey.public_key()
 
-        from acme.jose.jws import JWS
+        from josepy.jws import JWS
         self.unprotected = JWS.sign(
             payload=b'foo', key=self.privkey, alg=jwa.RS256)
         self.protected = JWS.sign(
@@ -137,7 +131,7 @@ class JWSTest(unittest.TestCase):
             b'_893n1zQjpim_eLS5J1F61lkvrCrCDErTEJnBGOGesJ72M7b6Ve1cAJA',
             compact)
 
-        from acme.jose.jws import JWS
+        from josepy.jws import JWS
         mixed = JWS.from_compact(compact)
 
         self.assertNotEqual(self.mixed, mixed)
@@ -145,7 +139,7 @@ class JWSTest(unittest.TestCase):
             set(['alg']), set(mixed.signature.combined.not_omitted()))
 
     def test_from_compact_missing_components(self):
-        from acme.jose.jws import JWS
+        from josepy.jws import JWS
         self.assertRaises(errors.DeserializationError, JWS.from_compact, b'.')
 
     def test_json_omitempty(self):
@@ -157,7 +151,7 @@ class JWSTest(unittest.TestCase):
 
         unprotected_jobj['header'] = unprotected_jobj['header'].to_json()
 
-        from acme.jose.jws import JWS
+        from josepy.jws import JWS
         self.assertEqual(JWS.from_json(protected_jobj), self.protected)
         self.assertEqual(JWS.from_json(unprotected_jobj), self.unprotected)
 
@@ -174,7 +168,7 @@ class JWSTest(unittest.TestCase):
         jobj_from['header'] = jobj_from['header'].to_json()
 
         self.assertEqual(self.mixed.to_partial_json(flat=True), jobj_to)
-        from acme.jose.jws import JWS
+        from josepy.jws import JWS
         self.assertEqual(self.mixed, JWS.from_json(jobj_from))
 
     def test_json_not_flat(self):
@@ -186,16 +180,16 @@ class JWSTest(unittest.TestCase):
         jobj_from['signatures'] = [jobj_to['signatures'][0].to_json()]
 
         self.assertEqual(self.mixed.to_partial_json(flat=False), jobj_to)
-        from acme.jose.jws import JWS
+        from josepy.jws import JWS
         self.assertEqual(self.mixed, JWS.from_json(jobj_from))
 
     def test_from_json_mixed_flat(self):
-        from acme.jose.jws import JWS
+        from josepy.jws import JWS
         self.assertRaises(errors.DeserializationError, JWS.from_json,
                           {'signatures': (), 'signature': 'foo'})
 
     def test_from_json_hashable(self):
-        from acme.jose.jws import JWS
+        from josepy.jws import JWS
         hash(JWS.from_json(self.mixed.to_json()))
 
 
@@ -205,14 +199,14 @@ class CLITest(unittest.TestCase):
         self.key_path = test_util.vector_path('rsa512_key.pem')
 
     def test_unverified(self):
-        from acme.jose.jws import CLI
+        from josepy.jws import CLI
         with mock.patch('sys.stdin') as sin:
             sin.read.return_value = '{"payload": "foo", "signature": "xxx"}'
             with mock.patch('sys.stdout'):
                 self.assertEqual(-1, CLI.run(['verify']))
 
     def test_json(self):
-        from acme.jose.jws import CLI
+        from josepy.jws import CLI
 
         with mock.patch('sys.stdin') as sin:
             sin.read.return_value = 'foo'
@@ -223,7 +217,7 @@ class CLITest(unittest.TestCase):
                 self.assertEqual(0, CLI.run(['verify']))
 
     def test_compact(self):
-        from acme.jose.jws import CLI
+        from josepy.jws import CLI
 
         with mock.patch('sys.stdin') as sin:
             sin.read.return_value = 'foo'

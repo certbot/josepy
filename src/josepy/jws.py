@@ -1,4 +1,4 @@
-"""JOSE Web Signature."""
+"""JSON Web Signature."""
 import argparse
 import base64
 import sys
@@ -6,12 +6,7 @@ import sys
 import OpenSSL
 import six
 
-from acme.jose import b64
-from acme.jose import errors
-from acme.jose import json_util
-from acme.jose import jwa
-from acme.jose import jwk
-from acme.jose import util
+from josepy import b64, errors, json_util, jwa, jwk, util
 
 
 class MediaType(object):
@@ -106,7 +101,7 @@ class Header(json_util.JSONObjectWithFields):
         :returns: (Public) key found in the header.
         :rtype: .JWK
 
-        :raises acme.jose.errors.Error: if key could not be found
+        :raises josepy.errors.Error: if key could not be found
 
         """
         if self.jwk is None:
@@ -275,7 +270,7 @@ class JWS(json_util.JSONObjectWithFields):
     def signature(self):
         """Get a singleton signature.
 
-        :rtype: `signature_cls`
+        :rtype: :class:`JWS.signature_cls`
 
         """
         assert len(self.signatures) == 1
@@ -403,8 +398,10 @@ class CLI(object):
         return jwk.JWK.TYPES[arg]
 
     @classmethod
-    def run(cls, args=sys.argv[1:]):
+    def run(cls, args=None):
         """Parse arguments and sign/verify."""
+        if args is None:
+            args = sys.argv[1:]
         parser = argparse.ArgumentParser()
         parser.add_argument('--compact', action='store_true')
 

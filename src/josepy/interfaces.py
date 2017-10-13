@@ -5,8 +5,7 @@ import json
 
 import six
 
-from acme.jose import errors
-from acme.jose import util
+from josepy import errors, util
 
 # pylint: disable=no-self-argument,no-method-argument,no-init,inherit-non-class
 # pylint: disable=too-few-public-methods
@@ -113,7 +112,7 @@ class JSONDeSerializable(object):
           # in particular...
           assert Bar().to_partial_json() != ['foo', 'foo']
 
-        :raises acme.jose.errors.SerializationError:
+        :raises josepy.errors.SerializationError:
             in case of any serialization error.
         :returns: Partially serializable object.
 
@@ -128,7 +127,7 @@ class JSONDeSerializable(object):
 
           assert Bar().to_json() == ['foo', 'foo']
 
-        :raises acme.jose.errors.SerializationError:
+        :raises josepy.errors.SerializationError:
             in case of any serialization error.
         :returns: Fully serialized object.
 
@@ -160,7 +159,7 @@ class JSONDeSerializable(object):
             types, as decoded from JSON document. Not necessarily
             :class:`dict` (as decoded from "JSON object" document).
 
-        :raises acme.jose.errors.DeserializationError:
+        :raises josepy.errors.DeserializationError:
             if decoding was unsuccessful, e.g. in case of unparseable
             X509 certificate, or wrong padding in JOSE base64 encoded
             string, etc.

@@ -1,10 +1,7 @@
-"""JOSE Base64.
-
-`JOSE Base64`_ is defined as:
+"""`JOSE Base64`_ is defined as:
 
   - URL-safe Base64
   - padding stripped
-
 
 .. _`JOSE Base64`:
     https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-37#appendix-C
@@ -22,12 +19,12 @@ def b64encode(data):
     """JOSE Base64 encode.
 
     :param data: Data to be encoded.
-    :type data: `bytes`
+    :type data: bytes
 
     :returns: JOSE Base64 string.
     :rtype: bytes
 
-    :raises TypeError: if `data` is of incorrect type
+    :raises TypeError: if ``data`` is of incorrect type
 
     """
     if not isinstance(data, six.binary_type):
@@ -40,7 +37,7 @@ def b64decode(data):
 
     :param data: Base64 string to be decoded. If it's unicode, then
                  only ASCII characters are allowed.
-    :type data: `bytes` or `unicode`
+    :type data: bytes or unicode
 
     :returns: Decoded data.
     :rtype: bytes

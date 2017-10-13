@@ -1,10 +1,7 @@
-"""Tests for acme.jose.jwa."""
+"""Tests for josepy.jwa."""
 import unittest
 
-from acme import test_util
-
-from acme.jose import errors
-
+from josepy import errors, test_util
 
 RSA256_KEY = test_util.load_rsa_private_key('rsa256_key.pem')
 RSA512_KEY = test_util.load_rsa_private_key('rsa512_key.pem')
@@ -12,10 +9,10 @@ RSA1024_KEY = test_util.load_rsa_private_key('rsa1024_key.pem')
 
 
 class JWASignatureTest(unittest.TestCase):
-    """Tests for acme.jose.jwa.JWASignature."""
+    """Tests for josepy.jwa.JWASignature."""
 
     def setUp(self):
-        from acme.jose.jwa import JWASignature
+        from josepy.jwa import JWASignature
 
         class MockSig(JWASignature):
             # pylint: disable=missing-docstring,too-few-public-methods
@@ -48,15 +45,15 @@ class JWASignatureTest(unittest.TestCase):
         self.assertEqual(self.Sig2.to_partial_json(), 'Sig2')
 
     def test_from_json(self):
-        from acme.jose.jwa import JWASignature
-        from acme.jose.jwa import RS256
+        from josepy.jwa import JWASignature
+        from josepy.jwa import RS256
         self.assertTrue(JWASignature.from_json('RS256') is RS256)
 
 
 class JWAHSTest(unittest.TestCase):  # pylint: disable=too-few-public-methods
 
     def test_it(self):
-        from acme.jose.jwa import HS256
+        from josepy.jwa import HS256
         sig = (
             b"\xceR\xea\xcd\x94\xab\xcf\xfb\xe0\xacA.:\x1a'\x08i\xe2\xc4"
             b"\r\x85+\x0e\x85\xaeUZ\xd4\xb3\x97zO"
@@ -69,18 +66,18 @@ class JWAHSTest(unittest.TestCase):  # pylint: disable=too-few-public-methods
 class JWARSTest(unittest.TestCase):
 
     def test_sign_no_private_part(self):
-        from acme.jose.jwa import RS256
+        from josepy.jwa import RS256
         self.assertRaises(
             errors.Error, RS256.sign, RSA512_KEY.public_key(), b'foo')
 
     def test_sign_key_too_small(self):
-        from acme.jose.jwa import RS256
-        from acme.jose.jwa import PS256
+        from josepy.jwa import RS256
+        from josepy.jwa import PS256
         self.assertRaises(errors.Error, RS256.sign, RSA256_KEY, b'foo')
         self.assertRaises(errors.Error, PS256.sign, RSA256_KEY, b'foo')
 
     def test_rs(self):
-        from acme.jose.jwa import RS256
+        from josepy.jwa import RS256
         sig = (
             b'|\xc6\xb2\xa4\xab(\x87\x99\xfa*:\xea\xf8\xa0N&}\x9f\x0f\xc0O'
             b'\xc6t\xa3\xe6\xfa\xbb"\x15Y\x80Y\xe0\x81\xb8\x88)\xba\x0c\x9c'
@@ -93,7 +90,7 @@ class JWARSTest(unittest.TestCase):
             RSA512_KEY.public_key(), b'foo', sig + b'!'))
 
     def test_ps(self):
-        from acme.jose.jwa import PS256
+        from josepy.jwa import PS256
         sig = PS256.sign(RSA1024_KEY, b'foo')
         self.assertTrue(PS256.verify(RSA1024_KEY.public_key(), b'foo', sig))
         self.assertFalse(PS256.verify(

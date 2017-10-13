@@ -13,11 +13,7 @@ import logging
 import OpenSSL
 import six
 
-from acme.jose import b64
-from acme.jose import errors
-from acme.jose import interfaces
-from acme.jose import util
-
+from josepy import b64, errors, interfaces, util
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +27,8 @@ class Field(object):
     ``encoder`` (``decoder``) is a callable that accepts a single
     parameter, i.e. a value to be encoded (decoded), and returns the
     serialized (deserialized) value. In case of errors it should raise
-    :class:`~acme.jose.errors.SerializationError`
-    (:class:`~acme.jose.errors.DeserializationError`).
+    :class:`~josepy.errors.SerializationError`
+    (:class:`~josepy.errors.DeserializationError`).
 
     Note, that ``decoder`` should perform partial serialization only.
 
@@ -100,7 +96,7 @@ class Field(object):
         """Default decoder.
 
         Recursively deserialize into immutable types (
-        :class:`acme.jose.util.frozendict` instead of
+        :class:`josepy.util.frozendict` instead of
         :func:`dict`, :func:`tuple` instead of :func:`list`).
 
         """
@@ -464,7 +460,7 @@ class TypedJSONObjectWithFields(JSONObjectWithFields):
 
         :returns: Serializable JSON object representing ACME typed object.
             :meth:`validate` will almost certainly not work, due to reasons
-            explained in :class:`acme.interfaces.IJSONSerializable`.
+            explained in :class:`josepy.interfaces.IJSONSerializable`.
         :rtype: dict
 
         """
@@ -476,7 +472,7 @@ class TypedJSONObjectWithFields(JSONObjectWithFields):
     def from_json(cls, jobj):
         """Deserialize ACME object from valid JSON object.
 
-        :raises acme.errors.UnrecognizedTypeError: if type
+        :raises josepy.errors.UnrecognizedTypeError: if type
             of the ACME object has not been registered.
 
         """

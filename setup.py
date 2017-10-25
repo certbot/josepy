@@ -11,7 +11,6 @@ install_requires = [
     # rsa_recover_prime_factors (>=0.8)
     'cryptography>=0.8',
     # Connection.set_tlsext_host_name (>=0.13)
-    'mock',
     'PyOpenSSL>=0.13',
     # For pkg_resources. >=1.0 so pip resolves it to a version cryptography
     # will tolerate; see #2599:
@@ -27,6 +26,7 @@ testing_requires = [
     'flake8',
     'pytest-flake8>=0.5',
     'pytest>=2.8.0',
+    'mock',
 ]
 
 # env markers cause problems with older pip and setuptools

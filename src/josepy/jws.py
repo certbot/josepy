@@ -3,8 +3,11 @@ import argparse
 import base64
 import sys
 
-import OpenSSL
 import six
+
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 
 from josepy import b64, errors, json_util, jwa, jwk, util
 
@@ -118,16 +121,15 @@ class Header(json_util.JSONObjectWithFields):
 
     @x5c.encoder  # type: ignore
     def x5c(value):  # pylint: disable=missing-docstring,no-self-argument
-        return [base64.b64encode(OpenSSL.crypto.dump_certificate(
-            OpenSSL.crypto.FILETYPE_ASN1, cert.wrapped)) for cert in value]
+        return [base64.b64encode(cert.public_bytes(
+            serialization.Encoding.DER)) for cert in value]
 
     @x5c.decoder  # type: ignore
     def x5c(value):  # pylint: disable=missing-docstring,no-self-argument
         try:
-            return tuple(util.ComparableX509(OpenSSL.crypto.load_certificate(
-                OpenSSL.crypto.FILETYPE_ASN1,
-                base64.b64decode(cert))) for cert in value)
-        except OpenSSL.crypto.Error as error:
+            return tuple(util.ComparableX509(x509.load_der_x509_certificate(
+                base64.b64decode(cert), default_backend())) for cert in value)
+        except ValueError as error:
             raise errors.DeserializationError(error)
 
 

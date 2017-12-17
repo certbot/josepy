@@ -2,7 +2,6 @@
 import collections
 
 import six
-
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa
 

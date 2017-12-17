@@ -66,7 +66,7 @@ setup(
     name='josepy',
     version=version,
     description='JOSE protocol implementation in Python',
-    url='https://github.com/jezdez/josepy',
+    url='https://github.com/certbot/josepy',
     author="Certbot Project",
     author_email='client-dev@letsencrypt.org',
     license='Apache License 2.0',

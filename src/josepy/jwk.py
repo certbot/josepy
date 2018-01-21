@@ -9,7 +9,7 @@ import six
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes  # type: ignore
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ec  # type: ignore
+from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 from josepy import errors, json_util, util
@@ -121,27 +121,114 @@ class JWK(json_util.TypedJSONObjectWithFields):
 
 
 @JWK.register
-class JWKES(JWK):  # pragma: no cover
+class JWKEC(JWK):  # pragma: no cover
     # pylint: disable=abstract-class-not-used
-    """ES JWK.
+    """EC JWK.
 
     .. warning:: This is not yet implemented!
 
     """
-    typ = 'ES'
+    typ = 'EC'
+    __slots__ = ('key',)
     cryptography_key_types = (
         ec.EllipticCurvePublicKey, ec.EllipticCurvePrivateKey)
     required = ('crv', JWK.type_field_name, 'x', 'y')
 
+    def __init__(self, *args, **kwargs):
+        if 'key' in kwargs and not isinstance(
+                kwargs['key'], util.ComparableECKey):
+            kwargs['key'] = util.ComparableECKey(kwargs['key'])
+        super(JWKEC, self).__init__(*args, **kwargs)
+
+    @classmethod
+    def _encode_param(cls, data):
+        """Encode Base64urlUInt.
+
+        :type data: long
+        :rtype: unicode
+
+        """
+        def _leading_zeros(arg):
+            if len(arg) % 2:
+                return '0' + arg
+            return arg
+
+        return json_util.encode_b64jose(binascii.unhexlify(
+            _leading_zeros(hex(data)[2:].rstrip('L'))))
+
+    @classmethod
+    def _decode_param(cls, data, name, expected_length):
+        """Decode Base64urlUInt."""
+        try:
+            binary = json_util.decode_b64jose(data)
+            if len(binary) != expected_length:
+                raise errors.Error(
+                    'Expected {name} to be {expected_length} bytes after base64-decoding; got {length}',
+                    name=name, expected_length=expected_length, length=len(binary))
+            return int(binascii.hexlify(binary), 16)
+        except ValueError:  # invalid literal for long() with base 16
+            raise errors.DeserializationError()
+
     def fields_to_partial_json(self):
-        raise NotImplementedError()
+        params = {}
+        if isinstance(self.key._wrapped, ec.EllipticCurvePublicKey):
+            public = self.key.public_numbers()
+        elif isinstance(self.key._wrapped, ec.EllipticCurvePrivateKey):
+            private = self.key.private_numbers()
+            public = self.key.public_key().public_numbers()
+            params.update({
+                'd': private.private_value,
+            })
+        else: raise AssertionError(
+            "key was not an EllipticCurvePublicKey or EllipticCurvePrivateKey")
+
+        params.update({
+            'x': public.x,
+            'y': public.y,
+        })
+        params = dict((key, self._encode_param(value))
+                    for key, value in six.iteritems(params))
+        params['crv'] = self._curve_name_to_crv(public.curve.name)
+        return params
+
+    @classmethod
+    def _curve_name_to_crv(cls, curve_name):
+        if curve_name == "secp256r1": return "P-256"
+        if curve_name == "secp384r1": return "P-384"
+        if curve_name == "secp521r1": return "P-521"
+        raise errors.SerializationError()
+
+    @classmethod
+    def _crv_to_curve(cls, crv):
+        # crv is case-sensitive
+        if crv == "P-256": return ec.SECP256R1()
+        if crv == "P-384": return ec.SECP384R1()
+        if crv == "P-521": return ec.SECP521R1()
+        raise errors.DeserializationError()
 
     @classmethod
     def fields_from_json(cls, jobj):
-        raise NotImplementedError()
+        # pylint: disable=invalid-name
+        curve = cls._crv_to_curve(jobj['crv'])
+        coord_length = (curve.key_size+7)//8
+        x, y = (cls._decode_param(jobj[n], n, coord_length) for n in ('x', 'y'))
+        public_numbers = ec.EllipticCurvePublicNumbers(x=x, y=y, curve=curve)
+        if 'd' not in jobj:  # public key
+            key = public_numbers.public_key(default_backend())
+        else:  # private key
+            exp_length = (curve.key_size.bit_length()+7)//8
+            d = cls._decode_param(jobj['d'], 'd', exp_length)
+            key = ec.EllipticCurvePrivateNumbers(d, public_numbers).private_key(
+                    default_backend())
+        return cls(key=key)
 
     def public_key(self):
-        raise NotImplementedError()
+        # Unlike RSAPrivateKey, EllipticCurvePrivateKey does not contain public_key()
+        if hasattr(self.key, 'public_key'):
+            key = self.key.public_key()
+        else:
+            key = self.key.public_numbers().public_key(default_backend())
+        return type(self)(key=key)
 
 
 @JWK.register

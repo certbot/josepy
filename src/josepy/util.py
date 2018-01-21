@@ -3,7 +3,8 @@ import collections
 
 import OpenSSL
 import six
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import ec, rsa
 
 
 class abstractclassmethod(classmethod):
@@ -134,6 +135,34 @@ class ComparableRSAKey(ComparableKey):  # pylint: disable=too-few-public-methods
             pub = self.public_numbers()
             return hash((self.__class__, pub.n, pub.e))
 
+class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
+    """Wrapper for ``cryptography`` RSA keys.
+
+    Wraps around:
+
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey`
+
+    """
+
+    def __hash__(self):
+        # public_numbers() hasn't got stable hash!
+        # https://github.com/pyca/cryptography/issues/2143
+        if isinstance(self._wrapped, ec.EllipticCurvePrivateKeyWithSerialization):
+            priv = self.private_numbers()
+            pub = priv.public_numbers
+            return hash((self.__class__, pub.curve.name, pub.x, pub.y, priv.d))
+        elif isinstance(self._wrapped, ec.EllipticCurvePublicKeyWithSerialization):
+            pub = self.public_numbers()
+            return hash((self.__class__, pub.curve.name, pub.x, pub.y))
+    def public_key(self):
+        """Get wrapped public key."""
+        # Unlike RSAPrivateKey, EllipticCurvePrivateKey does not have public_key()
+        if hasattr(self._wrapped, 'public_key'):
+            key = self._wrapped.public_key()
+        else:
+            key = self._wrapped.public_numbers().public_key(default_backend())
+        return self.__class__(key)
 
 class ImmutableMap(collections.Mapping, collections.Hashable):  # type: ignore
     # pylint: disable=too-few-public-methods

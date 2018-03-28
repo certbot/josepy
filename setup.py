@@ -40,6 +40,10 @@ docs_extras = [
 ]
 
 
+with open('README.rst') as f:
+    long_description = f.read()
+
+
 class PyTest(TestCommand):
     user_options = []
 
@@ -59,6 +63,7 @@ setup(
     name='josepy',
     version=version,
     description='JOSE protocol implementation in Python',
+    long_description=long_description,
     url='https://github.com/certbot/josepy',
     author="Certbot Project",
     author_email='client-dev@letsencrypt.org',

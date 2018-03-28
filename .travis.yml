@@ -12,3 +12,5 @@ script:
   - tox -v
 after_success:
   - codecov
+notifications:
+  email: false

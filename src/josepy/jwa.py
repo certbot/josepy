@@ -104,26 +104,18 @@ class _JWARSA(object):
     def sign(self, key, msg):
         """Sign the ``msg`` using ``key``."""
         try:
-            signer = key.signer(self.padding, self.hash)
+            return key.sign(msg, self.padding, self.hash)
         except AttributeError as error:
             logger.debug(error, exc_info=True)
             raise errors.Error("Public key cannot be used for signing")
         except ValueError as error:  # digest too large
             logger.debug(error, exc_info=True)
             raise errors.Error(str(error))
-        signer.update(msg)
-        try:
-            return signer.finalize()
-        except ValueError as error:
-            logger.debug(error, exc_info=True)
-            raise errors.Error(str(error))
 
     def verify(self, key, msg, sig):
         """Verify the ``msg` and ``sig`` using ``key``."""
-        verifier = key.verifier(sig, self.padding, self.hash)
-        verifier.update(msg)
         try:
-            verifier.verify()
+            key.verify(sig, msg, self.padding, self.hash)
         except cryptography.exceptions.InvalidSignature as error:
             logger.debug(error, exc_info=True)
             return False

@@ -1,3 +1,4 @@
+import io
 import sys
 
 from setuptools import find_packages, setup
@@ -40,7 +41,7 @@ docs_extras = [
 ]
 
 
-with open('README.rst') as f:
+with io.open('README.rst', encoding='UTF-8') as f:
     long_description = f.read()
 
 

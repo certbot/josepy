@@ -10,8 +10,10 @@ import abc
 import binascii
 import logging
 
-import OpenSSL
 import six
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 
 from josepy import b64, errors, interfaces, util
 
@@ -360,50 +362,49 @@ def decode_hex16(value, size=None, minimum=False):
 def encode_cert(cert):
     """Encode certificate as JOSE Base-64 DER.
 
-    :type cert: `OpenSSL.crypto.X509` wrapped in `.ComparableX509`
+    :type `ComparableX509` cert:
     :rtype: unicode
 
     """
-    return encode_b64jose(OpenSSL.crypto.dump_certificate(
-        OpenSSL.crypto.FILETYPE_ASN1, cert.wrapped))
+    return encode_b64jose(cert.public_bytes(serialization.Encoding.DER))
 
 
 def decode_cert(b64der):
     """Decode JOSE Base-64 DER-encoded certificate.
 
     :param unicode b64der:
-    :rtype: `OpenSSL.crypto.X509` wrapped in `.ComparableX509`
+    :rtype: `ComparableX509`
 
     """
     try:
-        return util.ComparableX509(OpenSSL.crypto.load_certificate(
-            OpenSSL.crypto.FILETYPE_ASN1, decode_b64jose(b64der)))
-    except OpenSSL.crypto.Error as error:
+        cert = x509.load_der_x509_certificate(
+            decode_b64jose(b64der), default_backend())
+        return util.ComparableX509(cert)
+    except ValueError as error:
         raise errors.DeserializationError(error)
 
 
 def encode_csr(csr):
     """Encode CSR as JOSE Base-64 DER.
 
-    :type csr: `OpenSSL.crypto.X509Req` wrapped in `.ComparableX509`
+    :type `ComparableX509` csr:
     :rtype: unicode
 
     """
-    return encode_b64jose(OpenSSL.crypto.dump_certificate_request(
-        OpenSSL.crypto.FILETYPE_ASN1, csr.wrapped))
+    return encode_b64jose(csr.public_bytes(serialization.Encoding.DER))
 
 
 def decode_csr(b64der):
     """Decode JOSE Base-64 DER-encoded CSR.
 
     :param unicode b64der:
-    :rtype: `OpenSSL.crypto.X509Req` wrapped in `.ComparableX509`
+    :rtype: `ComparableX509`
 
     """
     try:
-        return util.ComparableX509(OpenSSL.crypto.load_certificate_request(
-            OpenSSL.crypto.FILETYPE_ASN1, decode_b64jose(b64der)))
-    except OpenSSL.crypto.Error as error:
+        cert = x509.load_der_x509_csr(decode_b64jose(b64der), default_backend())
+        return util.ComparableX509(cert)
+    except ValueError as error:
         raise errors.DeserializationError(error)
 
 

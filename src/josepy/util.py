@@ -1,8 +1,8 @@
 """JOSE utilities."""
 import collections
 
-import OpenSSL
 import six
+from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 
@@ -30,43 +30,35 @@ class ComparableX509(object):  # pylint: disable=too-few-public-methods
     """Wrapper for OpenSSL.crypto.X509** objects that supports __eq__.
 
     :ivar wrapped: Wrapped certificate or certificate request.
-    :type wrapped: `OpenSSL.crypto.X509` or `OpenSSL.crypto.X509Req`.
-
+    :type wrapped: `cryptography` X509 object or `OpenSSL.crypto.X509` or
+                   `OpenSSL.crypto.X509Req`
     """
     def __init__(self, wrapped):
-        assert isinstance(wrapped, OpenSSL.crypto.X509) or isinstance(
-            wrapped, OpenSSL.crypto.X509Req)
-        self.wrapped = wrapped
+        if isinstance(wrapped, x509.Certificate) or \
+           isinstance(wrapped, x509.CertificateSigningRequest):
+            self.wrapped = wrapped
+        else:
+            # Fallback: Try OpenSSL?
+            self.wrapped = self._from_openssl(wrapped)
+
+    def _from_openssl(self, it):
+        # This is a fallback method that attempts to convert from an OpenSSL
+        # object.
+        try:
+            return it.to_cryptography()
+        except AttributeError:
+            raise ValueError('Unexpected object type %s' % type(it))
 
     def __getattr__(self, name):
         return getattr(self.wrapped, name)
 
-    def _dump(self, filetype=OpenSSL.crypto.FILETYPE_ASN1):
-        """Dumps the object into a buffer with the specified encoding.
-
-        :param int filetype: The desired encoding. Should be one of
-            `OpenSSL.crypto.FILETYPE_ASN1`,
-            `OpenSSL.crypto.FILETYPE_PEM`, or
-            `OpenSSL.crypto.FILETYPE_TEXT`.
-
-        :returns: Encoded X509 object.
-        :rtype: str
-
-        """
-        if isinstance(self.wrapped, OpenSSL.crypto.X509):
-            func = OpenSSL.crypto.dump_certificate
-        else:  # assert in __init__ makes sure this is X509Req
-            func = OpenSSL.crypto.dump_certificate_request
-        return func(filetype, self.wrapped)
-
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
-            return NotImplemented
-        # pylint: disable=protected-access
-        return self._dump() == other._dump()
+            return False
+        return self.wrapped == other.wrapped
 
     def __hash__(self):
-        return hash((self.__class__, self._dump()))
+        return hash((self.__class__, self.wrapped))
 
     def __ne__(self, other):
         return not self == other

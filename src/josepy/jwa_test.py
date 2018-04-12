@@ -1,6 +1,8 @@
 """Tests for josepy.jwa."""
 import unittest
 
+import mock
+
 from josepy import errors, test_util
 
 RSA256_KEY = test_util.load_rsa_private_key('rsa256_key.pem')
@@ -95,6 +97,40 @@ class JWARSTest(unittest.TestCase):
         self.assertTrue(PS256.verify(RSA1024_KEY.public_key(), b'foo', sig))
         self.assertFalse(PS256.verify(
             RSA1024_KEY.public_key(), b'foo', sig + b'!'))
+
+    def test_sign_new_api(self):
+        from josepy.jwa import RS256
+        key = mock.MagicMock()
+        RS256.sign(key, "message")
+        self.assertTrue(key.sign.called)
+
+    def test_sign_old_api(self):
+        from josepy.jwa import RS256
+        key = mock.MagicMock(spec=[u'signer'])
+        signer = mock.MagicMock()
+        key.signer.return_value = signer
+        RS256.sign(key, "message")
+        self.assertTrue(all([
+            key.signer.called,
+            signer.update.called,
+            signer.finalize.called]))
+
+    def test_verify_new_api(self):
+        from josepy.jwa import RS256
+        key = mock.MagicMock()
+        RS256.verify(key, "message", "signature")
+        self.assertTrue(key.verify.called)
+
+    def test_verify_old_api(self):
+        from josepy.jwa import RS256
+        key = mock.MagicMock(spec=[u'verifier'])
+        verifier = mock.MagicMock()
+        key.verifier.return_value = verifier
+        RS256.verify(key, "message", "signature")
+        self.assertTrue(all([
+            key.verifier.called,
+            verifier.update.called,
+            verifier.verify.called]))
 
 
 if __name__ == '__main__':

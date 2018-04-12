@@ -103,7 +103,11 @@ class _JWARSA(object):
 
     def sign(self, key, msg):
         """Sign the ``msg`` using ``key``."""
+        # If cryptography library supports new style api (v1.4 and later)
+        new_api = hasattr(key, "sign")
         try:
+            if new_api:
+                return key.sign(msg, self.padding, self.hash)
             signer = key.signer(self.padding, self.hash)
         except AttributeError as error:
             logger.debug(error, exc_info=True)
@@ -120,10 +124,16 @@ class _JWARSA(object):
 
     def verify(self, key, msg, sig):
         """Verify the ``msg` and ``sig`` using ``key``."""
-        verifier = key.verifier(sig, self.padding, self.hash)
-        verifier.update(msg)
+        # If cryptography library supports new style api (v1.4 and later)
+        new_api = hasattr(key, "verify")
+        if not new_api:
+            verifier = key.verifier(sig, self.padding, self.hash)
+            verifier.update(msg)
         try:
-            verifier.verify()
+            if new_api:
+                key.verify(sig, msg, self.padding, self.hash)
+            else:
+                verifier.verify()
         except cryptography.exceptions.InvalidSignature as error:
             logger.debug(error, exc_info=True)
             return False

@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.1.0 (2018-04-13)
+------------------
+
+* Deprecated support for Python 2.6 and 3.3.
+* Use the ``sign`` and ``verify`` methods when they are available in
+  ``cryptography`` instead of the deprecated methods ``signer`` and
+  ``verifier``.
+
 1.0.1 (2017-10-25)
 ------------------
 

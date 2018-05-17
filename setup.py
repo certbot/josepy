@@ -35,6 +35,11 @@ dev_extras = [
     'tox',
 ]
 
+dev3_extras = [
+    'mypy',
+    'typing',  # for python3.4
+]
+
 docs_extras = [
     'Sphinx>=1.0',  # autodoc_member_order = 'bysource', autodoc_default_flags
     'sphinx_rtd_theme',
@@ -91,6 +96,7 @@ setup(
     install_requires=install_requires,
     extras_require={
         'dev': dev_extras,
+        'dev3': dev3_extras,
         'docs': docs_extras,
         'tests': testing_requires,
     },

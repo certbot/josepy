@@ -178,7 +178,7 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
 
 
 @six.add_metaclass(JSONObjectWithFieldsMeta)
-class JSONObjectWithFields(util.ImmutableMap, interfaces.JSONDeSerializable):
+class JSONObjectWithFields(interfaces.JSONDeSerializable, util.ImmutableMap):
     # pylint: disable=too-few-public-methods
     """JSON object with fields.
 

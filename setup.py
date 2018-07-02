@@ -106,6 +106,7 @@ setup(
         ],
     },
     tests_require=testing_requires,
+    test_suite='josepy',
     cmdclass={
         'test': PyTest,
     },

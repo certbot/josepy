@@ -6,6 +6,14 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7"
+matrix:
+  exclude:
+    - python: "3.7"
+  include:
+    - dist: xenial
+      python: "3.7"
+      sudo: true
 install:
   - pip install tox-travis codecov
 script:

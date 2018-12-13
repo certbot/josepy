@@ -1,7 +1,10 @@
 """JOSE interfaces."""
 import abc
-import collections
 import json
+try:
+    from collections.abc import Sequence, Mapping  # pylint: disable=import-error
+except ImportError:
+    from collections import Sequence, Mapping
 
 import six
 
@@ -139,11 +142,11 @@ class JSONDeSerializable(object):
                 return obj
             elif isinstance(obj, list):
                 return [_serialize(subobj) for subobj in obj]
-            elif isinstance(obj, collections.Sequence):
+            elif isinstance(obj, Sequence):
                 # default to tuple, otherwise Mapping could get
                 # unhashable list
                 return tuple(_serialize(subobj) for subobj in obj)
-            elif isinstance(obj, collections.Mapping):
+            elif isinstance(obj, Mapping):
                 return dict((_serialize(key), _serialize(value))
                             for key, value in six.iteritems(obj))
             else:

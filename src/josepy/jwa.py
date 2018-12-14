@@ -5,10 +5,6 @@ https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
 """
 import abc
 import logging
-try:
-    from collections.abc import Hashable  # pylint: disable=import-error
-except ImportError:
-    from collections import Hashable
 
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
@@ -17,6 +13,11 @@ from cryptography.hazmat.primitives import hmac  # type: ignore
 from cryptography.hazmat.primitives.asymmetric import padding  # type: ignore
 
 from josepy import errors, interfaces, jwk
+
+try:
+    from collections.abc import Hashable  # pylint: disable=import-error
+except ImportError:
+    from collections import Hashable
 
 logger = logging.getLogger(__name__)
 

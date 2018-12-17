@@ -1,11 +1,15 @@
 """JOSE interfaces."""
 import abc
-import collections
 import json
 
 import six
 
 from josepy import errors, util
+
+try:
+    from collections.abc import Sequence, Mapping  # pylint: disable=import-error
+except ImportError:
+    from collections import Sequence, Mapping
 
 # pylint: disable=no-self-argument,no-method-argument,no-init,inherit-non-class
 # pylint: disable=too-few-public-methods
@@ -139,11 +143,11 @@ class JSONDeSerializable(object):
                 return obj
             elif isinstance(obj, list):
                 return [_serialize(subobj) for subobj in obj]
-            elif isinstance(obj, collections.Sequence):
+            elif isinstance(obj, Sequence):
                 # default to tuple, otherwise Mapping could get
                 # unhashable list
                 return tuple(_serialize(subobj) for subobj in obj)
-            elif isinstance(obj, collections.Mapping):
+            elif isinstance(obj, Mapping):
                 return dict((_serialize(key), _serialize(value))
                             for key, value in six.iteritems(obj))
             else:

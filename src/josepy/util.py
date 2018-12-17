@@ -1,5 +1,8 @@
 """JOSE utilities."""
-import collections
+try:
+    from collections.abc import Hashable, Mapping  # pylint: disable=import-error
+except ImportError:
+    from collections import Hashable, Mapping
 
 import OpenSSL
 import six
@@ -135,7 +138,7 @@ class ComparableRSAKey(ComparableKey):  # pylint: disable=too-few-public-methods
             return hash((self.__class__, pub.n, pub.e))
 
 
-class ImmutableMap(collections.Mapping, collections.Hashable):  # type: ignore
+class ImmutableMap(Mapping, Hashable):  # type: ignore
     # pylint: disable=too-few-public-methods
     """Immutable key to value mapping with attribute access."""
 
@@ -181,7 +184,7 @@ class ImmutableMap(collections.Mapping, collections.Hashable):  # type: ignore
             for key, value in six.iteritems(self)))
 
 
-class frozendict(collections.Mapping, collections.Hashable):  # type: ignore
+class frozendict(Mapping, Hashable):  # type: ignore
     # pylint: disable=invalid-name,too-few-public-methods
     """Frozen dictionary."""
     __slots__ = ('_items', '_keys')
@@ -189,7 +192,7 @@ class frozendict(collections.Mapping, collections.Hashable):  # type: ignore
     def __init__(self, *args, **kwargs):
         if kwargs and not args:
             items = dict(kwargs)
-        elif len(args) == 1 and isinstance(args[0], collections.Mapping):
+        elif len(args) == 1 and isinstance(args[0], Mapping):
             items = args[0]
         else:
             raise TypeError()

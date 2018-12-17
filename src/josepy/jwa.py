@@ -4,7 +4,6 @@ https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
 
 """
 import abc
-import collections
 import logging
 
 import cryptography.exceptions
@@ -14,6 +13,11 @@ from cryptography.hazmat.primitives import hmac  # type: ignore
 from cryptography.hazmat.primitives.asymmetric import padding  # type: ignore
 
 from josepy import errors, interfaces, jwk
+
+try:
+    from collections.abc import Hashable  # pylint: disable=import-error
+except ImportError:
+    from collections import Hashable
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +29,7 @@ class JWA(interfaces.JSONDeSerializable):  # pylint: disable=abstract-method
     """JSON Web Algorithm."""
 
 
-class JWASignature(JWA, collections.Hashable):  # type: ignore
+class JWASignature(JWA, Hashable):  # type: ignore
     """Base class for JSON Web Signature Algorithms."""
     SIGNATURES = {}  # type: dict
 

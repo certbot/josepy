@@ -1,14 +1,14 @@
 language: python
 sudo: false
 cache: pip
+dist: xenial
 matrix:
   include:
     - python: "2.7"
     - python: "3.4"
     - python: "3.5"
     - python: "3.6"
-    - dist: xenial
-      python: "3.7"
+    - python: "3.7"
       sudo: true
 install:
   - pip install tox-travis codecov

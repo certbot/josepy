@@ -21,7 +21,6 @@ install_requires = [
 
 testing_requires = [
     'coverage>=4.0',
-    'pytest-isort',
     'pytest-cache>=1.0',
     'pytest-cov',
     'flake8',

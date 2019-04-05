@@ -1,7 +1,7 @@
 JOSE protocol implementation in Python using cryptography
 
-.. image:: https://travis-ci.org/certbot/josepy.svg?branch=master
-  :target: https://travis-ci.org/certbot/josepy
+.. image:: https://travis-ci.com/certbot/josepy.svg?branch=master
+  :target: https://travis-ci.com/certbot/josepy
 
 .. image:: https://codecov.io/gh/certbot/josepy/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/certbot/josepy

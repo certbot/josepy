@@ -12,7 +12,7 @@ matrix:
 install:
   - pip install tox-travis codecov
 script:
-  - tox -v
+  - unknown_command
 after_success:
   - codecov
 notifications:

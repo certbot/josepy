@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.2.0 (2019-06-28)
+------------------
+
+* Support for Python 2.6 and 3.3 has been removed.
+* Known incompatibilities with Python 3.8 have been resolved.
+
 1.1.0 (2018-04-13)
 ------------------
 

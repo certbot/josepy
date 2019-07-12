@@ -91,6 +91,52 @@ class ComparableRSAKeyTest(unittest.TestCase):
         self.assertTrue(isinstance(self.key.public_key(), ComparableRSAKey))
 
 
+class ComparableECKeyTest(unittest.TestCase):
+    """Tests for josepy.util.ComparableECKey."""
+
+    def setUp(self):
+        # test_utl.load_ec_private_key return ComparableECKey
+        self.p256_key = test_util.load_ec_private_key('ec_p256_key.pem')
+        self.p256_key_same = test_util.load_ec_private_key('ec_p256_key.pem')
+        self.p384_key = test_util.load_ec_private_key('ec_p384_key.pem')
+        self.p521_key = test_util.load_ec_private_key('ec_p521_key.pem')
+
+    def test_getattr_proxy(self):
+        self.assertEqual(256, self.p256_key.key_size)
+
+    def test_eq(self):
+        self.assertEqual(self.p256_key, self.p256_key_same)
+
+    def test_ne(self):
+        self.assertNotEqual(self.p256_key, self.p384_key)
+        self.assertNotEqual(self.p256_key, self.p521_key)
+
+    def test_ne_different_types(self):
+        self.assertNotEqual(self.p256_key, 5)
+
+    def test_ne_not_wrapped(self):
+        # pylint: disable=protected-access
+        self.assertNotEqual(self.p256_key, self.p256_key_same._wrapped)
+
+    def test_ne_no_serialization(self):
+        from josepy.util import ComparableECKey
+        self.assertNotEqual(ComparableECKey(5), ComparableECKey(5))
+
+    def test_hash(self):
+        self.assertTrue(isinstance(hash(self.p256_key), int))
+        self.assertEqual(hash(self.p256_key), hash(self.p256_key_same))
+        self.assertNotEqual(hash(self.p256_key), hash(self.p384_key))
+        self.assertNotEqual(hash(self.p256_key), hash(self.p521_key))
+
+    def test_repr(self):
+        self.assertTrue(repr(self.p256_key).startswith(
+            '<ComparableECKey(<cryptography.hazmat.'))
+
+    def test_public_key(self):
+        from josepy.util import ComparableECKey
+        self.assertTrue(isinstance(self.p256_key.public_key(), ComparableECKey))
+
+
 class ImmutableMapTest(unittest.TestCase):
     """Tests for josepy.util.ImmutableMap."""
 

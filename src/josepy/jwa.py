@@ -10,7 +10,7 @@ import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes  # type: ignore
 from cryptography.hazmat.primitives import hmac  # type: ignore
-from cryptography.hazmat.primitives.asymmetric import padding  # type: ignore
+from cryptography.hazmat.primitives.asymmetric import padding, ec  # type: ignore
 
 from josepy import errors, interfaces, jwk
 
@@ -75,7 +75,6 @@ class JWASignature(JWA, Hashable):  # type: ignore
 
 
 class _JWAHS(JWASignature):
-
     kty = jwk.JWKOct
 
     def __init__(self, name, hash_):
@@ -100,7 +99,6 @@ class _JWAHS(JWASignature):
 
 
 class _JWARSA(object):
-
     kty = jwk.JWKRSA
     padding = NotImplemented
     hash = NotImplemented
@@ -163,15 +161,51 @@ class _JWAPS(_JWARSA, JWASignature):
         self.hash = hash_()
 
 
-class _JWAES(JWASignature):  # pylint: disable=abstract-class-not-used
+class _JWAEC(JWASignature):
+    kty = jwk.JWKEC
 
-    # TODO: implement ES signatures
+    def __init__(self, name, hash_):
+        super(_JWAEC, self).__init__(name)
+        self.hash = hash_()
 
-    def sign(self, key, msg):  # pragma: no cover
-        raise NotImplementedError()
+    def sign(self, key, msg):
+        """Sign the ``msg`` using ``key``."""
+        # If cryptography library supports new style api (v1.4 and later)
+        new_api = hasattr(key, 'sign')
+        try:
+            if new_api:
+                return key.sign(msg, ec.ECDSA(self.hash))
+            signer = key.signer(ec.ECDSA(self.hash))
+        except AttributeError as error:
+            logger.debug(error, exc_info=True)
+            raise errors.Error('Public key cannot be used for signing')
+        except ValueError as error:  # digest too large
+            logger.debug(error, exc_info=True)
+            raise errors.Error(str(error))
+        signer.update(msg)
+        try:
+            return signer.finalize()
+        except ValueError as error:
+            logger.debug(error, exc_info=True)
+            raise errors.Error(str(error))
 
-    def verify(self, key, msg, sig):  # pragma: no cover
-        raise NotImplementedError()
+    def verify(self, key, msg, sig):
+        """Verify the ``msg` and ``sig`` using ``key``."""
+        # If cryptography library supports new style api (v1.4 and later)
+        new_api = hasattr(key, 'verify')
+        if not new_api:
+            verifier = key.verifier(sig, ec.ECDSA(self.hash))
+            verifier.update(msg)
+        try:
+            if new_api:
+                key.verify(sig, msg, ec.ECDSA(self.hash))
+            else:
+                verifier.verify()
+        except cryptography.exceptions.InvalidSignature as error:
+            logger.debug(error, exc_info=True)
+            return False
+        else:
+            return True
 
 
 #: HMAC using SHA-256
@@ -196,8 +230,8 @@ PS384 = JWASignature.register(_JWAPS('PS384', hashes.SHA384))
 PS512 = JWASignature.register(_JWAPS('PS512', hashes.SHA512))
 
 #: ECDSA using P-256 and SHA-256
-ES256 = JWASignature.register(_JWAES('ES256'))
+ES256 = JWASignature.register(_JWAEC('ES256', hashes.SHA256))
 #: ECDSA using P-384 and SHA-384
-ES384 = JWASignature.register(_JWAES('ES384'))
+ES384 = JWASignature.register(_JWAEC('ES384', hashes.SHA384))
 #: ECDSA using P-521 and SHA-512
-ES512 = JWASignature.register(_JWAES('ES512'))
+ES512 = JWASignature.register(_JWAEC('ES512', hashes.SHA512))

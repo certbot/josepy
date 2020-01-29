@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.3.0 (2020-01-28)
+------------------
+
+* Deprecated support for Python 3.4.
+* Officially add support for Python 3.8.
+
 1.2.0 (2019-06-28)
 ------------------
 

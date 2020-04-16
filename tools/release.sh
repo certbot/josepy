@@ -46,7 +46,7 @@ mv "dist.$version" "dist.$version.$(date +%s).bak" || true
 git tag --delete "$tag" || true
 
 tmpvenv=$(mktemp -d)
-virtualenv --no-site-packages -p python2 $tmpvenv
+python3 -m venv "$tmpvenv"
 . $tmpvenv/bin/activate
 # update setuptools/pip just like in other places in the repo
 pip install -U setuptools
@@ -101,10 +101,10 @@ mv dist "dist.$version/josepy"
 echo "Testing packages"
 cd "dist.$version"
 # start local PyPI
-python -m SimpleHTTPServer $PORT &
+python -m http.server "$PORT" &
 # cd .. is NOT done on purpose: we make sure that all subpackages are
 # installed from local PyPI rather than current directory (repo root)
-virtualenv --no-site-packages ../venv
+virtualenv ../venv
 . ../venv/bin/activate
 pip install -U setuptools
 pip install -U pip

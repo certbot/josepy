@@ -1,12 +1,20 @@
+<<<<<<< HEAD
 # Specifies Python package versions for testing.
 # To update:
 # python3 -m venv venv && source venv/bin/activate
 # python3 -m pip install -e .[dev,tests] && pip freeze
 # Examine the produced list and update invididual entries here.
+=======
+# Specifies Python package versions for development and testing.
+# To generate:
+# python3 -m venv venv3 && source venv3/bin/activate
+# python3 -m pip install -e .[dev,tests] && pip freeze
+>>>>>>> 59469f554a54f6c88e9800003035bce5d589c29c
 # If anything changes about this file's contents or location, we may
 # need to submit a PR to pyca/cryptography, since they rely on it.
 
 apipkg==1.5
+<<<<<<< HEAD
 atomicwrites==1.4.0
 attrs==19.3.0
 cffi==1.14.0
@@ -22,12 +30,23 @@ funcsigs==1.0.2
 functools32==3.2.3.post2
 importlib-metadata==1.6.0
 ipaddress==1.0.23
+=======
+attrs==19.3.0
+cffi==1.14.0
+coverage==5.1
+cryptography==2.9.2
+execnet==1.7.1
+flake8==3.7.9
+>>>>>>> 59469f554a54f6c88e9800003035bce5d589c29c
 mccabe==0.6.1
 mock==1.3.0
 more-itertools==5.0.0
 packaging==20.3
+<<<<<<< HEAD
 pathlib2==2.3.5
 pbr==5.4.5
+=======
+>>>>>>> 59469f554a54f6c88e9800003035bce5d589c29c
 pluggy==0.13.1
 py==1.8.1
 pycodestyle==2.5.0
@@ -39,8 +58,13 @@ pytest==4.6.10
 pytest-cache==1.0
 pytest-cov==2.8.1
 pytest-flake8==1.0.5
+<<<<<<< HEAD
 scandir==1.10.0
 six==1.14.0
 typing==3.7.4.1
 wcwidth==0.1.9
 zipp==1.2.0
+=======
+six==1.14.0
+wcwidth==0.1.9
+>>>>>>> 59469f554a54f6c88e9800003035bce5d589c29c

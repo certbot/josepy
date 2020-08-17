@@ -26,7 +26,7 @@ Originally developed as part of the ACME_ protocol implementation.
 
 """
 import sys
-import warning
+import warnings
 
 # flake8: noqa
 from josepy.b64 import (

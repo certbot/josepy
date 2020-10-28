@@ -2,7 +2,6 @@ import io
 import sys
 
 from setuptools import find_packages, setup
-from setuptools.command.test import test as TestCommand
 
 version = '1.5.0.dev0'
 
@@ -48,21 +47,6 @@ with io.open('README.rst', encoding='UTF-8') as f:
     long_description = f.read()
 
 
-class PyTest(TestCommand):
-    user_options = []
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = ''
-
-    def run_tests(self):
-        import shlex
-        # import here, cause outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(shlex.split(self.pytest_args))
-        sys.exit(errno)
-
-
 setup(
     name='josepy',
     version=version,
@@ -102,10 +86,5 @@ setup(
         'console_scripts': [
             'jws = josepy.jws:CLI.run',
         ],
-    },
-    tests_require=testing_requires,
-    test_suite='josepy',
-    cmdclass={
-        'test': PyTest,
     },
 )

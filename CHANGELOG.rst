@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.5.0 (2020-11-03)
+------------------
+
+* Added support for Python 3.9.
+* Dropped support for Python 3.5.
+* Stopped supporting running tests with ``python setup.py test`` which is
+  deprecated in favor of ``python -m pytest``.
+
 1.4.0 (2020-08-17)
 ------------------
 

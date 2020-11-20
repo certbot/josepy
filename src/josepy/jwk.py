@@ -9,8 +9,9 @@ import six
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes  # type: ignore
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ec  # type: ignore
+from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.asymmetric.ec import EllipticCurvePrivateKey, EllipticCurvePublicNumbers
 
 from josepy import errors, json_util, util
 
@@ -121,27 +122,44 @@ class JWK(json_util.TypedJSONObjectWithFields):
 
 
 @JWK.register
-class JWKES(JWK):  # pragma: no cover
-    # pylint: disable=abstract-class-not-used
+class JWKES(JWK):
     """ES JWK.
 
-    .. warning:: This is not yet implemented!
-
+    :ivar: key: :class: `~cryptography.hazmat.primitives.asymmetric.rsa.EllipticCurvePrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.es.EllipticPublicKey` wrapped
+        in :class:`~josepy.util.ComparableKey`
     """
     typ = 'ES'
+    __slots__ = ('crv'),
     cryptography_key_types = (
         ec.EllipticCurvePublicKey, ec.EllipticCurvePrivateKey)
-    required = ('crv', JWK.type_field_name, 'x', 'y')
+    required = ('crv', JWK.type_field_name)
+
+    # pylint: disable=no-call-super
+    def __init__(self, **kwargs):
+        if 'crv' in kwargs and not isinstance(
+                kwargs['crv'], util.ComparableKey):
+            kwargs['crv'] = util.ComparableKey(kwargs['crv'])
+        # self.x = kwargs.pop('x', None)
+        # self.y = kwargs.pop('y', None)
+        super(JWKES, self).__init__(**kwargs)
 
     def fields_to_partial_json(self):
-        raise NotImplementedError()
+        # type: () -> dict
+        return {
+            'crv': self.crv,
+            'x': 0,
+            'y': 0,
+        }
 
     @classmethod
     def fields_from_json(cls, jobj):
-        raise NotImplementedError()
+        return default_backend().load_elliptic_curve_public_bytes(
+            jobj['crv'], (jobj['x'], jobj['y'])
+        )
 
     def public_key(self):
-        raise NotImplementedError()
+        return EllipticCurvePublicNumbers(x=0, y=0, curve=self.crv).public_key()
 
 
 @JWK.register
@@ -223,7 +241,7 @@ class JWKRSA(JWK):
         else:  # private key
             d = cls._decode_param(jobj['d'])
             if ('p' in jobj or 'q' in jobj or 'dp' in jobj or
-                    'dq' in jobj or 'qi' in jobj or 'oth' in jobj):
+                    'public_keydq' in jobj or 'qi' in jobj or 'oth' in jobj):
                 # "If the producer includes any of the other private
                 # key parameters, then all of the others MUST be
                 # present, with the exception of "oth", which MUST

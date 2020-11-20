@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.6.0 (Master)
+--------------
+
+* Added support for ecdsa private keys.
+
 1.5.0 (2020-11-03)
 ------------------
 

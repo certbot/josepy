@@ -13,3 +13,9 @@ and for the CSR:
 and for the certificate:
 
   openssl req -key rsa2047_key.pem -new -subj '/CN=example.com' -x509 -outform DER > cert.der
+
+and for the elliptic curve private keys, this command was used:
+
+  for curve in "prime256v1" "secp384r1" "secp521r1" do
+    openssl ecparam -genkey -name ${curve} -noout -out ${curve}_pair.pem
+  done

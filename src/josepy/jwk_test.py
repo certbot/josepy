@@ -7,6 +7,9 @@ from josepy import errors, json_util, test_util, util
 DSA_PEM = test_util.load_vector('dsa512_key.pem')
 RSA256_KEY = test_util.load_rsa_private_key('rsa256_key.pem')
 RSA512_KEY = test_util.load_rsa_private_key('rsa512_key.pem')
+SECP256R1_KEY = test_util.load_pyopenssl_private_key('secp256r1_key.pem')
+SECP384R1_KEY = test_util.load_pyopenssl_private_key('secp384r1_key.pem')
+SECP521R1_KEY = test_util.load_pyopenssl_private_key('secp521r1_key.pem')
 
 
 class JWKTest(unittest.TestCase):
@@ -31,6 +34,19 @@ class JWKTestBaseMixin(object):
 
     def test_thumbprint_public(self):
         self.assertEqual(self.thumbprint, self.jwk.public_key().thumbprint())
+
+
+class JWKESTest(unittest.TestCase, JWKTestBaseMixin):
+    """Tests for josepy.jwk.JWKEs."""
+
+    thumbprint = (b"\xf3\xe7\xbe\xa8`\xd2\xdap\xe9}\x9c\xce>"
+                  b"\xd0\xfcI\xbe\xcd\x92'\xd4o\x0e\xf41\xea"
+                  b"\x8e(\x8a\xb2i\x1c")
+
+    def setUp(self):
+        from josepy.jwk import JWKES
+        self.jwk = JWKES(crv="secp256r1")
+        self.jobj = {'crv': 'secp256r1'}
 
 
 class JWKOctTest(unittest.TestCase, JWKTestBaseMixin):

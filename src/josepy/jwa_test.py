@@ -8,6 +8,9 @@ from josepy import errors, test_util
 RSA256_KEY = test_util.load_rsa_private_key('rsa256_key.pem')
 RSA512_KEY = test_util.load_rsa_private_key('rsa512_key.pem')
 RSA1024_KEY = test_util.load_rsa_private_key('rsa1024_key.pem')
+SECP256R1_KEY = test_util.load_pyopenssl_private_key('secp256r1_key.pem')
+SECP384R1_KEY = test_util.load_pyopenssl_private_key('secp384r1_key.pem')
+SECP521R1_KEY = test_util.load_pyopenssl_private_key('secp521r1_key.pem')
 
 
 class JWASignatureTest(unittest.TestCase):

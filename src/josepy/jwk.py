@@ -133,7 +133,7 @@ class JWKES(JWK):
     __slots__ = ('crv'),
     cryptography_key_types = (
         ec.EllipticCurvePublicKey, ec.EllipticCurvePrivateKey)
-    required = ('crv', JWK.type_field_name)
+    required = ('crv', JWK.type_field_name, 'x', 'y', 'd')
 
     # pylint: disable=no-call-super
     def __init__(self, **kwargs):
@@ -145,17 +145,19 @@ class JWKES(JWK):
         super(JWKES, self).__init__(**kwargs)
 
     def fields_to_partial_json(self):
-        # type: () -> dict
         return {
             'crv': self.crv,
             'x': 0,
             'y': 0,
+            'd': 0,
         }
 
     @classmethod
     def fields_from_json(cls, jobj):
+        # https://tools.ietf.org/html/rfc7518#page-15
+
         return default_backend().load_elliptic_curve_public_bytes(
-            jobj['crv'], (jobj['x'], jobj['y'])
+            jobj['crv'], (jobj['x'], jobj['y']), jobj['d']
         )
 
     def public_key(self):

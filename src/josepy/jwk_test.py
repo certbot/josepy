@@ -45,7 +45,9 @@ class JWKESTest(unittest.TestCase, JWKTestBaseMixin):
 
     def setUp(self):
         from josepy.jwk import JWKES
-        self.jwk = JWKES(crv="secp256r1")
+        # https://tools.ietf.org/html/rfc7518#page-15
+        # dictates that it must be P-256
+        self.jwk = JWKES(crv="P-256")
         self.jobj = {'crv': 'secp256r1'}
 
 

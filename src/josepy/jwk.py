@@ -342,18 +342,13 @@ class JWKEC(JWK):
         elif isinstance(self.key._wrapped, ec.EllipticCurvePrivateKey):
             private = self.key.private_numbers()
             public = self.key.public_key().public_numbers()
-            params.update({
-                'd': private.private_value,
-            })
+            params['d'] = private.private_value
         else:
             raise errors.SerializationError(
                 'Supplied key is neither of type EllipticCurvePublicKey nor EllipticCurvePrivateKey')
-        params.update({
-            'x': public.x,
-            'y': public.y,
-        })
-        params = dict((key, self._encode_param(value))
-                      for key, value in six.iteritems(params))
+        params['x'] = public.x
+        params['y'] = public.y
+        params = {key: self._encode_param(value) for key, value in six.iteritems(params)}
         params['crv'] = self._curve_name_to_crv(public.curve.name)
         return params
 

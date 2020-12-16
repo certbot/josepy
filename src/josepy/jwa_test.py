@@ -72,8 +72,7 @@ class JWARSTest(unittest.TestCase):
 
     def test_sign_no_private_part(self):
         from josepy.jwa import RS256
-        self.assertRaises(
-            errors.Error, RS256.sign, RSA512_KEY.public_key(), b'foo')
+        self.assertRaises(errors.Error, RS256.sign, RSA512_KEY.public_key(), b'foo')
 
     def test_sign_key_too_small(self):
         from josepy.jwa import RS256

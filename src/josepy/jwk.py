@@ -225,7 +225,7 @@ class JWKRSA(JWK):
 
             key = rsa.RSAPrivateNumbers(
                 p, q, d, dp, dq, qi, public_numbers).private_key(
-                default_backend())
+                    default_backend())
 
         return cls(key=key)
 

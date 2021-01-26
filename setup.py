@@ -2,7 +2,7 @@ import io
 
 from setuptools import find_packages, setup
 
-version = '1.6.0'
+version = '1.7.0.dev0'
 
 # Please update tox.ini when modifying dependency version requirements
 install_requires = [

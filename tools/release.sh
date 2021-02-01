@@ -13,7 +13,7 @@ if [ "`dirname $0`" != "tools" ] ; then
 fi
 
 if [ "$1" != "--changelog-ok" ]; then
-    # turn of set -x for saner output
+    # turn off set -x for saner output
     set +x
     echo "Make sure the changelog includes the exact text you want for the"
     echo "release and run the script again with --changelog-ok."

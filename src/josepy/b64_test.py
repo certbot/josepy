@@ -14,8 +14,8 @@ B64_PADDING_EXAMPLES = {
 
 
 B64_URL_UNSAFE_EXAMPLES = {
-    six.int2byte(251) + six.int2byte(239): b'--8',
-    six.int2byte(255) * 2: b'__8',
+    bytes((251, 239)): b'--8',
+    bytes((255,)) * 2: b'__8',
 }
 
 

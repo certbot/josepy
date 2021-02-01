@@ -14,7 +14,6 @@ install_requires = [
     # For pkg_resources. >=1.0 so pip resolves it to a version cryptography
     # will tolerate; see #2599:
     'setuptools>=1.0',
-    'six>=1.9.0',  # needed for python_2_unicode_compatible
 ]
 
 testing_requires = [

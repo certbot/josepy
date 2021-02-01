@@ -246,7 +246,7 @@ class DeEncodersTest(unittest.TestCase):
     def test_encode_b64jose(self):
         from josepy.json_util import encode_b64jose
         encoded = encode_b64jose(b'x')
-        self.assertTrue(isinstance(encoded, six.string_types))
+        self.assertTrue(isinstance(encoded, str))
         self.assertEqual(u'eA', encoded)
 
     def test_decode_b64jose(self):
@@ -278,7 +278,7 @@ class DeEncodersTest(unittest.TestCase):
         from josepy.json_util import encode_hex16
         encoded = encode_hex16(b'foo')
         self.assertEqual(u'666f6f', encoded)
-        self.assertTrue(isinstance(encoded, six.string_types))
+        self.assertTrue(isinstance(encoded, str))
 
     def test_decode_hex16(self):
         from josepy.json_util import decode_hex16

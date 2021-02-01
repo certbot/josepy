@@ -46,7 +46,7 @@ def b64decode(data):
     :raises ValueError: if input is unicode with non-ASCII characters
 
     """
-    if isinstance(data, six.string_types):
+    if isinstance(data, str):
         try:
             data = data.encode('ascii')
         except UnicodeEncodeError:

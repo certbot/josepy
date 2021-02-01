@@ -139,7 +139,7 @@ class JSONDeSerializable(object):
         def _serialize(obj):
             if isinstance(obj, JSONDeSerializable):
                 return _serialize(obj.to_partial_json())
-            if isinstance(obj, six.string_types):  # strings are Sequence
+            if isinstance(obj, str):  # strings are Sequence
                 return obj
             elif isinstance(obj, list):
                 return [_serialize(subobj) for subobj in obj]

@@ -252,7 +252,7 @@ class DeEncodersTest(unittest.TestCase):
     def test_decode_b64jose(self):
         from josepy.json_util import decode_b64jose
         decoded = decode_b64jose(u'eA')
-        self.assertTrue(isinstance(decoded, six.binary_type))
+        self.assertTrue(isinstance(decoded, bytes))
         self.assertEqual(b'x', decoded)
 
     def test_decode_b64jose_padding_error(self):
@@ -284,7 +284,7 @@ class DeEncodersTest(unittest.TestCase):
         from josepy.json_util import decode_hex16
         decoded = decode_hex16(u'666f6f')
         self.assertEqual(b'foo', decoded)
-        self.assertTrue(isinstance(decoded, six.binary_type))
+        self.assertTrue(isinstance(decoded, bytes))
 
     def test_decode_hex16_minimum_size(self):
         from josepy.json_util import decode_hex16

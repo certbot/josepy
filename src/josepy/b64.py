@@ -27,8 +27,8 @@ def b64encode(data):
     :raises TypeError: if ``data`` is of incorrect type
 
     """
-    if not isinstance(data, six.binary_type):
-        raise TypeError('argument should be {0}'.format(six.binary_type))
+    if not isinstance(data, bytes):
+        raise TypeError('argument should be bytes')
     return base64.urlsafe_b64encode(data).rstrip(b'=')
 
 
@@ -52,7 +52,7 @@ def b64decode(data):
         except UnicodeEncodeError:
             raise ValueError(
                 'unicode argument should contain only ASCII characters')
-    elif not isinstance(data, six.binary_type):
+    elif not isinstance(data, bytes):
         raise TypeError('argument should be a str or unicode')
 
     return base64.urlsafe_b64decode(data + b'=' * (4 - (len(data) % 4)))

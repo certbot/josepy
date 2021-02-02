@@ -1,6 +1,5 @@
 """Tests for josepy.jwa."""
 import unittest
-
 from unittest import mock
 
 from josepy import errors, test_util

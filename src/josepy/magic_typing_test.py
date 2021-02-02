@@ -1,7 +1,6 @@
 """Tests for josepy.magic_typing."""
 import sys
 import unittest
-
 from unittest import mock
 
 

@@ -1,8 +1,8 @@
 """Tests for josepy.json_util."""
 import itertools
 import unittest
-
 from unittest import mock
+
 import six
 
 from josepy import errors, interfaces, test_util, util

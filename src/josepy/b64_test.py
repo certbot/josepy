@@ -1,7 +1,6 @@
 """Tests for josepy.b64."""
 import unittest
 
-import six
 
 # https://en.wikipedia.org/wiki/Base64#Examples
 B64_PADDING_EXAMPLES = {

@@ -2,7 +2,6 @@
 import functools
 import unittest
 
-import six
 
 from josepy import test_util
 

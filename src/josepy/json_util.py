@@ -11,7 +11,6 @@ import binascii
 import logging
 
 import OpenSSL
-import six
 
 from josepy import b64, errors, interfaces, util
 

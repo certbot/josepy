@@ -5,7 +5,6 @@ import json
 import logging
 
 import cryptography.exceptions
-import six
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes  # type: ignore
 from cryptography.hazmat.primitives import serialization

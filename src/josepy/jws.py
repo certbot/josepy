@@ -4,7 +4,6 @@ import base64
 import sys
 
 import OpenSSL
-import six
 
 from josepy import b64, errors, json_util, jwa, jwk, util
 

@@ -12,7 +12,6 @@
 """
 import base64
 
-import six
 
 
 def b64encode(data):

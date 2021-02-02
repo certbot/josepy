@@ -2,7 +2,6 @@
 import abc
 import json
 
-import six
 
 from josepy import errors, util
 

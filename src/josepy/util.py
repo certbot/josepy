@@ -5,7 +5,6 @@ except ImportError:
     from collections import Hashable, Mapping
 
 import OpenSSL
-import six
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 

@@ -2,7 +2,7 @@
 import base64
 import unittest
 
-import mock
+from unittest import mock
 import OpenSSL
 
 from josepy import errors, json_util, jwa, jwk, test_util

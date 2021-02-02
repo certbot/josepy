@@ -2,7 +2,7 @@
 import itertools
 import unittest
 
-import mock
+from unittest import mock
 import six
 
 from josepy import errors, interfaces, test_util, util

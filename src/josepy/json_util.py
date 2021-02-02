@@ -106,7 +106,7 @@ class Field(object):
         elif isinstance(value, dict):
             return util.frozendict(
                 dict((cls.default_decoder(key), cls.default_decoder(value))
-                     for key, value in six.iteritems(value)))
+                     for key, value in value.items()))
         else:  # integer or string
             return value
 
@@ -164,7 +164,7 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
         for base in bases:
             fields.update(getattr(base, '_fields', {}))
         # Do not reorder, this class might override fields from base classes!
-        for key, value in tuple(six.iteritems(dikt)):
+        for key, value in tuple(dikt.items()):
             # not six.iterkeys() (in-place edit!)
             if isinstance(value, Field):
                 fields[key] = dikt.pop(key)
@@ -210,7 +210,7 @@ class JSONObjectWithFields(util.ImmutableMap, interfaces.JSONDeSerializable):
     def _defaults(cls):
         """Get default fields values."""
         return dict([(slot, field.default) for slot, field
-                     in six.iteritems(cls._fields)])
+                     in cls._fields.items()])
 
     def __init__(self, **kwargs):
         # pylint: disable=star-args
@@ -237,7 +237,7 @@ class JSONObjectWithFields(util.ImmutableMap, interfaces.JSONDeSerializable):
         """Serialize fields to JSON."""
         jobj = {}
         omitted = set()
-        for slot, field in six.iteritems(self._fields):
+        for slot, field in self._fields.items():
             value = getattr(self, slot)
 
             if field.omit(value):
@@ -257,7 +257,7 @@ class JSONObjectWithFields(util.ImmutableMap, interfaces.JSONDeSerializable):
     @classmethod
     def _check_required(cls, jobj):
         missing = set()
-        for _, field in six.iteritems(cls._fields):
+        for _, field in cls._fields.items():
             if not field.omitempty and field.json_name not in jobj:
                 missing.add(field.json_name)
 
@@ -271,7 +271,7 @@ class JSONObjectWithFields(util.ImmutableMap, interfaces.JSONDeSerializable):
         """Deserialize fields from JSON."""
         cls._check_required(jobj)
         fields = {}
-        for slot, field in six.iteritems(cls._fields):
+        for slot, field in cls._fields.items():
             if field.json_name not in jobj and field.omitempty:
                 fields[slot] = field.default
             else:

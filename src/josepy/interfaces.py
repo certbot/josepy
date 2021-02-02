@@ -149,7 +149,7 @@ class JSONDeSerializable(object):
                 return tuple(_serialize(subobj) for subobj in obj)
             elif isinstance(obj, Mapping):
                 return dict((_serialize(key), _serialize(value))
-                            for key, value in six.iteritems(obj))
+                            for key, value in obj.items())
             else:
                 return obj
 

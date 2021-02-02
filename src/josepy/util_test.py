@@ -173,7 +173,7 @@ class frozendictTest(unittest.TestCase):  # pylint: disable=invalid-name
     def test_init_other_raises_type_error(self):
         from josepy.util import frozendict
         # specifically fail for generators...
-        self.assertRaises(TypeError, frozendict, six.iteritems({'a': 'b'}))
+        self.assertRaises(TypeError, frozendict, {'a': 'b'}.items())
 
     def test_len(self):
         self.assertEqual(2, len(self.fdict))

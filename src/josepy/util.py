@@ -181,7 +181,7 @@ class ImmutableMap(Mapping, Hashable):  # type: ignore
     def __repr__(self):
         return '{0}({1})'.format(self.__class__.__name__, ', '.join(
             '{0}={1!r}'.format(key, value)
-            for key, value in six.iteritems(self)))
+            for key, value in self.items()))
 
 
 class frozendict(Mapping, Hashable):  # type: ignore

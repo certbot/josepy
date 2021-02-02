@@ -31,11 +31,11 @@ class B64EncodeTest(unittest.TestCase):
         self.assertEqual(self._call(b''), b'')
 
     def test_unsafe_url(self):
-        for text, b64 in six.iteritems(B64_URL_UNSAFE_EXAMPLES):
+        for text, b64 in B64_URL_UNSAFE_EXAMPLES.items():
             self.assertEqual(self._call(text), b64)
 
     def test_different_paddings(self):
-        for text, (b64, _) in six.iteritems(B64_PADDING_EXAMPLES):
+        for text, (b64, _) in B64_PADDING_EXAMPLES.items():
             self.assertEqual(self._call(text), b64)
 
     def test_unicode_fails_with_type_error(self):
@@ -51,15 +51,15 @@ class B64DecodeTest(unittest.TestCase):
         return b64decode(data)
 
     def test_unsafe_url(self):
-        for text, b64 in six.iteritems(B64_URL_UNSAFE_EXAMPLES):
+        for text, b64 in B64_URL_UNSAFE_EXAMPLES.items():
             self.assertEqual(self._call(b64), text)
 
     def test_input_without_padding(self):
-        for text, (b64, _) in six.iteritems(B64_PADDING_EXAMPLES):
+        for text, (b64, _) in B64_PADDING_EXAMPLES.items():
             self.assertEqual(self._call(b64), text)
 
     def test_input_with_padding(self):
-        for text, (b64, pad) in six.iteritems(B64_PADDING_EXAMPLES):
+        for text, (b64, pad) in B64_PADDING_EXAMPLES.items():
             self.assertEqual(self._call(b64 + pad), text)
 
     def test_unicode_with_ascii(self):

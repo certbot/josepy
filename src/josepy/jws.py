@@ -76,7 +76,7 @@ class Header(json_util.JSONObjectWithFields):
     def not_omitted(self):
         """Fields that would not be omitted in the JSON object."""
         return dict((name, getattr(self, name))
-                    for name, field in six.iteritems(self._fields)
+                    for name, field in self._fields.items()
                     if not field.omit(getattr(self, name)))
 
     def __add__(self, other):

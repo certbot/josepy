@@ -5,6 +5,7 @@ Changelog
 ------------------
 
 * Dropped support for Python 2.7.
+* Removed dependency on six.
 
 1.6.0 (2021-01-26)
 ------------------

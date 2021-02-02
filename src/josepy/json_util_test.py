@@ -90,8 +90,7 @@ class JSONObjectWithFieldsMetaTest(unittest.TestCase):
         # pylint: disable=invalid-name,missing-docstring,too-few-public-methods
         # pylint: disable=blacklisted-name
 
-        @six.add_metaclass(JSONObjectWithFieldsMeta)
-        class A(object):
+        class A(object, metaclass=JSONObjectWithFieldsMeta):
             __slots__ = ('bar',)
             baz = self.field
 

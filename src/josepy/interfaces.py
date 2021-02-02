@@ -15,8 +15,7 @@ except ImportError:
 # pylint: disable=too-few-public-methods
 
 
-@six.add_metaclass(abc.ABCMeta)
-class JSONDeSerializable(object):
+class JSONDeSerializable(object, metaclass=abc.ABCMeta):
     # pylint: disable=too-few-public-methods
     """Interface for (de)serializable JSON objects.
 

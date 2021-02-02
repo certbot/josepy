@@ -13,7 +13,6 @@
 import base64
 
 
-
 def b64encode(data):
     """JOSE Base64 encode.
 

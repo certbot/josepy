@@ -114,7 +114,7 @@ class JWK(json_util.TypedJSONObjectWithFields):
                 key, cls.cryptography_key_types):
             raise errors.Error('Unable to deserialize {0} into {1}'.format(
                 key.__class__, cls.__class__))
-        for jwk_cls in six.itervalues(cls.TYPES):
+        for jwk_cls in cls.TYPES.values():
             if isinstance(key, jwk_cls.cryptography_key_types):
                 return jwk_cls(key=key)
         raise errors.Error('Unsupported algorithm: {0}'.format(key.__class__))

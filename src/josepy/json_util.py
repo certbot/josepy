@@ -435,7 +435,7 @@ class TypedJSONObjectWithFields(JSONObjectWithFields):
     @classmethod
     def get_type_cls(cls, jobj):
         """Get the registered class for ``jobj``."""
-        if cls in six.itervalues(cls.TYPES):
+        if cls in cls.TYPES.values():
             if cls.type_field_name not in jobj:
                 raise errors.DeserializationError(
                     "Missing type field ({0})".format(cls.type_field_name))

@@ -313,10 +313,9 @@ def decode_b64jose(data, size=None, minimum=False):
     :rtype: bytes
 
     """
-    error_cls = TypeError if six.PY2 else binascii.Error
     try:
         decoded = b64.b64decode(data.encode())
-    except error_cls as error:
+    except binascii.Error as error:
         raise errors.DeserializationError(error)
 
     if size is not None and ((not minimum and len(decoded) != size) or
@@ -352,10 +351,9 @@ def decode_hex16(value, size=None, minimum=False):
     if size is not None and ((not minimum and len(value) != size * 2) or
                              (minimum and len(value) < size * 2)):
         raise errors.DeserializationError()
-    error_cls = TypeError if six.PY2 else binascii.Error
     try:
         return binascii.unhexlify(value)
-    except error_cls as error:
+    except binascii.Error as error:
         raise errors.DeserializationError(error)
 
 

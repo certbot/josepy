@@ -164,14 +164,15 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
         for base in bases:
             fields.update(getattr(base, '_fields', {}))
         # Do not reorder, this class might override fields from base classes!
+        # We create a tuple based on dikt.items() here because the loop
+        # modifies dikt.
         for key, value in tuple(dikt.items()):
-            # not six.iterkeys() (in-place edit!)
             if isinstance(value, Field):
                 fields[key] = dikt.pop(key)
 
         dikt['_orig_slots'] = dikt.get('__slots__', ())
         dikt['__slots__'] = tuple(
-            list(dikt['_orig_slots']) + list(six.iterkeys(fields)))
+            list(dikt['_orig_slots']) + list(fields.keys()))
         dikt['_fields'] = fields
 
         return abc.ABCMeta.__new__(mcs, name, bases, dikt)

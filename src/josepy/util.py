@@ -199,7 +199,7 @@ class frozendict(Mapping, Hashable):  # type: ignore
         # TODO: support generators/iterators
 
         object.__setattr__(self, '_items', items)
-        object.__setattr__(self, '_keys', tuple(sorted(six.iterkeys(items))))
+        object.__setattr__(self, '_keys', tuple(sorted(items.keys())))
 
     def __getitem__(self, key):
         return self._items[key]

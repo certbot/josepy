@@ -357,9 +357,9 @@ class CLI(object):
                        protect=set(args.protect))
 
         if args.compact:
-            six.print_(sig.to_compact().decode('utf-8'))
+            print(sig.to_compact().decode('utf-8'))
         else:  # JSON
-            six.print_(sig.json_dumps_pretty())
+            print(sig.json_dumps_pretty())
 
     @classmethod
     def verify(cls, args):
@@ -370,7 +370,7 @@ class CLI(object):
             try:
                 sig = JWS.json_loads(sys.stdin.read())
             except errors.Error as error:
-                six.print_(error)
+                print(error)
                 return -1
 
         if args.key is not None:

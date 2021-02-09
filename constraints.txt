@@ -40,6 +40,7 @@ pytest-cache==1.0
 pytest-cov==2.8.1
 pytest-flake8==1.0.5
 scandir==1.10.0
+six==1.14.0
 typing==3.7.4.1
 wcwidth==0.1.9
 zipp==1.2.0

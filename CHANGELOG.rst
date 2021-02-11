@@ -1,11 +1,15 @@
 Changelog
 =========
 
-1.7.0 (master)
+1.8.0 (master)
+-----------------
+* Removed external mock dependency.
+
+1.7.0 (2021-02-11)
 ------------------
 
 * Dropped support for Python 2.7.
-* Removed external mock dependency.
+* Added support for EC keys.
 
 1.6.0 (2021-01-26)
 ------------------

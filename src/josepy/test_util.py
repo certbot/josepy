@@ -11,6 +11,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 
 from josepy import ComparableRSAKey, ComparableX509
+from josepy.util import ComparableECKey
 
 
 def vector_path(*names):
@@ -65,6 +66,14 @@ def load_rsa_private_key(*names):
     loader = _guess_loader(names[-1], serialization.load_pem_private_key,
                            serialization.load_der_private_key)
     return ComparableRSAKey(loader(
+        load_vector(*names), password=None, backend=default_backend()))
+
+
+def load_ec_private_key(*names):
+    """Load EC private key."""
+    loader = _guess_loader(names[-1], serialization.load_pem_private_key,
+                           serialization.load_der_private_key)
+    return ComparableECKey(loader(
         load_vector(*names), password=None, backend=default_backend()))
 
 

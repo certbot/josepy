@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.7.0 (master)
+1.7.0 (2021-02-11)
 ------------------
 
 * Dropped support for Python 2.7.

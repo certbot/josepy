@@ -154,12 +154,6 @@ class JWAECTest(unittest.TestCase):
         signature = ES384.sign(EC_P384_KEY, message)
         self.assertTrue(ES384.verify(EC_P384_KEY.public_key(), message, signature))
 
-    def test_es512_sign_and_verify(self):
-        from josepy.jwa import ES512
-        message = b'foo'
-        signature = ES512.sign(EC_P521_KEY, message)
-        self.assertTrue(ES512.verify(EC_P521_KEY.public_key(), message, signature))
-
     def test_verify_with_wrong_jwa(self):
         from josepy.jwa import ES256, ES384
         message = b'foo'

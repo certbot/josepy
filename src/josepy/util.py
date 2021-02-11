@@ -18,8 +18,8 @@ class abstractclassmethod(classmethod):
     classmethod. This is implemented as :class:`abc.abstractclassmethod`
     in the standard Python library starting with version 3.2.
 
-    This particular implementation, allegedly based on Python 3.3 source
-    code, is stolen from
+    This implementation is from a StackOverflow answer that was derived from
+    the implementation in the Python 3.3 abc library.
     http://stackoverflow.com/questions/11217878/python-2-7-combine-abc-abstractmethod-and-classmethod.
 
     """

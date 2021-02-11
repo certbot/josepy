@@ -1,15 +1,24 @@
 #!/bin/bash -xe
 # Release dev packages to PyPI
 
-Usage() {
+PrintUsageAndExit() {
     echo Usage:
-    echo "$0 [ --production ]"
+    echo "$0 --changelog-ok <release version> <next version>"
     exit 1
 }
 
 if [ "`dirname $0`" != "tools" ] ; then
     echo Please run this script from the repo root
     exit 1
+fi
+
+if [ "$1" != "--changelog-ok" ]; then
+    # turn off set -x for saner output
+    set +x
+    echo "Make sure the changelog includes the exact text you want for the"
+    echo "release and run the script again with --changelog-ok."
+    echo
+    PrintUsageAndExit
 fi
 
 CheckVersion() {
@@ -20,19 +29,12 @@ CheckVersion() {
     fi
 }
 
-if [ "$1" = "--production" ] ; then
-    version="$2"
-    CheckVersion Version "$version"
-    echo Releasing production version "$version"...
-    nextversion="$3"
-    CheckVersion "Next version" "$nextversion"
-    RELEASE_BRANCH="candidate-$version"
-else
-    version=`grep "__version__" certbot/__init__.py | cut -d\' -f2 | sed s/\.dev0//`
-    version="$version.dev$(date +%Y%m%d)1"
-    RELEASE_BRANCH="dev-release"
-    echo Releasing developer version "$version"...
-fi
+version="$2"
+CheckVersion Version "$version"
+echo Releasing production version "$version"...
+nextversion="$3"
+CheckVersion "Next version" "$nextversion"
+RELEASE_BRANCH="candidate-$version"
 
 RELEASE_GPG_KEY=${RELEASE_GPG_KEY:-A2CFB51FA275A7286234E7B24D17C995CD9775F2}
 # Needed to fix problems with git signatures and pinentry
@@ -46,7 +48,7 @@ mv "dist.$version" "dist.$version.$(date +%s).bak" || true
 git tag --delete "$tag" || true
 
 tmpvenv=$(mktemp -d)
-virtualenv --no-site-packages -p python2 $tmpvenv
+python3 -m venv "$tmpvenv"
 . $tmpvenv/bin/activate
 # update setuptools/pip just like in other places in the repo
 pip install -U setuptools
@@ -101,10 +103,10 @@ mv dist "dist.$version/josepy"
 echo "Testing packages"
 cd "dist.$version"
 # start local PyPI
-python -m SimpleHTTPServer $PORT &
+python -m http.server "$PORT" &
 # cd .. is NOT done on purpose: we make sure that all subpackages are
 # installed from local PyPI rather than current directory (repo root)
-virtualenv --no-site-packages ../venv
+virtualenv ../venv
 . ../venv/bin/activate
 pip install -U setuptools
 pip install -U pip

@@ -1,10 +1,8 @@
 import io
-import sys
 
 from setuptools import find_packages, setup
-from setuptools.command.test import test as TestCommand
 
-version = '1.3.0.dev0'
+version = '1.7.0.dev0'
 
 # Please update tox.ini when modifying dependency version requirements
 install_requires = [
@@ -36,7 +34,6 @@ dev_extras = [
 
 dev3_extras = [
     'mypy',
-    'typing',  # for python3.4
 ]
 
 docs_extras = [
@@ -49,21 +46,6 @@ with io.open('README.rst', encoding='UTF-8') as f:
     long_description = f.read()
 
 
-class PyTest(TestCommand):
-    user_options = []
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = ''
-
-    def run_tests(self):
-        import shlex
-        # import here, cause outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(shlex.split(self.pytest_args))
-        sys.exit(errno)
-
-
 setup(
     name='josepy',
     version=version,
@@ -73,19 +55,17 @@ setup(
     author="Certbot Project",
     author_email='client-dev@letsencrypt.org',
     license='Apache License 2.0',
-    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
+    python_requires='>=3.6',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Security',
     ],
@@ -104,10 +84,5 @@ setup(
         'console_scripts': [
             'jws = josepy.jws:CLI.run',
         ],
-    },
-    tests_require=testing_requires,
-    test_suite='josepy',
-    cmdclass={
-        'test': PyTest,
     },
 )

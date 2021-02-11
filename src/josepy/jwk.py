@@ -347,7 +347,7 @@ class JWKEC(JWK):
                 'Supplied key is neither of type EllipticCurvePublicKey nor EllipticCurvePrivateKey')
         params['x'] = public.x
         params['y'] = public.y
-        params = {key: self._encode_param(value) for key, value in six.iteritems(params)}
+        params = {key: self._encode_param(value) for key, value in params.items()}
         params['crv'] = self._curve_name_to_crv(public.curve.name)
         return params
 

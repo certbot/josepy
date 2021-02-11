@@ -120,30 +120,6 @@ class JWK(json_util.TypedJSONObjectWithFields):
 
 
 @JWK.register
-class JWKES(JWK):  # pragma: no cover
-    # pylint: disable=abstract-class-not-used
-    """ES JWK.
-
-    .. warning:: This is not yet implemented!
-
-    """
-    typ = 'ES'
-    cryptography_key_types = (
-        ec.EllipticCurvePublicKey, ec.EllipticCurvePrivateKey)
-    required = ('crv', JWK.type_field_name, 'x', 'y')
-
-    def fields_to_partial_json(self):
-        raise NotImplementedError()
-
-    @classmethod
-    def fields_from_json(cls, jobj):
-        raise NotImplementedError()
-
-    def public_key(self):
-        raise NotImplementedError()
-
-
-@JWK.register
 class JWKOct(JWK):
     """Symmetric JWK."""
     typ = 'oct'
@@ -193,6 +169,7 @@ class JWKRSA(JWK):
         :rtype: unicode
 
         """
+
         def _leading_zeros(arg):
             if len(arg) % 2:
                 return '0' + arg
@@ -274,3 +251,125 @@ class JWKRSA(JWK):
             }
         return dict((key, self._encode_param(value))
                     for key, value in params.items())
+
+
+@JWK.register
+class JWKEC(JWK):
+    """EC JWK.
+
+    :ivar key: :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey` wrapped
+        in :class:`~josepy.util.ComparableRSAKey`
+
+    """
+    typ = 'EC'
+    __slots__ = ('key',)
+    cryptography_key_types = (
+        ec.EllipticCurvePublicKey, ec.EllipticCurvePrivateKey)
+    required = ('crv', JWK.type_field_name, 'x', 'y')
+
+    def __init__(self, *args, **kwargs):
+        if 'key' in kwargs and not isinstance(
+                kwargs['key'], util.ComparableECKey):
+            kwargs['key'] = util.ComparableECKey(kwargs['key'])
+        super(JWKEC, self).__init__(*args, **kwargs)
+
+    @classmethod
+    def _encode_param(cls, data):
+        """Encode Base64urlUInt.
+        :type data: long
+        :rtype: unicode
+        """
+
+        def _leading_zeros(arg):
+            if len(arg) % 2:
+                return '0' + arg
+            return arg
+
+        return json_util.encode_b64jose(binascii.unhexlify(
+            _leading_zeros(hex(data)[2:].rstrip('L'))))
+
+    @classmethod
+    def _decode_param(cls, data, name, valid_lengths):
+        """Decode Base64urlUInt."""
+        try:
+            binary = json_util.decode_b64jose(data)
+            if len(binary) not in valid_lengths:
+                raise errors.DeserializationError(
+                    'Expected parameter "{name}" to be {valid_lengths} bytes '
+                    'after base64-decoding; got {length} bytes instead'.format(
+                        name=name, valid_lengths=valid_lengths, length=len(binary))
+                )
+            return int(binascii.hexlify(binary), 16)
+        except ValueError:  # invalid literal for long() with base 16
+            raise errors.DeserializationError()
+
+    @classmethod
+    def _curve_name_to_crv(cls, curve_name):
+        if curve_name == 'secp256r1':
+            return 'P-256'
+        if curve_name == 'secp384r1':
+            return 'P-384'
+        if curve_name == 'secp521r1':
+            return 'P-521'
+        raise errors.SerializationError()
+
+    @classmethod
+    def _crv_to_curve(cls, crv):
+        # crv is case-sensitive
+        if crv == 'P-256':
+            return ec.SECP256R1()
+        if crv == 'P-384':
+            return ec.SECP384R1()
+        if crv == 'P-521':
+            return ec.SECP521R1()
+        raise errors.DeserializationError()
+
+    @classmethod
+    def _expected_length_for_curve(cls, curve):
+        if isinstance(curve, ec.SECP256R1):
+            return range(32, 33)
+        elif isinstance(curve, ec.SECP384R1):
+            return range(48, 49)
+        elif isinstance(curve, ec.SECP521R1):
+            return range(63, 67)
+
+    def fields_to_partial_json(self):
+        params = {}
+        if isinstance(self.key._wrapped, ec.EllipticCurvePublicKey):
+            public = self.key.public_numbers()
+        elif isinstance(self.key._wrapped, ec.EllipticCurvePrivateKey):
+            private = self.key.private_numbers()
+            public = self.key.public_key().public_numbers()
+            params['d'] = private.private_value
+        else:
+            raise errors.SerializationError(
+                'Supplied key is neither of type EllipticCurvePublicKey nor EllipticCurvePrivateKey')
+        params['x'] = public.x
+        params['y'] = public.y
+        params = {key: self._encode_param(value) for key, value in six.iteritems(params)}
+        params['crv'] = self._curve_name_to_crv(public.curve.name)
+        return params
+
+    @classmethod
+    def fields_from_json(cls, jobj):
+        # pylint: disable=invalid-name
+        curve = cls._crv_to_curve(jobj['crv'])
+        expected_length = cls._expected_length_for_curve(curve)
+        x, y = (cls._decode_param(jobj[n], n, expected_length) for n in ('x', 'y'))
+        public_numbers = ec.EllipticCurvePublicNumbers(x=x, y=y, curve=curve)
+        if 'd' not in jobj:  # public key
+            key = public_numbers.public_key(default_backend())
+        else:  # private key
+            d = cls._decode_param(jobj['d'], 'd', expected_length)
+            key = ec.EllipticCurvePrivateNumbers(d, public_numbers).private_key(
+                default_backend())
+        return cls(key=key)
+
+    def public_key(self):
+        # Unlike RSAPrivateKey, EllipticCurvePrivateKey does not contain public_key()
+        if hasattr(self.key, 'public_key'):
+            key = self.key.public_key()
+        else:
+            key = self.key.public_numbers().public_key(default_backend())
+        return type(self)(key=key)

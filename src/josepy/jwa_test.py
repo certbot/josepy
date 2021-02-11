@@ -8,6 +8,9 @@ from josepy import errors, test_util
 RSA256_KEY = test_util.load_rsa_private_key('rsa256_key.pem')
 RSA512_KEY = test_util.load_rsa_private_key('rsa512_key.pem')
 RSA1024_KEY = test_util.load_rsa_private_key('rsa1024_key.pem')
+EC_P256_KEY = test_util.load_ec_private_key('ec_p256_key.pem')
+EC_P384_KEY = test_util.load_ec_private_key('ec_p384_key.pem')
+EC_P521_KEY = test_util.load_ec_private_key('ec_p521_key.pem')
 
 
 class JWASignatureTest(unittest.TestCase):
@@ -69,8 +72,7 @@ class JWARSTest(unittest.TestCase):
 
     def test_sign_no_private_part(self):
         from josepy.jwa import RS256
-        self.assertRaises(
-            errors.Error, RS256.sign, RSA512_KEY.public_key(), b'foo')
+        self.assertRaises(errors.Error, RS256.sign, RSA512_KEY.public_key(), b'foo')
 
     def test_sign_key_too_small(self):
         from josepy.jwa import RS256
@@ -127,6 +129,81 @@ class JWARSTest(unittest.TestCase):
         verifier = mock.MagicMock()
         key.verifier.return_value = verifier
         RS256.verify(key, "message", "signature")
+        self.assertTrue(all([
+            key.verifier.called,
+            verifier.update.called,
+            verifier.verify.called]))
+
+
+class JWAECTest(unittest.TestCase):
+
+    def test_sign_no_private_part(self):
+        from josepy.jwa import ES256
+        self.assertRaises(
+            errors.Error, ES256.sign, EC_P256_KEY.public_key(), b'foo')
+
+    def test_es256_sign_and_verify(self):
+        from josepy.jwa import ES256
+        message = b'foo'
+        signature = ES256.sign(EC_P256_KEY, message)
+        self.assertTrue(ES256.verify(EC_P256_KEY.public_key(), message, signature))
+
+    def test_es384_sign_and_verify(self):
+        from josepy.jwa import ES384
+        message = b'foo'
+        signature = ES384.sign(EC_P384_KEY, message)
+        self.assertTrue(ES384.verify(EC_P384_KEY.public_key(), message, signature))
+
+    def test_verify_with_wrong_jwa(self):
+        from josepy.jwa import ES256, ES384
+        message = b'foo'
+        signature = ES256.sign(EC_P256_KEY, message)
+        self.assertFalse(ES384.verify(EC_P384_KEY.public_key(), message, signature))
+
+    def test_verify_with_different_key(self):
+        from josepy.jwa import ES256
+        from cryptography.hazmat.primitives.asymmetric import ec
+        from cryptography.hazmat.backends import default_backend
+
+        message = b'foo'
+        signature = ES256.sign(EC_P256_KEY, message)
+        different_key = ec.generate_private_key(ec.SECP256R1, default_backend())
+        self.assertFalse(ES256.verify(different_key.public_key(), message, signature))
+
+    def test_sign_new_api(self):
+        from josepy.jwa import ES256
+        key = mock.MagicMock()
+        with mock.patch("josepy.jwa.decode_dss_signature") as decode_patch:
+            decode_patch.return_value = (0, 0)
+            ES256.sign(key, "message")
+        self.assertTrue(key.sign.called)
+
+    def test_sign_old_api(self):
+        from josepy.jwa import ES256
+        key = mock.MagicMock(spec=[u'signer'])
+        signer = mock.MagicMock()
+        key.signer.return_value = signer
+        with mock.patch("josepy.jwa.decode_dss_signature") as decode_patch:
+            decode_patch.return_value = (0, 0)
+            ES256.sign(key, "message")
+        self.assertTrue(all([
+            key.signer.called,
+            signer.update.called,
+            signer.finalize.called]))
+
+    def test_verify_new_api(self):
+        from josepy.jwa import ES256
+        key = mock.MagicMock()
+        ES256.verify(key, "message", "signature".encode())
+        self.assertTrue(key.verify.called)
+
+    def test_verify_old_api(self):
+        from josepy.jwa import ES256
+        key = mock.MagicMock(spec=[u'verifier'])
+        verifier = mock.MagicMock()
+        key.verifier.return_value = verifier
+        key.key_size = 65 * 8
+        ES256.verify(key, "message", "signature".encode())
         self.assertTrue(all([
             key.verifier.called,
             verifier.update.called,

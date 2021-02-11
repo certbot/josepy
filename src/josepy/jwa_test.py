@@ -179,7 +179,9 @@ class JWAECTest(unittest.TestCase):
     def test_sign_new_api(self):
         from josepy.jwa import ES256
         key = mock.MagicMock()
-        ES256.sign(key, "message")
+        with mock.patch("josepy.jwa.decode_dss_signature") as decode_patch:
+            decode_patch.return_value = (0, 0)
+            ES256.sign(key, "message")
         self.assertTrue(key.sign.called)
 
     def test_sign_old_api(self):
@@ -187,7 +189,9 @@ class JWAECTest(unittest.TestCase):
         key = mock.MagicMock(spec=[u'signer'])
         signer = mock.MagicMock()
         key.signer.return_value = signer
-        ES256.sign(key, "message")
+        with mock.patch("josepy.jwa.decode_dss_signature") as decode_patch:
+            decode_patch.return_value = (0, 0)
+            ES256.sign(key, "message")
         self.assertTrue(all([
             key.signer.called,
             signer.update.called,
@@ -196,7 +200,7 @@ class JWAECTest(unittest.TestCase):
     def test_verify_new_api(self):
         from josepy.jwa import ES256
         key = mock.MagicMock()
-        ES256.verify(key, "message", "signature")
+        ES256.verify(key, "message", "signature".encode())
         self.assertTrue(key.verify.called)
 
     def test_verify_old_api(self):
@@ -204,7 +208,8 @@ class JWAECTest(unittest.TestCase):
         key = mock.MagicMock(spec=[u'verifier'])
         verifier = mock.MagicMock()
         key.verifier.return_value = verifier
-        ES256.verify(key, "message", "signature")
+        key.key_size = 65 * 8
+        ES256.verify(key, "message", "signature".encode())
         self.assertTrue(all([
             key.verifier.called,
             verifier.update.called,

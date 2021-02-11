@@ -5,12 +5,15 @@ https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
 """
 import abc
 import logging
+import math
 
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes  # type: ignore
 from cryptography.hazmat.primitives import hmac  # type: ignore
 from cryptography.hazmat.primitives.asymmetric import padding, ec  # type: ignore
+from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
+from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature
 
 from josepy import errors, interfaces, jwk
 
@@ -170,6 +173,12 @@ class _JWAEC(JWASignature):
 
     def sign(self, key, msg):
         """Sign the ``msg`` using ``key``."""
+        sig = self._sign(key, msg)
+        dr, ds = decode_dss_signature(sig)
+        return (dr.to_bytes(length=math.ceil(dr.bit_length() / 8), byteorder='big') +
+                ds.to_bytes(length=math.ceil(ds.bit_length() / 8), byteorder='big'))
+
+    def _sign(self, key, msg):
         # If cryptography library supports new style api (v1.4 and later)
         new_api = hasattr(key, 'sign')
         try:
@@ -191,14 +200,22 @@ class _JWAEC(JWASignature):
 
     def verify(self, key, msg, sig):
         """Verify the ``msg` and ``sig`` using ``key``."""
+        rlen = math.ceil(key.key_size / 8)
+        asn1sig = encode_dss_signature(
+            int.from_bytes(sig[0:rlen], byteorder='big'),
+            int.from_bytes(sig[rlen:], byteorder='big')
+        )
+        return self._verify(key, msg, asn1sig)
+
+    def _verify(self, key, msg, asn1sig):
         # If cryptography library supports new style api (v1.4 and later)
         new_api = hasattr(key, 'verify')
         if not new_api:
-            verifier = key.verifier(sig, ec.ECDSA(self.hash))
+            verifier = key.verifier(asn1sig, ec.ECDSA(self.hash))
             verifier.update(msg)
         try:
             if new_api:
-                key.verify(sig, msg, ec.ECDSA(self.hash))
+                key.verify(asn1sig, msg, ec.ECDSA(self.hash))
             else:
                 verifier.verify()
         except cryptography.exceptions.InvalidSignature as error:

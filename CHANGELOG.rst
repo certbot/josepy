@@ -5,6 +5,7 @@ Changelog
 ------------------
 
 * Dropped support for Python 2.7.
+* Added support for EC keys.
 
 1.6.0 (2021-01-26)
 ------------------

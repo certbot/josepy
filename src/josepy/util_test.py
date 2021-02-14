@@ -20,7 +20,7 @@ class ComparableX509Test(unittest.TestCase):
         self.cert_other = test_util.load_comparable_cert('cert-san.pem')
 
     def test_getattr_proxy(self):
-        self.assertTrue(self.cert1.has_expired())
+        self.assertIs(self.cert1.has_expired(), True)
 
     def test_eq(self):
         self.assertEqual(self.req1, self.req2)
@@ -77,17 +77,17 @@ class ComparableRSAKeyTest(unittest.TestCase):
         self.assertNotEqual(ComparableRSAKey(5), ComparableRSAKey(5))
 
     def test_hash(self):
-        self.assertTrue(isinstance(hash(self.key), int))
+        self.assertIsInstance(hash(self.key), int)
         self.assertEqual(hash(self.key), hash(self.key_same))
         self.assertNotEqual(hash(self.key), hash(self.key2))
 
     def test_repr(self):
-        self.assertTrue(repr(self.key).startswith(
-            '<ComparableRSAKey(<cryptography.hazmat.'))
+        self.assertIs(repr(self.key).startswith(
+            '<ComparableRSAKey(<cryptography.hazmat.'), True)
 
     def test_public_key(self):
         from josepy.util import ComparableRSAKey
-        self.assertTrue(isinstance(self.key.public_key(), ComparableRSAKey))
+        self.assertIsInstance(self.key.public_key(), ComparableRSAKey)
 
 
 class ComparableECKeyTest(unittest.TestCase):
@@ -122,18 +122,18 @@ class ComparableECKeyTest(unittest.TestCase):
         self.assertNotEqual(ComparableECKey(5), ComparableECKey(5))
 
     def test_hash(self):
-        self.assertTrue(isinstance(hash(self.p256_key), int))
+        self.assertIsInstance(hash(self.p256_key), int)
         self.assertEqual(hash(self.p256_key), hash(self.p256_key_same))
         self.assertNotEqual(hash(self.p256_key), hash(self.p384_key))
         self.assertNotEqual(hash(self.p256_key), hash(self.p521_key))
 
     def test_repr(self):
-        self.assertTrue(repr(self.p256_key).startswith(
-            '<ComparableECKey(<cryptography.hazmat.'))
+        self.assertIs(repr(self.p256_key).startswith(
+            '<ComparableECKey(<cryptography.hazmat.'), True)
 
     def test_public_key(self):
         from josepy.util import ComparableECKey
-        self.assertTrue(isinstance(self.p256_key.public_key(), ComparableECKey))
+        self.assertIsInstance(self.p256_key.public_key(), ComparableECKey)
 
 
 class ImmutableMapTest(unittest.TestCase):
@@ -224,7 +224,7 @@ class frozendictTest(unittest.TestCase):  # pylint: disable=invalid-name
         self.assertEqual(2, len(self.fdict))
 
     def test_hash(self):
-        self.assertTrue(isinstance(hash(self.fdict), int))
+        self.assertIsInstance(hash(self.fdict), int)
 
     def test_getattr_proxy(self):
         self.assertEqual(1, self.fdict.x)

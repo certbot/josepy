@@ -116,13 +116,13 @@ class JWSTest(unittest.TestCase):
         self.assertEqual(self.mixed.signature.combined.jwk, self.pubkey)
 
     def test_sign_unprotected(self):
-        self.assertTrue(self.unprotected.verify())
+        self.assertIs(self.unprotected.verify(), True)
 
     def test_sign_protected(self):
-        self.assertTrue(self.protected.verify())
+        self.assertIs(self.protected.verify(), True)
 
     def test_sign_mixed(self):
-        self.assertTrue(self.mixed.verify())
+        self.assertIs(self.mixed.verify(), True)
 
     def test_compact_lost_unprotected(self):
         compact = self.mixed.to_compact()
@@ -146,8 +146,8 @@ class JWSTest(unittest.TestCase):
         protected_jobj = self.protected.to_partial_json(flat=True)
         unprotected_jobj = self.unprotected.to_partial_json(flat=True)
 
-        self.assertTrue('protected' not in unprotected_jobj)
-        self.assertTrue('header' not in protected_jobj)
+        self.assertNotIn('protected', unprotected_jobj)
+        self.assertNotIn('header', protected_jobj)
 
         unprotected_jobj['header'] = unprotected_jobj['header'].to_json()
 

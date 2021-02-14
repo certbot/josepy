@@ -64,7 +64,7 @@ class JWKOctTest(unittest.TestCase, JWKTestBaseMixin):
         self.assertEqual(self.jwk, JWKOct.load(b'foo'))
 
     def test_public_key(self):
-        self.assertTrue(self.jwk.public_key() is self.jwk)
+        self.assertIs(self.jwk.public_key(), self.jwk)
 
 
 class JWKRSATest(unittest.TestCase, JWKTestBaseMixin):
@@ -108,8 +108,7 @@ class JWKRSATest(unittest.TestCase, JWKTestBaseMixin):
         self.jwk = self.private
 
     def test_init_auto_comparable(self):
-        self.assertTrue(isinstance(
-            self.jwk256_not_comparable.key, util.ComparableRSAKey))
+        self.assertIsInstance(self.jwk256_not_comparable.key, util.ComparableRSAKey)
         self.assertEqual(self.jwk256, self.jwk256_not_comparable)
 
     def test_encode_param_zero(self):
@@ -226,8 +225,8 @@ class JWKECTest(unittest.TestCase, JWKTestBaseMixin):
         self.jwk = self.private
 
     def test_init_auto_comparable(self):
-        self.assertTrue(isinstance(
-            self.jwk256_not_comparable.key, util.ComparableECKey))
+        self.assertIsInstance(
+            self.jwk256_not_comparable.key, util.ComparableECKey)
         self.assertEqual(self.jwk256, self.jwk256_not_comparable)
 
     def test_encode_param_zero(self):

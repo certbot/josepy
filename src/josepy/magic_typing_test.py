@@ -36,7 +36,7 @@ class MagicTypingTest(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
             from josepy.magic_typing import Text  # pylint: disable=no-name-in-module
-        self.assertTrue(Text is None)
+        self.assertIsNone(Text)
         del sys.modules['josepy.magic_typing']
         sys.modules['typing'] = temp_typing
 

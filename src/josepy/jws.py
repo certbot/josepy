@@ -4,7 +4,6 @@ import base64
 import sys
 
 import OpenSSL
-import six
 
 from josepy import b64, errors, json_util, jwa, jwk, util
 
@@ -76,7 +75,7 @@ class Header(json_util.JSONObjectWithFields):
     def not_omitted(self):
         """Fields that would not be omitted in the JSON object."""
         return dict((name, getattr(self, name))
-                    for name, field in six.iteritems(self._fields)
+                    for name, field in self._fields.items()
                     if not field.omit(getattr(self, name)))
 
     def __add__(self, other):
@@ -357,9 +356,9 @@ class CLI(object):
                        protect=set(args.protect))
 
         if args.compact:
-            six.print_(sig.to_compact().decode('utf-8'))
+            print(sig.to_compact().decode('utf-8'))
         else:  # JSON
-            six.print_(sig.json_dumps_pretty())
+            print(sig.json_dumps_pretty())
 
     @classmethod
     def verify(cls, args):
@@ -370,7 +369,7 @@ class CLI(object):
             try:
                 sig = JWS.json_loads(sys.stdin.read())
             except errors.Error as error:
-                six.print_(error)
+                print(error)
                 return -1
 
         if args.key is not None:

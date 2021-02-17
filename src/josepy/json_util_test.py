@@ -3,7 +3,6 @@ import itertools
 import unittest
 
 import mock
-import six
 
 from josepy import errors, interfaces, test_util, util
 
@@ -90,8 +89,7 @@ class JSONObjectWithFieldsMetaTest(unittest.TestCase):
         # pylint: disable=invalid-name,missing-docstring,too-few-public-methods
         # pylint: disable=blacklisted-name
 
-        @six.add_metaclass(JSONObjectWithFieldsMeta)
-        class A(object):
+        class A(object, metaclass=JSONObjectWithFieldsMeta):
             __slots__ = ('bar',)
             baz = self.field
 
@@ -246,13 +244,13 @@ class DeEncodersTest(unittest.TestCase):
     def test_encode_b64jose(self):
         from josepy.json_util import encode_b64jose
         encoded = encode_b64jose(b'x')
-        self.assertTrue(isinstance(encoded, six.string_types))
+        self.assertTrue(isinstance(encoded, str))
         self.assertEqual(u'eA', encoded)
 
     def test_decode_b64jose(self):
         from josepy.json_util import decode_b64jose
         decoded = decode_b64jose(u'eA')
-        self.assertTrue(isinstance(decoded, six.binary_type))
+        self.assertTrue(isinstance(decoded, bytes))
         self.assertEqual(b'x', decoded)
 
     def test_decode_b64jose_padding_error(self):
@@ -278,13 +276,13 @@ class DeEncodersTest(unittest.TestCase):
         from josepy.json_util import encode_hex16
         encoded = encode_hex16(b'foo')
         self.assertEqual(u'666f6f', encoded)
-        self.assertTrue(isinstance(encoded, six.string_types))
+        self.assertTrue(isinstance(encoded, str))
 
     def test_decode_hex16(self):
         from josepy.json_util import decode_hex16
         decoded = decode_hex16(u'666f6f')
         self.assertEqual(b'foo', decoded)
-        self.assertTrue(isinstance(decoded, six.binary_type))
+        self.assertTrue(isinstance(decoded, bytes))
 
     def test_decode_hex16_minimum_size(self):
         from josepy.json_util import decode_hex16

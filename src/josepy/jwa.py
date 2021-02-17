@@ -17,10 +17,7 @@ from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature
 
 from josepy import errors, interfaces, jwk
 
-try:
-    from collections.abc import Hashable  # pylint: disable=import-error
-except ImportError:
-    from collections import Hashable
+from collections.abc import Hashable
 
 logger = logging.getLogger(__name__)
 

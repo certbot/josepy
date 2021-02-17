@@ -1,8 +1,5 @@
 """JOSE utilities."""
-try:
-    from collections.abc import Hashable, Mapping  # pylint: disable=import-error
-except ImportError:
-    from collections import Hashable, Mapping
+from collections.abc import Hashable, Mapping
 
 import OpenSSL
 from cryptography.hazmat.backends import default_backend

@@ -5,10 +5,7 @@ import json
 
 from josepy import errors, util
 
-try:
-    from collections.abc import Sequence, Mapping  # pylint: disable=import-error
-except ImportError:
-    from collections import Sequence, Mapping
+from collections.abc import Sequence, Mapping
 
 # pylint: disable=no-self-argument,no-method-argument,no-init,inherit-non-class
 # pylint: disable=too-few-public-methods

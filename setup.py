@@ -23,7 +23,6 @@ testing_requires = [
     'flake8',
     'pytest-flake8>=0.5',
     'pytest>=2.8.0',
-    'mock',
 ]
 
 dev_extras = [

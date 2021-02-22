@@ -1,8 +1,8 @@
 """Tests for josepy.jws."""
 import base64
 import unittest
+from unittest import mock
 
-import mock
 import OpenSSL
 
 from josepy import errors, json_util, jwa, jwk, test_util

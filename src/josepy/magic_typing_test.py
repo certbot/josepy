@@ -1,8 +1,7 @@
 """Tests for josepy.magic_typing."""
 import sys
 import unittest
-
-import mock
+from unittest import mock
 
 
 class MagicTypingTest(unittest.TestCase):

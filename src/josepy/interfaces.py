@@ -2,21 +2,16 @@
 import abc
 import json
 
-import six
 
 from josepy import errors, util
 
-try:
-    from collections.abc import Sequence, Mapping  # pylint: disable=import-error
-except ImportError:
-    from collections import Sequence, Mapping
+from collections.abc import Sequence, Mapping
 
 # pylint: disable=no-self-argument,no-method-argument,no-init,inherit-non-class
 # pylint: disable=too-few-public-methods
 
 
-@six.add_metaclass(abc.ABCMeta)
-class JSONDeSerializable(object):
+class JSONDeSerializable(object, metaclass=abc.ABCMeta):
     # pylint: disable=too-few-public-methods
     """Interface for (de)serializable JSON objects.
 
@@ -139,7 +134,7 @@ class JSONDeSerializable(object):
         def _serialize(obj):
             if isinstance(obj, JSONDeSerializable):
                 return _serialize(obj.to_partial_json())
-            if isinstance(obj, six.string_types):  # strings are Sequence
+            if isinstance(obj, str):  # strings are Sequence
                 return obj
             elif isinstance(obj, list):
                 return [_serialize(subobj) for subobj in obj]
@@ -149,7 +144,7 @@ class JSONDeSerializable(object):
                 return tuple(_serialize(subobj) for subobj in obj)
             elif isinstance(obj, Mapping):
                 return dict((_serialize(key), _serialize(value))
-                            for key, value in six.iteritems(obj))
+                            for key, value in obj.items())
             else:
                 return obj
 

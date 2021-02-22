@@ -3,7 +3,9 @@ Changelog
 
 1.8.0 (master)
 -----------------
+
 * Removed external mock dependency.
+* Removed dependency on six.
 
 1.7.0 (2021-02-11)
 ------------------

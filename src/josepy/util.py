@@ -1,11 +1,7 @@
 """JOSE utilities."""
-try:
-    from collections.abc import Hashable, Mapping  # pylint: disable=import-error
-except ImportError:
-    from collections import Hashable, Mapping
+from collections.abc import Hashable, Mapping
 
 import OpenSSL
-import six
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
 
@@ -211,7 +207,7 @@ class ImmutableMap(Mapping, Hashable):  # type: ignore
     def __repr__(self):
         return '{0}({1})'.format(self.__class__.__name__, ', '.join(
             '{0}={1!r}'.format(key, value)
-            for key, value in six.iteritems(self)))
+            for key, value in self.items()))
 
 
 class frozendict(Mapping, Hashable):  # type: ignore
@@ -229,7 +225,7 @@ class frozendict(Mapping, Hashable):  # type: ignore
         # TODO: support generators/iterators
 
         object.__setattr__(self, '_items', items)
-        object.__setattr__(self, '_keys', tuple(sorted(six.iterkeys(items))))
+        object.__setattr__(self, '_keys', tuple(sorted(items.keys())))
 
     def __getitem__(self, key):
         return self._items[key]

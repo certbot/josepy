@@ -5,7 +5,6 @@ import json
 import logging
 
 import cryptography.exceptions
-import six
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes  # type: ignore
 from cryptography.hazmat.primitives import serialization
@@ -48,7 +47,7 @@ class JWK(json_util.TypedJSONObjectWithFields):
         """
         digest = hashes.Hash(hash_function(), backend=default_backend())
         digest.update(json.dumps(
-            dict((k, v) for k, v in six.iteritems(self.to_json())
+            dict((k, v) for k, v in self.to_json().items()
                  if k in self.required),
             **self._thumbprint_json_dumps_params).encode())
         return digest.finalize()
@@ -114,7 +113,7 @@ class JWK(json_util.TypedJSONObjectWithFields):
                 key, cls.cryptography_key_types):
             raise errors.Error('Unable to deserialize {0} into {1}'.format(
                 key.__class__, cls.__class__))
-        for jwk_cls in six.itervalues(cls.TYPES):
+        for jwk_cls in cls.TYPES.values():
             if isinstance(key, jwk_cls.cryptography_key_types):
                 return jwk_cls(key=key)
         raise errors.Error('Unsupported algorithm: {0}'.format(key.__class__))
@@ -251,7 +250,7 @@ class JWKRSA(JWK):
                 'qi': private.iqmp,
             }
         return dict((key, self._encode_param(value))
-                    for key, value in six.iteritems(params))
+                    for key, value in params.items())
 
 
 @JWK.register
@@ -348,7 +347,7 @@ class JWKEC(JWK):
                 'Supplied key is neither of type EllipticCurvePublicKey nor EllipticCurvePrivateKey')
         params['x'] = public.x
         params['y'] = public.y
-        params = {key: self._encode_param(value) for key, value in six.iteritems(params)}
+        params = {key: self._encode_param(value) for key, value in params.items()}
         params['crv'] = self._curve_name_to_crv(public.curve.name)
         return params
 

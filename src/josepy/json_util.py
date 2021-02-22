@@ -11,7 +11,6 @@ import binascii
 import logging
 
 import OpenSSL
-import six
 
 from josepy import b64, errors, interfaces, util
 
@@ -106,7 +105,7 @@ class Field(object):
         elif isinstance(value, dict):
             return util.frozendict(
                 dict((cls.default_decoder(key), cls.default_decoder(value))
-                     for key, value in six.iteritems(value)))
+                     for key, value in value.items()))
         else:  # integer or string
             return value
 
@@ -164,21 +163,23 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
         for base in bases:
             fields.update(getattr(base, '_fields', {}))
         # Do not reorder, this class might override fields from base classes!
-        for key, value in tuple(six.iteritems(dikt)):
-            # not six.iterkeys() (in-place edit!)
+        # We create a tuple based on dikt.items() here because the loop
+        # modifies dikt.
+        for key, value in tuple(dikt.items()):
             if isinstance(value, Field):
                 fields[key] = dikt.pop(key)
 
         dikt['_orig_slots'] = dikt.get('__slots__', ())
         dikt['__slots__'] = tuple(
-            list(dikt['_orig_slots']) + list(six.iterkeys(fields)))
+            list(dikt['_orig_slots']) + list(fields.keys()))
         dikt['_fields'] = fields
 
         return abc.ABCMeta.__new__(mcs, name, bases, dikt)
 
 
-@six.add_metaclass(JSONObjectWithFieldsMeta)
-class JSONObjectWithFields(util.ImmutableMap, interfaces.JSONDeSerializable):
+class JSONObjectWithFields(util.ImmutableMap,
+                           interfaces.JSONDeSerializable,
+                           metaclass=JSONObjectWithFieldsMeta):
     # pylint: disable=too-few-public-methods
     """JSON object with fields.
 
@@ -210,7 +211,7 @@ class JSONObjectWithFields(util.ImmutableMap, interfaces.JSONDeSerializable):
     def _defaults(cls):
         """Get default fields values."""
         return dict([(slot, field.default) for slot, field
-                     in six.iteritems(cls._fields)])
+                     in cls._fields.items()])
 
     def __init__(self, **kwargs):
         # pylint: disable=star-args
@@ -237,7 +238,7 @@ class JSONObjectWithFields(util.ImmutableMap, interfaces.JSONDeSerializable):
         """Serialize fields to JSON."""
         jobj = {}
         omitted = set()
-        for slot, field in six.iteritems(self._fields):
+        for slot, field in self._fields.items():
             value = getattr(self, slot)
 
             if field.omit(value):
@@ -257,7 +258,7 @@ class JSONObjectWithFields(util.ImmutableMap, interfaces.JSONDeSerializable):
     @classmethod
     def _check_required(cls, jobj):
         missing = set()
-        for _, field in six.iteritems(cls._fields):
+        for _, field in cls._fields.items():
             if not field.omitempty and field.json_name not in jobj:
                 missing.add(field.json_name)
 
@@ -271,7 +272,7 @@ class JSONObjectWithFields(util.ImmutableMap, interfaces.JSONDeSerializable):
         """Deserialize fields from JSON."""
         cls._check_required(jobj)
         fields = {}
-        for slot, field in six.iteritems(cls._fields):
+        for slot, field in cls._fields.items():
             if field.json_name not in jobj and field.omitempty:
                 fields[slot] = field.default
             else:
@@ -311,10 +312,9 @@ def decode_b64jose(data, size=None, minimum=False):
     :rtype: bytes
 
     """
-    error_cls = TypeError if six.PY2 else binascii.Error
     try:
         decoded = b64.b64decode(data.encode())
-    except error_cls as error:
+    except binascii.Error as error:
         raise errors.DeserializationError(error)
 
     if size is not None and ((not minimum and len(decoded) != size) or
@@ -350,10 +350,9 @@ def decode_hex16(value, size=None, minimum=False):
     if size is not None and ((not minimum and len(value) != size * 2) or
                              (minimum and len(value) < size * 2)):
         raise errors.DeserializationError()
-    error_cls = TypeError if six.PY2 else binascii.Error
     try:
         return binascii.unhexlify(value)
-    except error_cls as error:
+    except binascii.Error as error:
         raise errors.DeserializationError(error)
 
 
@@ -433,7 +432,7 @@ class TypedJSONObjectWithFields(JSONObjectWithFields):
     @classmethod
     def get_type_cls(cls, jobj):
         """Get the registered class for ``jobj``."""
-        if cls in six.itervalues(cls.TYPES):
+        if cls in cls.TYPES.values():
             if cls.type_field_name not in jobj:
                 raise errors.DeserializationError(
                     "Missing type field ({0})".format(cls.type_field_name))

@@ -26,12 +26,9 @@ testing_requires = [
 ]
 
 dev_extras = [
+    'mypy',
     'pytest',
     'tox',
-]
-
-dev3_extras = [
-    'mypy',
 ]
 
 docs_extras = [
@@ -74,7 +71,6 @@ setup(
     install_requires=install_requires,
     extras_require={
         'dev': dev_extras,
-        'dev3': dev3_extras,
         'docs': docs_extras,
         'tests': testing_requires,
     },

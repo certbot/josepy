@@ -6,6 +6,7 @@ Changelog
 
 * Removed external mock dependency.
 * Removed dependency on six.
+* Deprecated the module josepy.magic_typing.
 
 1.7.0 (2021-02-11)
 ------------------

@@ -1,6 +1,7 @@
 """Tests for josepy.magic_typing."""
 import sys
 import unittest
+import warnings
 from unittest import mock
 
 
@@ -17,7 +18,9 @@ class MagicTypingTest(unittest.TestCase):
         sys.modules['typing'] = typing_class_mock
         if 'josepy.magic_typing' in sys.modules:
             del sys.modules['josepy.magic_typing']  # pragma: no cover
-        from josepy.magic_typing import Text  # pylint: disable=no-name-in-module
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            from josepy.magic_typing import Text  # pylint: disable=no-name-in-module
         self.assertEqual(Text, text_mock)
         del sys.modules['josepy.magic_typing']
         sys.modules['typing'] = temp_typing
@@ -30,7 +33,9 @@ class MagicTypingTest(unittest.TestCase):
         sys.modules['typing'] = None
         if 'josepy.magic_typing' in sys.modules:
             del sys.modules['josepy.magic_typing']  # pragma: no cover
-        from josepy.magic_typing import Text  # pylint: disable=no-name-in-module
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            from josepy.magic_typing import Text  # pylint: disable=no-name-in-module
         self.assertTrue(Text is None)
         del sys.modules['josepy.magic_typing']
         sys.modules['typing'] = temp_typing

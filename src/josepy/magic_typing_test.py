@@ -25,21 +25,6 @@ class MagicTypingTest(unittest.TestCase):
         del sys.modules['josepy.magic_typing']
         sys.modules['typing'] = temp_typing
 
-    def test_import_failure(self):
-        try:
-            import typing as temp_typing
-        except ImportError:  # pragma: no cover
-            temp_typing = None  # pragma: no cover
-        sys.modules['typing'] = None
-        if 'josepy.magic_typing' in sys.modules:
-            del sys.modules['josepy.magic_typing']  # pragma: no cover
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            from josepy.magic_typing import Text  # pylint: disable=no-name-in-module
-        self.assertIsNone(Text)
-        del sys.modules['josepy.magic_typing']
-        sys.modules['typing'] = temp_typing
-
 
 if __name__ == '__main__':
     unittest.main()  # pragma: no cover

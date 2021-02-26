@@ -4,6 +4,8 @@ import json
 import logging
 import math
 
+from typing import Any, Dict
+
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes  # type: ignore
@@ -16,15 +18,15 @@ from josepy import errors, json_util, util
 logger = logging.getLogger(__name__)
 
 
-class JWK(json_util.TypedJSONObjectWithFields):
+class JWK(json_util.TypedJSONObjectWithFields, metaclass=abc.ABCMeta):
     # pylint: disable=too-few-public-methods
     """JSON Web Key."""
     type_field_name = 'kty'
-    TYPES = {}  # type: dict
-    cryptography_key_types = ()  # type: tuple
+    TYPES: Dict[str, Type] = {}
+    cryptography_key_types: Sequence[Type] = () 
     """Subclasses should override."""
 
-    required = NotImplemented
+    required: Sequence[str] = NotImplemented 
     """Required members of public key's representation as defined by JWK/JWA."""
 
     _thumbprint_json_dumps_params = {
@@ -35,7 +37,7 @@ class JWK(json_util.TypedJSONObjectWithFields):
         # "members ordered lexicographically by the Unicode [UNICODE]
         # code points of the member names"
         'sort_keys': True,
-    }
+    }  # type: Dict[str, Any]
 
     def thumbprint(self, hash_function=hashes.SHA256):
         """Compute JWK Thumbprint.

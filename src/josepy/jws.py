@@ -107,7 +107,7 @@ class Header(json_util.JSONObjectWithFields):
             raise errors.Error('No key found')
         return self.jwk
 
-    @crit.decoder
+    @crit.decoder  # type: ignore
     def crit(unused_value):
         # pylint: disable=missing-docstring,no-self-argument,no-self-use
         raise errors.DeserializationError(

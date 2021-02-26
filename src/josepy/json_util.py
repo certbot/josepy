@@ -9,6 +9,7 @@ The framework presented here is somewhat based on `Go's "json" package`_
 import abc
 import binascii
 import logging
+from typing import Any, Dict
 
 import OpenSSL
 
@@ -159,6 +160,8 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
 
     """
 
+    _fields: Dict[str, Field] = {}
+
     def __new__(mcs, name, bases, dikt):
         fields = {}
 
@@ -210,7 +213,7 @@ class JSONObjectWithFields(util.ImmutableMap,
     """
 
     @classmethod
-    def _defaults(cls):
+    def _defaults(cls) -> Dict:
         """Get default fields values."""
         return {
             slot: field.default for slot, field in cls._fields.items()
@@ -293,11 +296,11 @@ class JSONObjectWithFields(util.ImmutableMap,
         return cls(**cls.fields_from_json(jobj))
 
 
-def encode_b64jose(data):
+def encode_b64jose(data: bytes) -> str:
     """Encode JOSE Base-64 field.
 
     :param bytes data:
-    :rtype: `unicode`
+    :rtype: `str`
 
     """
     # b64encode produces ASCII characters only
@@ -412,17 +415,17 @@ def decode_csr(b64der):
 class TypedJSONObjectWithFields(JSONObjectWithFields):
     """JSON object with type."""
 
-    typ = NotImplemented
+    typ: str = NotImplemented 
     """Type of the object. Subclasses must override."""
 
-    type_field_name = "type"
+    type_field_name = "type"  # type: str
     """Field name used to distinguish different object types.
 
     Subclasses will probably have to override this.
 
     """
 
-    TYPES = NotImplemented
+    TYPES: Dict[str, Type] = NotImplemented
     """Types registered for JSON deserialization"""
 
     @classmethod

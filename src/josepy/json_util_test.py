@@ -16,8 +16,8 @@ class FieldTest(unittest.TestCase):
         from josepy.json_util import Field
         for default, omitempty, value in itertools.product(
                 [True, False], [True, False], [True, False]):
-            self.assertFalse(
-                Field("foo", default=default, omitempty=omitempty).omit(value))
+            self.assertIs(
+                Field("foo", default=default, omitempty=omitempty).omit(value), False)
 
     def test_descriptors(self):
         mock_value = mock.MagicMock()
@@ -52,14 +52,14 @@ class FieldTest(unittest.TestCase):
         mock_field = MockField()
 
         from josepy.json_util import Field
-        self.assertTrue(Field.default_encoder(mock_field) is mock_field)
+        self.assertIs(Field.default_encoder(mock_field), mock_field)
         # in particular...
         self.assertNotEqual('foo', Field.default_encoder(mock_field))
 
     def test_default_encoder_passthrough(self):
         mock_value = mock.MagicMock()
         from josepy.json_util import Field
-        self.assertTrue(Field.default_encoder(mock_value) is mock_value)
+        self.assertIs(Field.default_encoder(mock_value), mock_value)
 
     def test_default_decoder_list_to_tuple(self):
         from josepy.json_util import Field
@@ -68,13 +68,13 @@ class FieldTest(unittest.TestCase):
     def test_default_decoder_dict_to_frozendict(self):
         from josepy.json_util import Field
         obj = Field.default_decoder({'x': 2})
-        self.assertTrue(isinstance(obj, util.frozendict))
+        self.assertIsInstance(obj, util.frozendict)
         self.assertEqual(obj, util.frozendict(x=2))
 
     def test_default_decoder_passthrough(self):
         mock_value = mock.MagicMock()
         from josepy.json_util import Field
-        self.assertTrue(Field.default_decoder(mock_value) is mock_value)
+        self.assertIs(Field.default_decoder(mock_value), mock_value)
 
 
 class JSONObjectWithFieldsMetaTest(unittest.TestCase):
@@ -243,13 +243,13 @@ class DeEncodersTest(unittest.TestCase):
     def test_encode_b64jose(self):
         from josepy.json_util import encode_b64jose
         encoded = encode_b64jose(b'x')
-        self.assertTrue(isinstance(encoded, str))
+        self.assertIsInstance(encoded, str)
         self.assertEqual(u'eA', encoded)
 
     def test_decode_b64jose(self):
         from josepy.json_util import decode_b64jose
         decoded = decode_b64jose(u'eA')
-        self.assertTrue(isinstance(decoded, bytes))
+        self.assertIsInstance(decoded, bytes)
         self.assertEqual(b'x', decoded)
 
     def test_decode_b64jose_padding_error(self):
@@ -275,13 +275,13 @@ class DeEncodersTest(unittest.TestCase):
         from josepy.json_util import encode_hex16
         encoded = encode_hex16(b'foo')
         self.assertEqual(u'666f6f', encoded)
-        self.assertTrue(isinstance(encoded, str))
+        self.assertIsInstance(encoded, str)
 
     def test_decode_hex16(self):
         from josepy.json_util import decode_hex16
         decoded = decode_hex16(u'666f6f')
         self.assertEqual(b'foo', decoded)
-        self.assertTrue(isinstance(decoded, bytes))
+        self.assertIsInstance(decoded, bytes)
 
     def test_decode_hex16_minimum_size(self):
         from josepy.json_util import decode_hex16
@@ -301,7 +301,7 @@ class DeEncodersTest(unittest.TestCase):
     def test_decode_cert(self):
         from josepy.json_util import decode_cert
         cert = decode_cert(self.b64_cert)
-        self.assertTrue(isinstance(cert, util.ComparableX509))
+        self.assertIsInstance(cert, util.ComparableX509)
         self.assertEqual(cert, CERT)
         self.assertRaises(errors.DeserializationError, decode_cert, u'')
 
@@ -312,7 +312,7 @@ class DeEncodersTest(unittest.TestCase):
     def test_decode_csr(self):
         from josepy.json_util import decode_csr
         csr = decode_csr(self.b64_csr)
-        self.assertTrue(isinstance(csr, util.ComparableX509))
+        self.assertIsInstance(csr, util.ComparableX509)
         self.assertEqual(csr, CSR)
         self.assertRaises(errors.DeserializationError, decode_csr, u'')
 

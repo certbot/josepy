@@ -66,7 +66,7 @@ class JSONDeSerializableTest(unittest.TestCase):
 
     def test_to_json_other(self):
         mock_value = object()
-        self.assertTrue(self.Basic(mock_value).to_json() is mock_value)
+        self.assertIs(self.Basic(mock_value).to_json(), mock_value)
 
     def test_to_json_nested(self):
         self.assertEqual(self.nested.to_json(), [['foo1']])
@@ -80,9 +80,9 @@ class JSONDeSerializableTest(unittest.TestCase):
 
     def test_json_loads(self):
         seq = self.Sequence.json_loads('["foo1", "foo2"]')
-        self.assertTrue(isinstance(seq, self.Sequence))
-        self.assertTrue(isinstance(seq.x, self.Basic))
-        self.assertTrue(isinstance(seq.y, self.Basic))
+        self.assertIsInstance(seq, self.Sequence)
+        self.assertIsInstance(seq.x, self.Basic)
+        self.assertIsInstance(seq.y, self.Basic)
         self.assertEqual(seq.x.v, 'foo1')
         self.assertEqual(seq.y.v, 'foo2')
 
@@ -101,8 +101,8 @@ class JSONDeSerializableTest(unittest.TestCase):
 
         jobj = JSONDeSerializable.json_dump_default(self.seq)
         self.assertEqual(len(jobj), 2)
-        self.assertTrue(jobj[0] is self.basic1)
-        self.assertTrue(jobj[1] is self.basic2)
+        self.assertIs(jobj[0], self.basic1)
+        self.assertIs(jobj[1], self.basic2)
 
     def test_json_dump_default_type_error(self):
         from josepy.interfaces import JSONDeSerializable

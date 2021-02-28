@@ -172,8 +172,9 @@ class _JWAEC(JWASignature):
         """Sign the ``msg`` using ``key``."""
         sig = self._sign(key, msg)
         dr, ds = decode_dss_signature(sig)
-        return (dr.to_bytes(length=math.ceil(dr.bit_length() / 8), byteorder='big') +
-                ds.to_bytes(length=math.ceil(ds.bit_length() / 8), byteorder='big'))
+        length = math.ceil(key.key_size / 8)
+        return (dr.to_bytes(length=length, byteorder='big') +
+                ds.to_bytes(length=length, byteorder='big'))
 
     def _sign(self, key, msg):
         # If cryptography library supports new style api (v1.4 and later)
@@ -198,6 +199,9 @@ class _JWAEC(JWASignature):
     def verify(self, key, msg, sig):
         """Verify the ``msg` and ``sig`` using ``key``."""
         rlen = math.ceil(key.key_size / 8)
+        if len(sig) != 2 * rlen:
+            # Format error - rfc7518 - 3.4 … MUST NOT be shortened to omit any leading zero octets
+            return False
         asn1sig = encode_dss_signature(
             int.from_bytes(sig[0:rlen], byteorder='big'),
             int.from_bytes(sig[rlen:], byteorder='big')

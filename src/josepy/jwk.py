@@ -1,8 +1,8 @@
 """JSON Web Key."""
 import abc
-import binascii
 import json
 import logging
+import math
 
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
@@ -164,25 +164,21 @@ class JWKRSA(JWK):
     @classmethod
     def _encode_param(cls, data):
         """Encode Base64urlUInt.
-
         :type data: long
         :rtype: unicode
-
         """
-
-        def _leading_zeros(arg):
-            if len(arg) % 2:
-                return '0' + arg
-            return arg
-
-        return json_util.encode_b64jose(binascii.unhexlify(
-            _leading_zeros(hex(data)[2:].rstrip('L'))))
+        length = max(data.bit_length(), 8)  # decoding 0
+        length = math.ceil(length / 8)
+        return json_util.encode_b64jose(data.to_bytes(byteorder="big", length=length))
 
     @classmethod
     def _decode_param(cls, data):
         """Decode Base64urlUInt."""
         try:
-            return int(binascii.hexlify(json_util.decode_b64jose(data)), 16)
+            binary = json_util.decode_b64jose(data)
+            if not binary:
+                raise errors.DeserializationError()
+            return int.from_bytes(binary, byteorder="big")
         except ValueError:  # invalid literal for long() with base 16
             raise errors.DeserializationError()
 
@@ -280,14 +276,9 @@ class JWKEC(JWK):
         :type data: long
         :rtype: unicode
         """
-
-        def _leading_zeros(arg):
-            if len(arg) % 2:
-                return '0' + arg
-            return arg
-
-        return json_util.encode_b64jose(binascii.unhexlify(
-            _leading_zeros(hex(data)[2:].rstrip('L'))))
+        length = max(data.bit_length(), 8)  # decoding 0
+        length = math.ceil(length / 8)
+        return json_util.encode_b64jose(data.to_bytes(byteorder="big", length=length))
 
     @classmethod
     def _decode_param(cls, data, name, valid_lengths):
@@ -300,7 +291,7 @@ class JWKEC(JWK):
                     'after base64-decoding; got {length} bytes instead'.format(
                         name=name, valid_lengths=valid_lengths, length=len(binary))
                 )
-            return int(binascii.hexlify(binary), 16)
+            return int.from_bytes(binary, byteorder="big")
         except ValueError:  # invalid literal for long() with base 16
             raise errors.DeserializationError()
 

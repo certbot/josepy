@@ -177,7 +177,7 @@ class JWAECTest(unittest.TestCase):
 
     def test_sign_old_api(self):
         from josepy.jwa import ES256
-        key = mock.MagicMock(spec=[u'signer'])
+        key = mock.MagicMock(spec=[u'signer'], key_size=256)
         signer = mock.MagicMock()
         key.signer.return_value = signer
         with mock.patch("josepy.jwa.decode_dss_signature") as decode_patch:
@@ -189,8 +189,8 @@ class JWAECTest(unittest.TestCase):
 
     def test_verify_new_api(self):
         from josepy.jwa import ES256
-        key = mock.MagicMock()
-        ES256.verify(key, "message", "signature".encode())
+        key = mock.MagicMock(key_size=256)
+        ES256.verify(key, "message", b'\x00' * int(key.key_size / 8) * 2)
         self.assertIs(key.verify.called, True)
 
     def test_verify_old_api(self):
@@ -199,10 +199,26 @@ class JWAECTest(unittest.TestCase):
         verifier = mock.MagicMock()
         key.verifier.return_value = verifier
         key.key_size = 65 * 8
-        ES256.verify(key, "message", "signature".encode())
+        ES256.verify(key, "message", b'\x00' * int(key.key_size / 8) * 2)
         self.assertIs(key.verifier.called, True)
         self.assertIs(verifier.update.called, True)
         self.assertIs(verifier.verify.called, True)
+
+    def test_signature_size(self):
+        from josepy.jwa import ES512
+        from josepy.jwk import JWK
+        key = JWK.from_json(
+            {
+                'd': 'Af9KP6DqLRbtit6NS_LRIaCP_-NdC5l5R2ugbILdfpv6dS9R4wUPNxiGw-vVWumA56Yo1oBnEm8ZdR4W-u1lPHw5',
+                'x': 'PiLhJPInTuJkmQeSkoQ64gKmfogeSfPACWt_7XDVrl2o6xF7fQQQJI3i8XFp4Ca10FIIoHAKruHWrhs-AysxS8U',
+                'y': 'cCVfGtpuNzH_IHEY5ueb8OQRAwkrUTr04djfHdXEXlVegpz3cIbgYuho--mFlC9me3kR8TFCg-S3A4whWEEdoVE',
+                'crv': 'P-521',
+                'kty': 'EC'
+            })
+        with mock.patch("josepy.jwa.decode_dss_signature") as decode_patch:
+            decode_patch.return_value = (0, 0)
+            sig = ES512.sign(key.key, b"test")
+            self.assertEqual(len(sig), 2 * 66)
 
 
 if __name__ == '__main__':

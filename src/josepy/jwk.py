@@ -4,7 +4,7 @@ import json
 import logging
 import math
 
-from typing import Any, Dict
+from typing import Dict, Optional, Sequence, Type, Union
 
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
@@ -23,13 +23,13 @@ class JWK(json_util.TypedJSONObjectWithFields, metaclass=abc.ABCMeta):
     """JSON Web Key."""
     type_field_name = 'kty'
     TYPES: Dict[str, Type] = {}
-    cryptography_key_types: Sequence[Type] = () 
+    cryptography_key_types: Sequence[Type] = ()
     """Subclasses should override."""
 
-    required: Sequence[str] = NotImplemented 
+    required: Sequence[str] = NotImplemented
     """Required members of public key's representation as defined by JWK/JWA."""
 
-    _thumbprint_json_dumps_params = {
+    _thumbprint_json_dumps_params: Dict[str, Union[Optional[int], Sequence[str], bool]] = {
         # "no whitespace or line breaks before or after any syntactic
         # elements"
         'indent': None,
@@ -37,7 +37,7 @@ class JWK(json_util.TypedJSONObjectWithFields, metaclass=abc.ABCMeta):
         # "members ordered lexicographically by the Unicode [UNICODE]
         # code points of the member names"
         'sort_keys': True,
-    }  # type: Dict[str, Any]
+    }
 
     def thumbprint(self, hash_function=hashes.SHA256):
         """Compute JWK Thumbprint.

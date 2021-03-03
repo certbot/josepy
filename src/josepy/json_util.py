@@ -9,7 +9,7 @@ The framework presented here is somewhat based on `Go's "json" package`_
 import abc
 import binascii
 import logging
-from typing import Any, Dict
+from typing import Dict, Type
 
 import OpenSSL
 
@@ -415,10 +415,10 @@ def decode_csr(b64der):
 class TypedJSONObjectWithFields(JSONObjectWithFields):
     """JSON object with type."""
 
-    typ: str = NotImplemented 
+    typ: str = NotImplemented
     """Type of the object. Subclasses must override."""
 
-    type_field_name = "type"  # type: str
+    type_field_name: str = "type"
     """Field name used to distinguish different object types.
 
     Subclasses will probably have to override this.

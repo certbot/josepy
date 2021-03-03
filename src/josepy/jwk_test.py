@@ -1,7 +1,6 @@
 """Tests for josepy.jwk."""
 import binascii
 import unittest
-from typing import Any
 
 from josepy import errors, json_util, test_util, util
 

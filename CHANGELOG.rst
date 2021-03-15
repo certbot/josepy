@@ -7,6 +7,7 @@ Changelog
 * Removed external mock dependency.
 * Removed dependency on six.
 * Deprecated the module josepy.magic_typing.
+* Fix JWS/JWK generation with EC keys when keys or signatures have leading zeros.
 
 1.7.0 (2021-02-11)
 ------------------

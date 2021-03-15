@@ -1,8 +1,11 @@
 Changelog
 =========
 
+1.9.0 (master)
+--------------
+
 1.8.0 (2021-03-15)
------------------
+------------------
 
 * Removed external mock dependency.
 * Removed dependency on six.

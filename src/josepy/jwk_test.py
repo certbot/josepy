@@ -212,7 +212,7 @@ class JWKECTest(unittest.TestCase, JWKTestBaseMixin):
         self.jwk521json = {
             'kty': 'EC',
             'crv': 'P-521',
-            'x': 'WR2XpwrMGY_XxTx99-k_ghk3Z4QPjmENzBE-Xll4KXAdwu2cwEy5ZgUU783OboMvYyGk3TMjZtwwsl33lpja0-w',
+            'x': 'AFkdl6cKzBmP18U8fffpP4IZN2eED45hDcwRPl5ZeClwHcLtnMBMuWYFFO_Nzm6DL2MhpN0zI2bcMLJd95aY2tPs',
             'y': 'AYvZq3wByjt7nQd8nYMqhFNCL3j_-U6GPWZet1hYBY_XZHrC4yIV0R4JnssRAY9eqc1EElpCc4hziis1jiV1iR4W',
         }
         self.private = JWKEC(key=EC_P256_KEY)
@@ -233,7 +233,7 @@ class JWKECTest(unittest.TestCase, JWKTestBaseMixin):
         from josepy.jwk import JWKEC
         # pylint: disable=protected-access
         # TODO: move encode/decode _param to separate class
-        self.assertEqual('AA', JWKEC._encode_param(0))
+        self.assertEqual('AA', JWKEC._encode_param(0, 1))
 
     def test_equals(self):
         self.assertEqual(self.jwk256, self.jwk256)
@@ -303,6 +303,22 @@ class JWKECTest(unittest.TestCase, JWKTestBaseMixin):
                            'crv': 'P-255',
                            'x': 'jjQtV-fA7J_tK8dPzYq7jRPNjF8r5p6LW2R25S2Gw5U',
                            'y': 'EPAw8_8z7PYKsHH6hlGSlsWxFoFl7-0vM0QRGbmnvCc'})
+
+
+    def test_encode_y_leading_zero_p256(self):
+        from josepy.jwk import JWKEC,JWK
+        import josepy
+        data = b"""-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEICZ7LCI99Na2KZ/Fq8JmJROakGJ5+J7rHiGSPoO36kOAoAoGCCqGSM49
+AwEHoUQDQgAEGS5RvStca15z2FEanCM3juoX7tE/LB7iD44GWawGE40APAl/iZuH
+31wQfst4glTZpxkpEI/MzNZHjiYnqrGeSw==
+-----END EC PRIVATE KEY-----"""
+        key = JWKEC.load(data)
+        data = key.to_partial_json()
+        y = josepy.json_util.decode_b64jose(data['y'])
+        self.assertEqual(y[0], 0)
+        self.assertEqual(len(y), 32)
+        JWK.from_json(data)
 
 
 if __name__ == '__main__':

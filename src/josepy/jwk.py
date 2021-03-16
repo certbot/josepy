@@ -271,25 +271,25 @@ class JWKEC(JWK):
         super(JWKEC, self).__init__(*args, **kwargs)
 
     @classmethod
-    def _encode_param(cls, data):
+    def _encode_param(cls, data, key_size):
         """Encode Base64urlUInt.
         :type data: long
+        :type key_size: long
         :rtype: unicode
         """
-        length = max(data.bit_length(), 8)  # decoding 0
-        length = math.ceil(length / 8)
+        length = math.ceil(key_size / 8)
         return json_util.encode_b64jose(data.to_bytes(byteorder="big", length=length))
 
     @classmethod
-    def _decode_param(cls, data, name, valid_lengths):
+    def _decode_param(cls, data, name, valid_length):
         """Decode Base64urlUInt."""
         try:
             binary = json_util.decode_b64jose(data)
-            if len(binary) not in valid_lengths:
+            if len(binary) != valid_length:
                 raise errors.DeserializationError(
                     'Expected parameter "{name}" to be {valid_lengths} bytes '
                     'after base64-decoding; got {length} bytes instead'.format(
-                        name=name, valid_lengths=valid_lengths, length=len(binary))
+                        name=name, valid_lengths=valid_length, length=len(binary))
                 )
             return int.from_bytes(binary, byteorder="big")
         except ValueError:  # invalid literal for long() with base 16
@@ -319,11 +319,11 @@ class JWKEC(JWK):
     @classmethod
     def _expected_length_for_curve(cls, curve):
         if isinstance(curve, ec.SECP256R1):
-            return range(32, 33)
+            return 32
         elif isinstance(curve, ec.SECP384R1):
-            return range(48, 49)
+            return 48
         elif isinstance(curve, ec.SECP521R1):
-            return range(63, 67)
+            return 66
 
     def fields_to_partial_json(self):
         params = {}
@@ -338,7 +338,7 @@ class JWKEC(JWK):
                 'Supplied key is neither of type EllipticCurvePublicKey nor EllipticCurvePrivateKey')
         params['x'] = public.x
         params['y'] = public.y
-        params = {key: self._encode_param(value) for key, value in params.items()}
+        params = {key: self._encode_param(value, self.key.key_size) for key, value in params.items()}
         params['crv'] = self._curve_name_to_crv(public.curve.name)
         return params
 

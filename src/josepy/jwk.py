@@ -271,13 +271,12 @@ class JWKEC(JWK):
         super(JWKEC, self).__init__(*args, **kwargs)
 
     @classmethod
-    def _encode_param(cls, data, key_size):
+    def _encode_param(cls, data, length):
         """Encode Base64urlUInt.
         :type data: long
         :type key_size: long
         :rtype: unicode
         """
-        length = math.ceil(key_size / 8)
         return json_util.encode_b64jose(data.to_bytes(byteorder="big", length=length))
 
     @classmethod
@@ -338,7 +337,7 @@ class JWKEC(JWK):
                 'Supplied key is neither of type EllipticCurvePublicKey nor EllipticCurvePrivateKey')
         params['x'] = public.x
         params['y'] = public.y
-        params = {key: self._encode_param(value, self.key.key_size) for key, value in params.items()}
+        params = {key: self._encode_param(value, self._expected_length_for_curve(public.curve)) for key, value in params.items()}
         params['crv'] = self._curve_name_to_crv(public.curve.name)
         return params
 

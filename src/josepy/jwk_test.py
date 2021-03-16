@@ -304,9 +304,8 @@ class JWKECTest(unittest.TestCase, JWKTestBaseMixin):
                            'x': 'jjQtV-fA7J_tK8dPzYq7jRPNjF8r5p6LW2R25S2Gw5U',
                            'y': 'EPAw8_8z7PYKsHH6hlGSlsWxFoFl7-0vM0QRGbmnvCc'})
 
-
     def test_encode_y_leading_zero_p256(self):
-        from josepy.jwk import JWKEC,JWK
+        from josepy.jwk import JWKEC, JWK
         import josepy
         data = b"""-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEICZ7LCI99Na2KZ/Fq8JmJROakGJ5+J7rHiGSPoO36kOAoAoGCCqGSM49

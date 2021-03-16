@@ -5,7 +5,6 @@ https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
 """
 import abc
 import logging
-import math
 
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
@@ -172,7 +171,7 @@ class _JWAEC(JWASignature):
         """Sign the ``msg`` using ``key``."""
         sig = self._sign(key, msg)
         dr, ds = decode_dss_signature(sig)
-        length = math.ceil(key.key_size / 8)
+        length = jwk.JWKEC.expected_length_for_curve(key.curve)
         return (dr.to_bytes(length=length, byteorder='big') +
                 ds.to_bytes(length=length, byteorder='big'))
 
@@ -198,7 +197,7 @@ class _JWAEC(JWASignature):
 
     def verify(self, key, msg, sig):
         """Verify the ``msg` and ``sig`` using ``key``."""
-        rlen = math.ceil(key.key_size / 8)
+        rlen = jwk.JWKEC.expected_length_for_curve(key.curve)
         if len(sig) != 2 * rlen:
             # Format error - rfc7518 - 3.4 … MUST NOT be shortened to omit any leading zero octets
             return False

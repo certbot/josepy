@@ -316,7 +316,7 @@ class JWKEC(JWK):
         raise errors.DeserializationError()
 
     @classmethod
-    def _expected_length_for_curve(cls, curve):
+    def expected_length_for_curve(cls, curve):
         if isinstance(curve, ec.SECP256R1):
             return 32
         elif isinstance(curve, ec.SECP384R1):
@@ -337,7 +337,7 @@ class JWKEC(JWK):
                 'Supplied key is neither of type EllipticCurvePublicKey nor EllipticCurvePrivateKey')
         params['x'] = public.x
         params['y'] = public.y
-        params = {key: self._encode_param(value, self._expected_length_for_curve(public.curve)) for key, value in params.items()}
+        params = {key: self._encode_param(value, self.expected_length_for_curve(public.curve)) for key, value in params.items()}
         params['crv'] = self._curve_name_to_crv(public.curve.name)
         return params
 
@@ -345,7 +345,7 @@ class JWKEC(JWK):
     def fields_from_json(cls, jobj):
         # pylint: disable=invalid-name
         curve = cls._crv_to_curve(jobj['crv'])
-        expected_length = cls._expected_length_for_curve(curve)
+        expected_length = cls.expected_length_for_curve(curve)
         x, y = (cls._decode_param(jobj[n], n, expected_length) for n in ('x', 'y'))
         public_numbers = ec.EllipticCurvePublicNumbers(x=x, y=y, curve=curve)
         if 'd' not in jobj:  # public key

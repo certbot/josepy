@@ -169,7 +169,8 @@ class JWAECTest(unittest.TestCase):
 
     def test_sign_new_api(self):
         from josepy.jwa import ES256
-        key = mock.MagicMock()
+        from cryptography.hazmat.primitives.asymmetric.ec import SECP256R1
+        key = mock.MagicMock(curve=SECP256R1())
         with mock.patch("josepy.jwa.decode_dss_signature") as decode_patch:
             decode_patch.return_value = (0, 0)
             ES256.sign(key, "message")
@@ -177,7 +178,8 @@ class JWAECTest(unittest.TestCase):
 
     def test_sign_old_api(self):
         from josepy.jwa import ES256
-        key = mock.MagicMock(spec=[u'signer'], key_size=256)
+        from cryptography.hazmat.primitives.asymmetric.ec import SECP256R1
+        key = mock.MagicMock(spec=[u'signer'], curve=SECP256R1())
         signer = mock.MagicMock()
         key.signer.return_value = signer
         with mock.patch("josepy.jwa.decode_dss_signature") as decode_patch:
@@ -188,18 +190,21 @@ class JWAECTest(unittest.TestCase):
         self.assertIs(signer.finalize.called, True)
 
     def test_verify_new_api(self):
+        import math
         from josepy.jwa import ES256
-        key = mock.MagicMock(key_size=256)
-        ES256.verify(key, "message", b'\x00' * int(key.key_size / 8) * 2)
+        from cryptography.hazmat.primitives.asymmetric.ec import SECP256R1
+        key = mock.MagicMock(key_size=256, curve=SECP256R1())
+        ES256.verify(key, "message", b'\x00' * math.ceil(key.key_size / 8) * 2)
         self.assertIs(key.verify.called, True)
 
     def test_verify_old_api(self):
+        import math
         from josepy.jwa import ES256
-        key = mock.MagicMock(spec=[u'verifier'])
+        from cryptography.hazmat.primitives.asymmetric.ec import SECP521R1
+        key = mock.MagicMock(spec=[u'verifier'], key_size=521, curve=SECP521R1())
         verifier = mock.MagicMock()
         key.verifier.return_value = verifier
-        key.key_size = 65 * 8
-        ES256.verify(key, "message", b'\x00' * int(key.key_size / 8) * 2)
+        ES256.verify(key, "message", b'\x00' * math.ceil(key.key_size / 8) * 2)
         self.assertIs(key.verifier.called, True)
         self.assertIs(verifier.update.called, True)
         self.assertIs(verifier.verify.called, True)
@@ -210,8 +215,8 @@ class JWAECTest(unittest.TestCase):
         key = JWK.from_json(
             {
                 'd': 'Af9KP6DqLRbtit6NS_LRIaCP_-NdC5l5R2ugbILdfpv6dS9R4wUPNxiGw-vVWumA56Yo1oBnEm8ZdR4W-u1lPHw5',
-                'x': 'PiLhJPInTuJkmQeSkoQ64gKmfogeSfPACWt_7XDVrl2o6xF7fQQQJI3i8XFp4Ca10FIIoHAKruHWrhs-AysxS8U',
-                'y': 'cCVfGtpuNzH_IHEY5ueb8OQRAwkrUTr04djfHdXEXlVegpz3cIbgYuho--mFlC9me3kR8TFCg-S3A4whWEEdoVE',
+                'x': 'AD4i4STyJ07iZJkHkpKEOuICpn6IHknzwAlrf-1w1a5dqOsRe30EECSN4vFxaeAmtdBSCKBwCq7h1q4bPgMrMUvF',
+                'y': 'AHAlXxrabjcx_yBxGObnm_DkEQMJK1E69OHY3x3VxF5VXoKc93CG4GLoaPvphZQvZnt5EfExQoPktwOMIVhBHaFR',
                 'crv': 'P-521',
                 'kty': 'EC'
             })

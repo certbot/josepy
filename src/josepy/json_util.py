@@ -68,10 +68,12 @@ class Field(object):
         return self._empty(value) and self.omitempty
 
     def _update_params(self, **kwargs):
-        current = dict(json_name=self.json_name, default=self.default,
-                       omitempty=self.omitempty,
-                       decoder=self.fdec, encoder=self.fenc)
-        current.update(kwargs)
+        current = {
+            "json_name": self.json_name, "default": self.default,
+            "omitempty": self.omitempty,
+            "decoder": self.fdec, "encoder": self.fenc,
+            **kwargs,
+        }
         return type(self)(**current)  # pylint: disable=star-args
 
     def decoder(self, fdec):
@@ -104,8 +106,8 @@ class Field(object):
             return tuple(cls.default_decoder(subvalue) for subvalue in value)
         elif isinstance(value, dict):
             return util.frozendict(
-                dict((cls.default_decoder(key), cls.default_decoder(value))
-                     for key, value in value.items()))
+                {cls.default_decoder(key): cls.default_decoder(value)
+                 for key, value in value.items()})
         else:  # integer or string
             return value
 
@@ -210,13 +212,14 @@ class JSONObjectWithFields(util.ImmutableMap,
     @classmethod
     def _defaults(cls):
         """Get default fields values."""
-        return dict([(slot, field.default) for slot, field
-                     in cls._fields.items()])
+        return {
+            slot: field.default for slot, field in cls._fields.items()
+        }
 
     def __init__(self, **kwargs):
         # pylint: disable=star-args
         super(JSONObjectWithFields, self).__init__(
-            **(dict(self._defaults(), **kwargs)))
+            **{**self._defaults(), **kwargs})
 
     def encode(self, name):
         """Encode a single field.

@@ -143,8 +143,8 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
                 # unhashable list
                 return tuple(_serialize(subobj) for subobj in obj)
             elif isinstance(obj, Mapping):
-                return dict((_serialize(key), _serialize(value))
-                            for key, value in obj.items())
+                return {_serialize(key): _serialize(value)
+                        for key, value in obj.items()}
             else:
                 return obj
 

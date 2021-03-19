@@ -182,8 +182,7 @@ class ImmutableMap(Mapping, Hashable):  # type: ignore
 
     def update(self, **kwargs):
         """Return updated map."""
-        items = dict(self)
-        items.update(kwargs)
+        items = {**self, **kwargs}
         return type(self)(**items)  # pylint: disable=star-args
 
     def __getitem__(self, key):

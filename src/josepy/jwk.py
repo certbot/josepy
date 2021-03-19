@@ -47,8 +47,8 @@ class JWK(json_util.TypedJSONObjectWithFields):
         """
         digest = hashes.Hash(hash_function(), backend=default_backend())
         digest.update(json.dumps(
-            dict((k, v) for k, v in self.to_json().items()
-                 if k in self.required),
+            {k: v for k, v in self.to_json().items()
+                if k in self.required},
             **self._thumbprint_json_dumps_params).encode())
         return digest.finalize()
 
@@ -245,8 +245,8 @@ class JWKRSA(JWK):
                 'dq': private.dmq1,
                 'qi': private.iqmp,
             }
-        return dict((key, self._encode_param(value))
-                    for key, value in params.items())
+        return {key: self._encode_param(value)
+                for key, value in params.items()}
 
 
 @JWK.register

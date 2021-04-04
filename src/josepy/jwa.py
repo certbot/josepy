@@ -5,6 +5,7 @@ https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
 """
 import abc
 import logging
+from typing import Dict, Type
 
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
@@ -30,7 +31,7 @@ class JWA(interfaces.JSONDeSerializable):  # pylint: disable=abstract-method
 
 class JWASignature(JWA, Hashable):
     """Base class for JSON Web Signature Algorithms."""
-    SIGNATURES = {}  # type: dict
+    SIGNATURES: Dict[str, Type] = {}
 
     def __init__(self, name):
         self.name = name

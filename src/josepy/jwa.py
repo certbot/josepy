@@ -8,9 +8,9 @@ import logging
 
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes  # type: ignore
-from cryptography.hazmat.primitives import hmac  # type: ignore
-from cryptography.hazmat.primitives.asymmetric import padding, ec  # type: ignore
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hmac
+from cryptography.hazmat.primitives.asymmetric import padding, ec
 from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
 from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature
 
@@ -28,7 +28,7 @@ class JWA(interfaces.JSONDeSerializable):  # pylint: disable=abstract-method
     """JSON Web Algorithm."""
 
 
-class JWASignature(JWA, Hashable):  # type: ignore
+class JWASignature(JWA, Hashable):
     """Base class for JSON Web Signature Algorithms."""
     SIGNATURES = {}  # type: dict
 

@@ -164,7 +164,7 @@ class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
         return self.__class__(key)
 
 
-class ImmutableMap(Mapping, Hashable):  # type: ignore
+class ImmutableMap(Mapping, Hashable):
     # pylint: disable=too-few-public-methods
     """Immutable key to value mapping with attribute access."""
 
@@ -209,7 +209,7 @@ class ImmutableMap(Mapping, Hashable):  # type: ignore
             for key, value in self.items()))
 
 
-class frozendict(Mapping, Hashable):  # type: ignore
+class frozendict(Mapping, Hashable):
     # pylint: disable=invalid-name,too-few-public-methods
     """Frozen dictionary."""
     __slots__ = ('_items', '_keys')

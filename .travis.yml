@@ -1,7 +1,7 @@
 language: python
 sudo: false
 cache: pip
-dist: xenial
+dist: bionic
 matrix:
   include:
     - python: "3.6"

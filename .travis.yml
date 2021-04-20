@@ -5,13 +5,13 @@ dist: xenial
 matrix:
   include:
     - python: "3.6"
-      env: TOXENV=py36, mypy
+      env: TOXENV=py36,mypy
     - python: "3.7"
-      env: TOXENV=py37, mypy
+      env: TOXENV=py37,mypy
     - python: "3.8"
-      env: TOXENV=py38, mypy
+      env: TOXENV=py38,mypy
     - python: "3.9"
-      env: TOXENV=py39, mypy
+      env: TOXENV=py39,mypy
 install:
   - pip install tox-travis codecov
 script:

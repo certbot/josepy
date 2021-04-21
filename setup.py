@@ -73,7 +73,6 @@ setup(
         'dev': dev_extras,
         'docs': docs_extras,
         'tests': testing_requires,
-        'mypy': ['mypy']
     },
     entry_points={
         'console_scripts': [

@@ -4,11 +4,13 @@ import json
 import logging
 import math
 
+from typing import Dict, Optional, Sequence, Type, Union
+
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes  # type: ignore
+from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ec  # type: ignore
+from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 from josepy import errors, json_util, util
@@ -16,18 +18,18 @@ from josepy import errors, json_util, util
 logger = logging.getLogger(__name__)
 
 
-class JWK(json_util.TypedJSONObjectWithFields):
+class JWK(json_util.TypedJSONObjectWithFields, metaclass=abc.ABCMeta):
     # pylint: disable=too-few-public-methods
     """JSON Web Key."""
     type_field_name = 'kty'
-    TYPES = {}  # type: dict
-    cryptography_key_types = ()  # type: tuple
+    TYPES: Dict[str, Type] = {}
+    cryptography_key_types: Sequence[Type] = ()
     """Subclasses should override."""
 
-    required = NotImplemented
+    required: Sequence[str] = NotImplemented
     """Required members of public key's representation as defined by JWK/JWA."""
 
-    _thumbprint_json_dumps_params = {
+    _thumbprint_json_dumps_params: Dict[str, Union[Optional[int], Sequence[str], bool]] = {
         # "no whitespace or line breaks before or after any syntactic
         # elements"
         'indent': None,

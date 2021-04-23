@@ -27,7 +27,7 @@ class JWKTest(unittest.TestCase):
 class JWKTestBaseMixin(object):
     """Mixin test for JWK subclass tests."""
 
-    thumbprint = NotImplemented
+    thumbprint: bytes = NotImplemented
 
     def test_thumbprint_private(self):
         self.assertEqual(self.thumbprint, self.jwk.thumbprint())

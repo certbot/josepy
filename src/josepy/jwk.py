@@ -13,6 +13,11 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import rsa
 
+from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+    Ed25519PrivateKey,
+    Ed25519PublicKey,
+)
+
 from josepy import errors, json_util, util
 
 logger = logging.getLogger(__name__)
@@ -365,3 +370,95 @@ class JWKEC(JWK):
         else:
             key = self.key.public_numbers().public_key(default_backend())
         return type(self)(key=key)
+
+
+@JWK.register
+class JWKEd25519(Algorithm):
+    """
+    Performs signing and verification operations using Ed25519
+
+    This class requires ``cryptography>=2.6`` to be installed.
+    """
+
+    def __init__(self, **kwargs):
+        pass
+
+    def prepare_key(self, key):
+
+        if isinstance(key, (Ed25519PrivateKey, Ed25519PublicKey)):
+            return key
+
+        if isinstance(key, (bytes, str)):
+            if isinstance(key, str):
+                key = key.encode("utf-8")
+            str_key = key.decode("utf-8")
+
+            if "-----BEGIN PUBLIC" in str_key:
+                return load_pem_public_key(key)
+            if "-----BEGIN PRIVATE" in str_key:
+                return load_pem_private_key(key, password=None)
+            if str_key[0:4] == "ssh-":
+                return load_ssh_public_key(key)
+
+        raise TypeError("Expecting a PEM-formatted or OpenSSH key.")
+
+    def sign(self, msg, key):
+        """
+        Sign a message ``msg`` using the Ed25519 private key ``key``
+        :param str|bytes msg: Message to sign
+        :param Ed25519PrivateKey key: A :class:`.Ed25519PrivateKey` instance
+        :return bytes signature: The signature, as bytes
+        """
+        msg = bytes(msg, "utf-8") if type(msg) is not bytes else msg
+        return key.sign(msg)
+
+    def verify(self, msg, key, sig):
+        """
+        Verify a given ``msg`` against a signature ``sig`` using the Ed25519 key ``key``
+
+        :param str|bytes sig: Ed25519 signature to check ``msg`` against
+        :param str|bytes msg: Message to sign
+        :param Ed25519PrivateKey|Ed25519PublicKey key: A private or public Ed25519 key instance
+        :return bool verified: True if signature is valid, False if not.
+        """
+        try:
+            msg = bytes(msg, "utf-8") if type(msg) is not bytes else msg
+            sig = bytes(sig, "utf-8") if type(sig) is not bytes else sig
+
+            if isinstance(key, Ed25519PrivateKey):
+                key = key.public_key()
+            key.verify(sig, msg)
+            return True  # If no exception was raised, the signature is valid.
+        except cryptography.exceptions.InvalidSignature:
+            return False
+
+    @staticmethod
+    def from_jwk(jwk):
+        try:
+            if isinstance(jwk, str):
+                obj = json.loads(jwk)
+            elif isinstance(jwk, dict):
+                obj = jwk
+            else:
+                raise ValueError
+        except ValueError:
+            raise InvalidKeyError("Key is not valid JSON")
+
+        if obj.get("kty") != "OKP":
+            raise InvalidKeyError("Not an Octet Key Pair")
+
+        curve = obj.get("crv")
+        if curve != "Ed25519":
+            raise InvalidKeyError(f"Invalid curve: {curve}")
+
+        if "x" not in obj:
+            raise InvalidKeyError('OKP should have "x" parameter')
+        x = base64url_decode(obj.get("x"))
+
+        try:
+            if "d" not in obj:
+                return Ed25519PublicKey.from_public_bytes(x)
+            d = base64url_decode(obj.get("d"))
+            return Ed25519PrivateKey.from_private_bytes(d)
+        except ValueError as err:
+            raise InvalidKeyError("Invalid key parameter") from err

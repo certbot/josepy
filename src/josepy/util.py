@@ -4,6 +4,10 @@ from collections.abc import Hashable, Mapping
 import OpenSSL
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives.asymmetric.ed448 import Ed448PrivateKey
+from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
+from cryptography.hazmat.primitives.asymmetric.x448 import X448PrivateKey
 
 
 class abstractclassmethod(classmethod):
@@ -131,10 +135,19 @@ class ComparableRSAKey(ComparableKey):  # pylint: disable=too-few-public-methods
 
 
 class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
-    """Wrapper for ``cryptography`` RSA keys.
+    """Wrapper for ``cryptography`` EC keys.
     Wraps around:
     - :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey`
+
     """
 
     def __hash__(self):
@@ -156,6 +169,29 @@ class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
         else:
             key = self._wrapped.public_numbers().public_key(default_backend())
         return self.__class__(key)
+
+
+class ComparableEdDSAKey(ComparableKey):
+    """Wrapper for ``cryptography`` EdDSA keys.
+    Wraps around:
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey`
+    """
+
+    def __hash__(self):
+        if isinstance(self._wrapped, ):
+            priv = self.private_numbers()
+            pub = priv.public_numbers
+            return hash((self.__class__, pub.curve.name, pub.x, pub.y, priv.private_value))
+        elif isinstance(self._wrapped, ec.EllipticCurvePublicKeyWithSerialization):
+            pub = self.public_numbers()
+            return hash((self.__class__, pub.curve.name, pub.x, pub.y))
 
 
 class ImmutableMap(Mapping, Hashable):

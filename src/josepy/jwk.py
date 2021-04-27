@@ -17,6 +17,10 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
     Ed25519PublicKey,
 )
+from cryptography.hazmat.primitives.asymmetric.ed448 import (
+    Ed448PrivateKey,
+    Ed448PublicKey,
+)
 
 from josepy import errors, json_util, util
 
@@ -261,8 +265,17 @@ class JWKEC(JWK):
     """EC JWK.
 
     :ivar key: :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
-        or :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey` wrapped
-        in :class:`~josepy.util.ComparableRSAKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.x448.Ed448PrivateKey`
+
+        wrapped
+        in :class:`~josepy.util.ComparableECKey`
 
     """
     typ = 'EC'
@@ -373,34 +386,28 @@ class JWKEC(JWK):
 
 
 @JWK.register
-class JWKEd25519(Algorithm):
+class JWKEdDSA(JWK):
     """
-    Performs signing and verification operations using Ed25519
+    Performs signing and verification operations using either
+    Ed25519 or X448. See RFC 8037.
 
     This class requires ``cryptography>=2.6`` to be installed.
     """
 
-    def __init__(self, **kwargs):
-        pass
+    typ = 'EdDSA'
+    __slots__ = ('key',)    :ivar key: :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey` wrapped
+        in :class:`~josepy.util.ComparableRSAKey`
 
-    def prepare_key(self, key):
+    cryptography_key_types = (
+        Ed25519PrivateKey, Ed25519PrivateKey, Ed448PublicKey, Ed448PrivateKey,
+    )
+    required = ('crv', JWK.type_field_name, 'x', 'y')
 
-        if isinstance(key, (Ed25519PrivateKey, Ed25519PublicKey)):
-            return key
 
-        if isinstance(key, (bytes, str)):
-            if isinstance(key, str):
-                key = key.encode("utf-8")
-            str_key = key.decode("utf-8")
 
-            if "-----BEGIN PUBLIC" in str_key:
-                return load_pem_public_key(key)
-            if "-----BEGIN PRIVATE" in str_key:
-                return load_pem_private_key(key, password=None)
-            if str_key[0:4] == "ssh-":
-                return load_ssh_public_key(key)
-
-        raise TypeError("Expecting a PEM-formatted or OpenSSH key.")
+    def thumbprint(self, hash_function=hashes.SHA256):
+        return super().thumbprint(hash_function)
 
     def sign(self, msg, key):
         """
@@ -411,6 +418,10 @@ class JWKEd25519(Algorithm):
         """
         msg = bytes(msg, "utf-8") if type(msg) is not bytes else msg
         return key.sign(msg)
+
+    @classmethod
+    def from_json(cls, jobj):
+        return super().from_json(jobj)
 
     def verify(self, msg, key, sig):
         """
@@ -432,33 +443,36 @@ class JWKEd25519(Algorithm):
         except cryptography.exceptions.InvalidSignature:
             return False
 
-    @staticmethod
-    def from_jwk(jwk):
-        try:
-            if isinstance(jwk, str):
-                obj = json.loads(jwk)
-            elif isinstance(jwk, dict):
-                obj = jwk
-            else:
-                raise ValueError
-        except ValueError:
-            raise InvalidKeyError("Key is not valid JSON")
+    def public_key(self):
+        pass
 
-        if obj.get("kty") != "OKP":
-            raise InvalidKeyError("Not an Octet Key Pair")
-
-        curve = obj.get("crv")
-        if curve != "Ed25519":
-            raise InvalidKeyError(f"Invalid curve: {curve}")
-
-        if "x" not in obj:
-            raise InvalidKeyError('OKP should have "x" parameter')
-        x = base64url_decode(obj.get("x"))
-
-        try:
-            if "d" not in obj:
-                return Ed25519PublicKey.from_public_bytes(x)
-            d = base64url_decode(obj.get("d"))
-            return Ed25519PrivateKey.from_private_bytes(d)
-        except ValueError as err:
-            raise InvalidKeyError("Invalid key parameter") from err
+    # @staticmethod
+    # def from_jwk(jwk):
+    #     try:
+    #         if isinstance(jwk, str):
+    #             obj = json.loads(jwk)
+    #         elif isinstance(jwk, dict):
+    #             obj = jwk
+    #         else:
+    #             raise ValueError
+    #     except ValueError:
+    #         raise InvalidKeyError("Key is not valid JSON")
+    #
+    #     if obj.get("kty") != "OKP":
+    #         raise InvalidKeyError("Not an Octet Key Pair")
+    #
+    #     curve = obj.get("crv")
+    #     if curve != "Ed25519":
+    #         raise InvalidKeyError(f"Invalid curve: {curve}")
+    #
+    #     if "x" not in obj:
+    #         raise InvalidKeyError('OKP should have "x" parameter')
+    #     x = base64url_decode(obj.get("x"))
+    #
+    #     try:
+    #         if "d" not in obj:
+    #             return Ed25519PublicKey.from_public_bytes(x)
+    #         d = base64url_decode(obj.get("d"))
+    #         return Ed25519PrivateKey.from_private_bytes(d)
+    #     except ValueError as err:
+    #         raise InvalidKeyError("Invalid key parameter") from err

@@ -320,5 +320,30 @@ AwEHoUQDQgAEGS5RvStca15z2FEanCM3juoX7tE/LB7iD44GWawGE40APAl/iZuH
         JWK.from_json(data)
 
 
+class JWKXTest(unittest.TestCase, JWKTestBaseMixin):
+    """Tests for josepy.jwk.JWKX."""
+    # pylint: disable=too-many-instance-attributes
+
+    def test_encode_ed448(self):
+        from josepy.jwk import JWKEdDSA, JWK
+        import josepy
+        data = b"""
+        """
+        key = JWKEdDSA.load(data)
+        data = key.to_partial_json()
+        key = JWKEdDSA.load(data)
+        y = josepy.json_util.decode_b64jose(data['y'])
+
+    def test_encode_ed25519(self):
+        from josepy.jwk import JWKEdDSA, JWK
+        import josepy
+        data = b"""
+        """
+        key = JWKEdDSA.load(data)
+        data = key.to_partial_json()
+        key = JWKEdDSA.load(data)
+        y = josepy.json_util.decode_b64jose(data['y'])
+
+
 if __name__ == '__main__':
     unittest.main()  # pragma: no cover

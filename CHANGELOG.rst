@@ -5,6 +5,8 @@ Changelog
 --------------
 
 * Removed pytest-cache testing dependency.
+* Added support for Ed25519 and Ed448 keys (see `RFC 8037 <https://tools.ietf.org/html/rfc8037>`_).
+* Minimum requirement of ``cryptography`` is now 2.6+.
 
 1.8.0 (2021-03-15)
 ------------------

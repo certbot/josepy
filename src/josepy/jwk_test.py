@@ -10,6 +10,10 @@ RSA512_KEY = test_util.load_rsa_private_key('rsa512_key.pem')
 EC_P256_KEY = test_util.load_ec_private_key('ec_p256_key.pem')
 EC_P384_KEY = test_util.load_ec_private_key('ec_p384_key.pem')
 EC_P521_KEY = test_util.load_ec_private_key('ec_p521_key.pem')
+Ed25519_KEY = test_util.load_ec_private_key('ed25519_key.pem')
+Ed448_KEY = test_util.load_ec_private_key('ed448_key.pem')
+X25519_KEY = test_util.load_ec_private_key('x25519_key.pem')
+X448_KEY = test_util.load_ec_private_key('x448_key.pem')
 
 
 class JWKTest(unittest.TestCase):
@@ -320,29 +324,38 @@ AwEHoUQDQgAEGS5RvStca15z2FEanCM3juoX7tE/LB7iD44GWawGE40APAl/iZuH
         JWK.from_json(data)
 
 
-class JWKXTest(unittest.TestCase, JWKTestBaseMixin):
-    """Tests for josepy.jwk.JWKX."""
+class JWKOKPTest(JWKTestBaseMixin, unittest.TestCase):
+    """Tests for josepy.jwk.JWKOKP."""
     # pylint: disable=too-many-instance-attributes
 
-    def test_encode_ed448(self):
-        from josepy.jwk import JWKEdDSA, JWK
-        import josepy
-        data = b"""
-        """
-        key = JWKEdDSA.load(data)
-        data = key.to_partial_json()
-        key = JWKEdDSA.load(data)
-        y = josepy.json_util.decode_b64jose(data['y'])
+    def setUp(self):
+        from josepy.jwk import JWKOKP, JWK
+        self.ed25519_key = JWKOKP(key=Ed25519_KEY.public_key())
+        self.ed448_key = JWKOKP(key=Ed448_KEY.public_key())
+        self.x25519_key = JWKOKP(key=X25519_KEY.public_key())
+        self.x448_key = JWKOKP(key=X448_KEY.public_key())
 
-    def test_encode_ed25519(self):
-        from josepy.jwk import JWKEdDSA, JWK
+    def test_encode_ed448(self):
+        from josepy.jwk import JWKOKP
         import josepy
-        data = b"""
-        """
-        key = JWKEdDSA.load(data)
+        data = b"""-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
+-----END PRIVATE KEY-----"""
+        key = JWKOKP.load(data)
         data = key.to_partial_json()
-        key = JWKEdDSA.load(data)
+        key = JWKOKP.load(data)
         y = josepy.json_util.decode_b64jose(data['y'])
+        self.assertEqual(len(y), 64)
+
+    # def test_encode_ed25519(self):
+    #     from josepy.jwk import JWKOKP
+    #     import josepy
+    #     data = b"""
+    #     """
+    #     key = JWKEdDSA.load(data)
+    #     data = key.to_partial_json()
+    #     key = JWKEdDSA.load(data)
+    #     y = josepy.json_util.decode_b64jose(data['y'])
 
 
 if __name__ == '__main__':

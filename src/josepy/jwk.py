@@ -400,7 +400,7 @@ class JWKOKP(JWK):
 
     def __init__(self, *args, **kwargs):
         if 'key' in kwargs and not isinstance(kwargs['key'], util.ComparableOKPKey):
-            kwargs['key'] = util.ComparableECKey(kwargs['key'])
+            kwargs['key'] = util.ComparableOKPKey(kwargs['key'])
         super(JWKOKP, self).__init__(*args, **kwargs)
 
     def sign(
@@ -425,6 +425,9 @@ class JWKOKP(JWK):
 
     def public_key(self):
         return
+
+    def to_partial_json(self):
+        return super().to_partial_json()
 
     @classmethod
     def from_json(cls, jobj):

@@ -3,7 +3,7 @@ from collections.abc import Hashable, Mapping
 
 import OpenSSL
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import ec, rsa, ed25519, ed448
+from cryptography.hazmat.primitives.asymmetric import ec, rsa  # , ed25519, ed448
 
 
 class abstractclassmethod(classmethod):

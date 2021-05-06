@@ -13,13 +13,8 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from cryptography.hazmat.primitives.asymmetric.ed25519 import (
-    Ed25519PrivateKey,
-    Ed25519PublicKey,
-)
-from cryptography.hazmat.primitives.asymmetric.ed448 import (
-    Ed448PrivateKey,
-    Ed448PublicKey,
+from cryptography.hazmat.primitives.asymmetric import (
+    ed25519, ed448, x25519, x448,
 )
 
 from josepy import errors, json_util, util
@@ -266,13 +261,6 @@ class JWKEC(JWK):
 
     :ivar key: :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
         or :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey`
-        or :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey`
-        or :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey`
-        or :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey`
-        or :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey`
-        or :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
-        or :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey`
-        or :class:`~cryptography.hazmat.primitives.asymmetric.x448.Ed448PrivateKey`
 
         wrapped
         in :class:`~josepy.util.ComparableECKey`
@@ -386,38 +374,57 @@ class JWKEC(JWK):
 
 
 @JWK.register
-class JWKEdDSA(JWK):
+class JWKOKP(JWK):
     """
     Performs signing and verification operations using either
-    Ed25519 or X448. See RFC 8037.
+    Ed25519, Ed448, X25519 or X448. See RFC 8037 and RFC 8032 for details about
+    the algorithms, and signing, respectively.
+
+    :ivar: :key :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey`
 
     This class requires ``cryptography>=2.6`` to be installed.
     """
-
-    typ = 'EdDSA'
-    __slots__ = ('key',)    :ivar key: :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
-        or :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey` wrapped
-        in :class:`~josepy.util.ComparableRSAKey`
+    typ = 'OKP'
+    __slots__ = ('key', )
 
     cryptography_key_types = (
-        Ed25519PrivateKey, Ed25519PrivateKey, Ed448PublicKey, Ed448PrivateKey,
+        ed25519.Ed25519PrivateKey, ed25519.Ed25519PrivateKey,
+        ed448.Ed448PublicKey, ed448.Ed448PrivateKey,
+        x25519.X25519PrivateKey, x25519.X25519PublicKey,
+        x448.X448PrivateKey, x448.X448PublicKey,
     )
-    required = ('crv', JWK.type_field_name, 'x', 'y')
+    required = ('crv', JWK.type_field_name, 'x')
 
+    def __init__(self, *args, **kwargs):
+        if 'key' in kwargs and not isinstance(kwargs['key'], util.ComparableOKPKey):
+            kwargs['key'] = util.ComparableECKey(kwargs['key'])
+        super(JWKOKP, self).__init__(*args, **kwargs)
 
-
-    def thumbprint(self, hash_function=hashes.SHA256):
-        return super().thumbprint(hash_function)
-
-    def sign(self, msg, key):
+    def sign(
+        self,
+        msg,
+        key: Union[
+            ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey,
+            x25519.X25519PrivateKey, x448.X448PrivateKey
+        ]
+    ) -> bytes:
         """
-        Sign a message ``msg`` using the Ed25519 private key ``key``
-        :param str|bytes msg: Message to sign
-        :param Ed25519PrivateKey key: A :class:`.Ed25519PrivateKey` instance
-        :return bytes signature: The signature, as bytes
+        Sign a message ``msg`` using either the Ed25519 or the Ed448
+        private key ``key``.
+        RFC 8032 contains more details.
         """
         msg = bytes(msg, "utf-8") if type(msg) is not bytes else msg
         return key.sign(msg)
+
+    @classmethod
+    def expected_length_for_curve(cls, curve):
+        return 256
+
+    def public_key(self):
+        return
 
     @classmethod
     def from_json(cls, jobj):
@@ -444,6 +451,10 @@ class JWKEdDSA(JWK):
             return False
 
     def public_key(self):
+        pass
+
+    @classmethod
+    def fields_from_json(cls, jobj):
         pass
 
     # @staticmethod

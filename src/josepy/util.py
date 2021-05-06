@@ -3,11 +3,7 @@ from collections.abc import Hashable, Mapping
 
 import OpenSSL
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import ec, rsa
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-from cryptography.hazmat.primitives.asymmetric.ed448 import Ed448PrivateKey
-from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
-from cryptography.hazmat.primitives.asymmetric.x448 import X448PrivateKey
+from cryptography.hazmat.primitives.asymmetric import ec, rsa, ed25519, ed448
 
 
 class abstractclassmethod(classmethod):
@@ -171,8 +167,9 @@ class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
         return self.__class__(key)
 
 
-class ComparableEdDSAKey(ComparableKey):
-    """Wrapper for ``cryptography`` EdDSA keys.
+class ComparableOKPKey(ComparableKey):
+    """Wrapper for ``cryptography`` OKP keys.
+
     Wraps around:
     - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey`
@@ -185,13 +182,13 @@ class ComparableEdDSAKey(ComparableKey):
     """
 
     def __hash__(self):
-        if isinstance(self._wrapped, ):
-            priv = self.private_numbers()
-            pub = priv.public_numbers
-            return hash((self.__class__, pub.curve.name, pub.x, pub.y, priv.private_value))
-        elif isinstance(self._wrapped, ec.EllipticCurvePublicKeyWithSerialization):
-            pub = self.public_numbers()
-            return hash((self.__class__, pub.curve.name, pub.x, pub.y))
+        # TODO figure out how to do the hashing
+        return hash((self.__class__, self._wrapped.curve.name, pub.x, pub.y))
+
+    def public_key(self):
+        """Get wrapped public key."""
+        key = self._wrapped.public_key()
+        return type(key)()
 
 
 class ImmutableMap(Mapping, Hashable):

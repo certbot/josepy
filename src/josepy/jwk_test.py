@@ -334,6 +334,8 @@ class JWKOKPTest(JWKTestBaseMixin, unittest.TestCase):
         self.ed448_key = JWKOKP(key=Ed448_KEY.public_key())
         self.x25519_key = JWKOKP(key=X25519_KEY.public_key())
         self.x448_key = JWKOKP(key=X448_KEY.public_key())
+        self.private = self.x448_key
+        self.jwk = self.private
 
     def test_encode_ed448(self):
         from josepy.jwk import JWKOKP

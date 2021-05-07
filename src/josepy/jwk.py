@@ -1,5 +1,6 @@
 """JSON Web Key."""
 import abc
+import base64
 import json
 import logging
 import math
@@ -419,74 +420,36 @@ class JWKOKP(JWK):
         msg = bytes(msg, "utf-8") if type(msg) is not bytes else msg
         return key.sign(msg)
 
-    @classmethod
-    def expected_length_for_curve(cls, curve):
-        return 256
-
     def public_key(self):
-        return
-
-    def to_partial_json(self):
-        return super().to_partial_json()
-
-    @classmethod
-    def from_json(cls, jobj):
-        return super().from_json(jobj)
-
-    def verify(self, msg, key, sig):
-        """
-        Verify a given ``msg`` against a signature ``sig`` using the Ed25519 key ``key``
-
-        :param str|bytes sig: Ed25519 signature to check ``msg`` against
-        :param str|bytes msg: Message to sign
-        :param Ed25519PrivateKey|Ed25519PublicKey key: A private or public Ed25519 key instance
-        :return bool verified: True if signature is valid, False if not.
-        """
-        try:
-            msg = bytes(msg, "utf-8") if type(msg) is not bytes else msg
-            sig = bytes(sig, "utf-8") if type(sig) is not bytes else sig
-
-            if isinstance(key, Ed25519PrivateKey):
-                key = key.public_key()
-            key.verify(sig, msg)
-            return True  # If no exception was raised, the signature is valid.
-        except cryptography.exceptions.InvalidSignature:
-            return False
-
-    def public_key(self):
-        pass
+        return type(self)(key=self.key.public_key())
 
     @classmethod
     def fields_from_json(cls, jobj):
-        pass
+        try:
+            if isinstance(jobj, str):
+                obj = json.loads(jobj)
+            elif isinstance(jobj, dict):
+                obj = jobj
+            else:
+                raise ValueError
+        except ValueError:
+            raise errors.DeserializationError("Key is not valid JSON")
 
-    # @staticmethod
-    # def from_jwk(jwk):
-    #     try:
-    #         if isinstance(jwk, str):
-    #             obj = json.loads(jwk)
-    #         elif isinstance(jwk, dict):
-    #             obj = jwk
-    #         else:
-    #             raise ValueError
-    #     except ValueError:
-    #         raise InvalidKeyError("Key is not valid JSON")
-    #
-    #     if obj.get("kty") != "OKP":
-    #         raise InvalidKeyError("Not an Octet Key Pair")
-    #
-    #     curve = obj.get("crv")
-    #     if curve != "Ed25519":
-    #         raise InvalidKeyError(f"Invalid curve: {curve}")
-    #
-    #     if "x" not in obj:
-    #         raise InvalidKeyError('OKP should have "x" parameter')
-    #     x = base64url_decode(obj.get("x"))
-    #
-    #     try:
-    #         if "d" not in obj:
-    #             return Ed25519PublicKey.from_public_bytes(x)
-    #         d = base64url_decode(obj.get("d"))
-    #         return Ed25519PrivateKey.from_private_bytes(d)
-    #     except ValueError as err:
-    #         raise InvalidKeyError("Invalid key parameter") from err
+        if obj.get("kty") != "OKP":
+            raise errors.DeserializationError("Not an Octet Key Pair")
+
+        curve = obj.get("crv")
+        if curve not in ("Ed25519", "Ed448", "X25519", "X448"):
+            raise errors.DeserializationError(f"Invalid curve: {curve}")
+
+        if "x" not in obj:
+            raise errors.DeserializationError('OKP should have "x" parameter')
+        x = base64.b64decode(jobj.get("x"))
+
+        try:
+            if "d" not in obj:
+                return jobj.key.from_public_bytes(x)
+            d = base64.b64decode(obj.get("d"))
+            return jobj.from_private_bytes(d)
+        except ValueError as err:
+            raise errors.DeserializationError("Invalid key parameter") from err

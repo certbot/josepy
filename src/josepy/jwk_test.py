@@ -329,7 +329,7 @@ class JWKOKPTest(JWKTestBaseMixin, unittest.TestCase):
     # pylint: disable=too-many-instance-attributes
 
     def setUp(self):
-        from josepy.jwk import JWKOKP, JWK
+        from josepy.jwk import JWKOKP
         self.ed25519_key = JWKOKP(key=Ed25519_KEY.public_key())
         self.ed448_key = JWKOKP(key=Ed448_KEY.public_key())
         self.x25519_key = JWKOKP(key=X25519_KEY.public_key())
@@ -341,7 +341,8 @@ class JWKOKPTest(JWKTestBaseMixin, unittest.TestCase):
         from josepy.jwk import JWKOKP
         import josepy
         data = b"""-----BEGIN PRIVATE KEY-----
-MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
+MEcCAQAwBQYDK2VxBDsEOfqsAFWdop10FFPW7Ha2tx2AZh0Ii+jfL2wFXU/dY/fe
+iU7/vrGmQ+ux26NkgzfploOHZjEmltLJ9w==
 -----END PRIVATE KEY-----"""
         key = JWKOKP.load(data)
         data = key.to_partial_json()
@@ -349,15 +350,17 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
         y = josepy.json_util.decode_b64jose(data['y'])
         self.assertEqual(len(y), 64)
 
-    # def test_encode_ed25519(self):
-    #     from josepy.jwk import JWKOKP
-    #     import josepy
-    #     data = b"""
-    #     """
-    #     key = JWKEdDSA.load(data)
-    #     data = key.to_partial_json()
-    #     key = JWKEdDSA.load(data)
-    #     y = josepy.json_util.decode_b64jose(data['y'])
+    def test_encode_ed25519(self):
+        from josepy.jwk import JWKOKP
+        import josepy
+        data = b"""-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
+-----END PRIVATE KEY-----"""
+        key = JWKOKP.load(data)
+        data = key.to_partial_json()
+        key = JWKOKP.load(data)
+        y = josepy.json_util.decode_b64jose(data['y'])
+        self.assertEqual(len(y), 64)
 
 
 if __name__ == '__main__':

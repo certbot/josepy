@@ -402,7 +402,7 @@ class JWKOKP(JWK):
     def __init__(self, *args, **kwargs):
         if 'key' in kwargs and not isinstance(kwargs['key'], util.ComparableOKPKey):
             kwargs['key'] = util.ComparableOKPKey(kwargs['key'])
-        super(JWKOKP, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def sign(
         self,
@@ -425,6 +425,7 @@ class JWKOKP(JWK):
 
     @classmethod
     def fields_from_json(cls, jobj):
+        # TODO finish this
         try:
             if isinstance(jobj, str):
                 obj = json.loads(jobj)

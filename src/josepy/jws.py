@@ -8,7 +8,7 @@ import OpenSSL
 from josepy import b64, errors, json_util, jwa, jwk, util
 
 
-class MediaType(object):
+class MediaType:
     """MediaType field encoder/decoder."""
 
     PREFIX = 'application/'
@@ -339,7 +339,7 @@ class JWS(json_util.JSONObjectWithFields):
                                         for sig in jobj['signatures']))
 
 
-class CLI(object):
+class CLI:
     """JWS CLI."""
 
     @classmethod

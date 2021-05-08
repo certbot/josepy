@@ -26,7 +26,7 @@ class abstractclassmethod(classmethod):
         super().__init__(target)
 
 
-class ComparableX509(object):  # pylint: disable=too-few-public-methods
+class ComparableX509:  # pylint: disable=too-few-public-methods
     """Wrapper for OpenSSL.crypto.X509** objects that supports __eq__.
 
     :ivar wrapped: Wrapped certificate or certificate request.
@@ -73,7 +73,7 @@ class ComparableX509(object):  # pylint: disable=too-few-public-methods
         return '<{0}({1!r})>'.format(self.__class__.__name__, self.wrapped)
 
 
-class ComparableKey(object):  # pylint: disable=too-few-public-methods
+class ComparableKey:  # pylint: disable=too-few-public-methods
     """Comparable wrapper for ``cryptography`` keys.
 
     See https://github.com/pyca/cryptography/issues/2122.

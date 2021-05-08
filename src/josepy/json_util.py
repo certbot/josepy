@@ -18,7 +18,7 @@ from josepy import b64, errors, interfaces, util
 logger = logging.getLogger(__name__)
 
 
-class Field(object):
+class Field:
     """JSON object field.
 
     :class:`Field` is meant to be used together with
@@ -140,7 +140,7 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
 
       some_field = Field('someField', default=())
 
-      class Foo(object):
+      class Foo:
           __metaclass__ = JSONObjectWithFieldsMeta
           __slots__ = ('baz',)
           some_field = some_field

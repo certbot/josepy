@@ -8,7 +8,7 @@ warnings.warn("josepy.magic_typing is deprecated and will be removed in a future
               DeprecationWarning)
 
 
-class TypingClass(object):
+class TypingClass:
     """Ignore import errors by getting anything"""
     def __getattr__(self, name):
         return None

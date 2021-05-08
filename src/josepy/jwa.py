@@ -44,9 +44,6 @@ class JWASignature(JWA, Hashable):
     def __hash__(self):
         return hash((self.__class__, self.name))
 
-    def __ne__(self, other):
-        return not self == other
-
     @classmethod
     def register(cls, signature_cls):
         """Register class for JSON deserialization."""

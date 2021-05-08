@@ -69,9 +69,6 @@ class ComparableX509(object):  # pylint: disable=too-few-public-methods
     def __hash__(self):
         return hash((self.__class__, self._dump()))
 
-    def __ne__(self, other):
-        return not self == other
-
     def __repr__(self):
         return '<{0}({1!r})>'.format(self.__class__.__name__, self.wrapped)
 
@@ -101,9 +98,6 @@ class ComparableKey(object):  # pylint: disable=too-few-public-methods
             return self.public_numbers() == other.public_numbers()
         else:
             return NotImplemented
-
-    def __ne__(self, other):
-        return not self == other
 
     def __repr__(self):
         return '<{0}({1!r})>'.format(self.__class__.__name__, self._wrapped)

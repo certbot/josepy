@@ -182,8 +182,7 @@ class ComparableOKPKey(ComparableKey):
     """
 
     def __hash__(self):
-        # TODO figure out how to do the hashing
-        return hash((self.__class__, self._wrapped.curve.name, pub.x, pub.y))
+        return hash((self.__class__, self._wrapped.curve.name, self._wrapped.x))
 
     def public_key(self):
         """Get wrapped public key."""

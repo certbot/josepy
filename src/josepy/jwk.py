@@ -404,28 +404,11 @@ class JWKOKP(JWK):
             kwargs['key'] = util.ComparableOKPKey(kwargs['key'])
         super().__init__(*args, **kwargs)
 
-    def sign(
-        self,
-        msg,
-        key: Union[
-            ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey,
-            x25519.X25519PrivateKey, x448.X448PrivateKey
-        ]
-    ) -> bytes:
-        """
-        Sign a message ``msg`` using either the Ed25519 or the Ed448
-        private key ``key``.
-        RFC 8032 contains more details.
-        """
-        msg = bytes(msg, "utf-8") if type(msg) is not bytes else msg
-        return key.sign(msg)
-
     def public_key(self):
         return type(self)(key=self.key.public_key())
 
     @classmethod
     def fields_from_json(cls, jobj):
-        # TODO finish this
         try:
             if isinstance(jobj, str):
                 obj = json.loads(jobj)
@@ -449,8 +432,9 @@ class JWKOKP(JWK):
 
         try:
             if "d" not in obj:
-                return jobj.key.from_public_bytes(x)
+                # This is the the public key
+                return jobj["key"].from_public_bytes(x)
             d = base64.b64decode(obj.get("d"))
-            return jobj.from_private_bytes(d)
+            return jobj["key"].from_private_bytes(d)
         except ValueError as err:
             raise errors.DeserializationError("Invalid key parameter") from err

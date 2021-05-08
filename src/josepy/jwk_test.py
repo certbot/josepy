@@ -324,7 +324,7 @@ AwEHoUQDQgAEGS5RvStca15z2FEanCM3juoX7tE/LB7iD44GWawGE40APAl/iZuH
         JWK.from_json(data)
 
 
-class JWKOKPTest(JWKTestBaseMixin, unittest.TestCase):
+class JWKOKPTest(unittest.TestCase):
     """Tests for josepy.jwk.JWKOKP."""
     # pylint: disable=too-many-instance-attributes
 
@@ -361,6 +361,17 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
         key = JWKOKP.load(data)
         y = josepy.json_util.decode_b64jose(data['y'])
         self.assertEqual(len(y), 64)
+
+    def test_unknown_crv_name(self):
+        from josepy.jwk import JWK
+        self.assertRaises(
+            errors.DeserializationError, JWK.from_json,
+            {
+                'kty': 'OKP',
+                'crv': 'Ed1000',
+                'x': 'jjQtV-fA7J_tK8dPzYq7jRPNjF8r5p6LW2R25S2Gw5U',
+            }
+        )
 
 
 if __name__ == '__main__':

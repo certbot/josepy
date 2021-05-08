@@ -19,6 +19,7 @@ from cryptography.hazmat.primitives.asymmetric import (
 )
 
 from josepy import errors, json_util, util
+from josepy.util import ComparableOKPKey
 
 logger = logging.getLogger(__name__)
 
@@ -399,7 +400,7 @@ class JWKOKP(JWK):
     )
     required = ('crv', JWK.type_field_name, 'x')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         if 'key' in kwargs and not isinstance(kwargs['key'], util.ComparableOKPKey):
             kwargs['key'] = util.ComparableOKPKey(kwargs['key'])
         super().__init__(*args, **kwargs)
@@ -408,7 +409,7 @@ class JWKOKP(JWK):
         return type(self)(key=self.key.public_key())
 
     @classmethod
-    def fields_from_json(cls, jobj):
+    def fields_from_json(cls, jobj) -> ComparableOKPKey:
         try:
             if isinstance(jobj, str):
                 obj = json.loads(jobj)
@@ -429,6 +430,7 @@ class JWKOKP(JWK):
         if "x" not in obj:
             raise errors.DeserializationError('OKP should have "x" parameter')
         x = base64.b64decode(jobj.get("x"))
+        print(x)
 
         try:
             if "d" not in obj:

@@ -10,7 +10,7 @@ class DeserializationError(Error):
 
     def __str__(self):
         return "Deserialization error: {0}".format(
-            super(DeserializationError, self).__str__())
+            super().__str__())
 
 
 class SerializationError(Error):
@@ -28,7 +28,7 @@ class UnrecognizedTypeError(DeserializationError):
     def __init__(self, typ, jobj):
         self.typ = typ
         self.jobj = jobj
-        super(UnrecognizedTypeError, self).__init__(str(self))
+        super().__init__(str(self))
 
     def __str__(self):
         return '{0} was not recognized, full message: {1}'.format(

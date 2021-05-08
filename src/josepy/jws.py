@@ -163,7 +163,7 @@ class Signature(json_util.JSONObjectWithFields):
     def __init__(self, **kwargs):
         if 'combined' not in kwargs:
             kwargs = self._with_combined(kwargs)
-        super(Signature, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         assert self.combined.alg is not None
 
     @classmethod
@@ -230,14 +230,14 @@ class Signature(json_util.JSONObjectWithFields):
         return cls(protected=protected, header=header, signature=signature)
 
     def fields_to_partial_json(self):
-        fields = super(Signature, self).fields_to_partial_json()
+        fields = super().fields_to_partial_json()
         if not fields['header'].not_omitted():
             del fields['header']
         return fields
 
     @classmethod
     def fields_from_json(cls, jobj):
-        fields = super(Signature, cls).fields_from_json(jobj)
+        fields = super().fields_from_json(jobj)
         fields_with_combined = cls._with_combined(fields)
         if 'alg' not in fields_with_combined['combined'].not_omitted():
             raise errors.DeserializationError('alg not present')

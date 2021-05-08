@@ -23,7 +23,7 @@ class abstractclassmethod(classmethod):
 
     def __init__(self, target):
         target.__isabstractmethod__ = True
-        super(abstractclassmethod, self).__init__(target)
+        super().__init__(target)
 
 
 class ComparableX509(object):  # pylint: disable=too-few-public-methods

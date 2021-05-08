@@ -161,7 +161,7 @@ class JWKRSA(JWK):
         if 'key' in kwargs and not isinstance(
                 kwargs['key'], util.ComparableRSAKey):
             kwargs['key'] = util.ComparableRSAKey(kwargs['key'])
-        super(JWKRSA, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @classmethod
     def _encode_param(cls, data):
@@ -270,7 +270,7 @@ class JWKEC(JWK):
         if 'key' in kwargs and not isinstance(
                 kwargs['key'], util.ComparableECKey):
             kwargs['key'] = util.ComparableECKey(kwargs['key'])
-        super(JWKEC, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @classmethod
     def _encode_param(cls, data, length):

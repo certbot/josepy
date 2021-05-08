@@ -221,7 +221,7 @@ class JSONObjectWithFields(util.ImmutableMap,
 
     def __init__(self, **kwargs):
         # pylint: disable=star-args
-        super(JSONObjectWithFields, self).__init__(
+        super().__init__(
             **{**self._defaults(), **kwargs})
 
     def encode(self, name):

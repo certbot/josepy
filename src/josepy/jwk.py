@@ -263,9 +263,7 @@ class JWKEC(JWK):
 
     :ivar key: :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
         or :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey`
-
-        wrapped
-        in :class:`~josepy.util.ComparableECKey`
+        wrapped in :class:`~josepy.util.ComparableECKey`
 
     """
     typ = 'EC'
@@ -412,9 +410,28 @@ class JWKOKP(JWK):
         params = {}  # type: Dict
         print(self.key)
         if self.key.is_private():
-            print(self.key, dir(self.key._wrapped))
-            params['d'] = base64.b64decode(self.key._wrapped._raw_private_bytes())
-            params['x'] = base64.b64decode(self.key.public_key().public_bytes())
+            print(self.key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.PKCS8,
+                encryption_algorithm=serialization.NoEncryption()
+            ))
+            params['d'] = self.key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.PKCS8,
+                encryption_algorithm=serialization.NoEncryption()
+            )
+            print(params)
+            # params['x'] = self.key.public_key().public_bytes(
+            #     encoding=serialization.Encoding.PEM,
+            #     format=serialization.PublicFormat.PKCS8,
+            #     encryption_algorithm=serialization.NoEncryption()
+            # )
+        else:
+            params['x'] = base64.b64decode(self.key.public_bytes(
+                serialization.Encoding.Raw,
+                serialization.PublicFormat.Raw,
+                serialization.NoEncryption(),
+            ))
         params['crv'] = 'ed25519'
         return params
 

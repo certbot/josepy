@@ -2,6 +2,8 @@
 import binascii
 import unittest
 
+from cryptography.hazmat.backends import default_backend
+
 from josepy import errors, json_util, test_util, util
 
 DSA_PEM = test_util.load_vector('dsa512_key.pem')
@@ -328,6 +330,10 @@ class JWKOKPTest(unittest.TestCase):
     """Tests for josepy.jwk.JWKOKP."""
     # pylint: disable=too-many-instance-attributes
 
+    thumbprint = (
+
+    )
+
     def setUp(self):
         from josepy.jwk import JWKOKP
         self.ed25519_key = JWKOKP(key=Ed25519_KEY.public_key())
@@ -336,6 +342,27 @@ class JWKOKPTest(unittest.TestCase):
         self.x448_key = JWKOKP(key=X448_KEY.public_key())
         self.private = self.x448_key
         self.jwk = self.private
+        # TODO get the vectors from the RFC
+        self.jwked25519json = {
+            'kty': 'OKP',
+            'crv': 'Ed25519',
+            'x': 'jjQtV-fA7J_tK8dPzYq7jRPNjF8r5p6LW2R25S2Gw5U',
+        }
+        self.jwked448json = {
+            'kty': 'EC',
+            'crv': 'Ed448',
+            'x': 'jjQtV-fA7J_tK8dPzYq7jRPNjF8r5p6LW2R25S2Gw5U',
+        }
+        self.jwkx25519json = {
+            'kty': 'EC',
+            'crv': 'Ed448',
+            'x': 'jjQtV-fA7J_tK8dPzYq7jRPNjF8r5p6LW2R25S2Gw5U',
+        }
+        self.jwkx448json = {
+            'kty': 'EC',
+            'crv': 'Ed448',
+            'x': 'jjQtV-fA7J_tK8dPzYq7jRPNjF8r5p6LW2R25S2Gw5U',
+        }
 
     def test_encode_ed448(self):
         from josepy.jwk import JWKOKP
@@ -353,14 +380,15 @@ iU7/vrGmQ+ux26NkgzfploOHZjEmltLJ9w==
     def test_encode_ed25519(self):
         from josepy.jwk import JWKOKP
         import josepy
-        data = b"""-----BEGIN PRIVATE KEY-----
+        data = """-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
 -----END PRIVATE KEY-----"""
-        key = JWKOKP.load(data)
-        data = key.to_partial_json()
-        key = JWKOKP.load(data)
-        y = josepy.json_util.decode_b64jose(data['y'])
-        self.assertEqual(len(y), 64)
+        key = JWKOKP.load(data, backend=default_backend())
+        key
+        # data = key.to_partial_json()
+        # key = JWKOKP.load(data)
+        # y = josepy.json_util.decode_b64jose(data['y'])
+        # self.assertEqual(len(y), 64)
 
     def test_unknown_crv_name(self):
         from josepy.jwk import JWK

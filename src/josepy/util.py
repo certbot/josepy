@@ -3,7 +3,12 @@ from collections.abc import Hashable, Mapping
 
 import OpenSSL
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import ec, rsa  # , ed25519, ed448
+from cryptography.hazmat.primitives.asymmetric import (
+    ec,
+    ed25519, ed448,
+    rsa,
+    x25519, x448,
+)
 
 
 class abstractclassmethod(classmethod):
@@ -183,6 +188,14 @@ class ComparableOKPKey(ComparableKey):
 
     def __hash__(self):
         return hash((self.__class__, self._wrapped.curve.name, self._wrapped.x))
+
+    def is_private(self):
+        return isinstance(
+            self._wrapped, (
+                ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey,
+                x25519.X25519PrivateKey, x448.X448PrivateKey
+            )
+        )
 
     def public_key(self):
         """Get wrapped public key."""

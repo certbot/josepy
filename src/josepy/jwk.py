@@ -408,6 +408,16 @@ class JWKOKP(JWK):
     def public_key(self):
         return type(self)(key=self.key.public_key())
 
+    def fields_to_partial_json(self):
+        params = {}  # type: Dict
+        print(self.key)
+        if self.key.is_private():
+            print(self.key, dir(self.key._wrapped))
+            params['d'] = base64.b64decode(self.key._wrapped._raw_private_bytes())
+            params['x'] = base64.b64decode(self.key.public_key().public_bytes())
+        params['crv'] = 'ed25519'
+        return params
+
     @classmethod
     def fields_from_json(cls, jobj) -> ComparableOKPKey:
         try:
@@ -430,7 +440,7 @@ class JWKOKP(JWK):
         if "x" not in obj:
             raise errors.DeserializationError('OKP should have "x" parameter')
         x = base64.b64decode(jobj.get("x"))
-        print(x)
+        print("x=", x)
 
         try:
             if "d" not in obj:

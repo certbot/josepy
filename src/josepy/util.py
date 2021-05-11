@@ -1,5 +1,6 @@
 """JOSE utilities."""
 from collections.abc import Hashable, Mapping
+from typing import Union
 
 import OpenSSL
 from cryptography.hazmat.backends import default_backend
@@ -140,15 +141,6 @@ class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
     Wraps around:
     - :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey`
-    - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
-    - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey`
-    - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey`
-    - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey`
-    - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey`
-    - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey`
-    - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey`
-    - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey`
-
     """
 
     def __hash__(self):
@@ -197,9 +189,10 @@ class ComparableOKPKey(ComparableKey):
             )
         )
 
-    def public_key(self):
+    def public_key(self) -> Union[ed25519.Ed25519PrivateKey]:
         """Get wrapped public key."""
-        key = self._wrapped.public_key()
+        key = self._wrapped.public_key(
+        )
         return type(key)()
 
 

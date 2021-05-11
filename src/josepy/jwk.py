@@ -342,10 +342,15 @@ class JWKEC(JWK):
             params['d'] = private.private_value
         else:
             raise errors.SerializationError(
-                'Supplied key is neither of type EllipticCurvePublicKey nor EllipticCurvePrivateKey')
+                'Supplied key is neither of type EllipticCurvePublicKey '
+                'nor EllipticCurvePrivateKey'
+            )
         params['x'] = public.x
         params['y'] = public.y
-        params = {key: self._encode_param(value, self.expected_length_for_curve(public.curve)) for key, value in params.items()}
+        params = {
+            key: self._encode_param(value, self.expected_length_for_curve(public.curve))
+            for key, value in params.items()
+        }
         params['crv'] = self._curve_name_to_crv(public.curve.name)
         return params
 
@@ -408,7 +413,6 @@ class JWKOKP(JWK):
 
     def fields_to_partial_json(self):
         params = {}  # type: Dict
-        print(self.key)
         if self.key.is_private():
             print(self.key.private_bytes(
                 encoding=serialization.Encoding.PEM,
@@ -420,7 +424,7 @@ class JWKOKP(JWK):
                 format=serialization.PrivateFormat.PKCS8,
                 encryption_algorithm=serialization.NoEncryption()
             )
-            print(params)
+            print("params", params)
             # params['x'] = self.key.public_key().public_bytes(
             #     encoding=serialization.Encoding.PEM,
             #     format=serialization.PublicFormat.PKCS8,

@@ -389,6 +389,10 @@ class JWKOKP(JWK):
         or :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey`
         or :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
         or :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey`
+        or :ivar: :key :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey`
 
     This class requires ``cryptography>=2.6`` to be installed.
     """
@@ -408,34 +412,33 @@ class JWKOKP(JWK):
             kwargs['key'] = util.ComparableOKPKey(kwargs['key'])
         super().__init__(*args, **kwargs)
 
-    def public_key(self):
-        return type(self)(key=self.key.public_key())
+    def public_key(self) -> Union[
+        ed25519.Ed25519PublicKey, ed448.Ed448PublicKey,
+        x25519.X25519PublicKey, x448.X448PublicKey,
+    ]:
+        # work on the class methods instead :)
+        return self._wrapped.public_key()
 
-    def fields_to_partial_json(self):
+    def fields_to_partial_json(self) -> Dict:
         params = {}  # type: Dict
         if self.key.is_private():
-            print(self.key.private_bytes(
+            params['d'] = base64.b64encode(self.key.private_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PrivateFormat.PKCS8,
                 encryption_algorithm=serialization.NoEncryption()
             ))
-            params['d'] = self.key.private_bytes(
+            params['x'] = self.key.public_bytes(
                 encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.PKCS8,
+                format=serialization.PublicFormat.PKCS8,
                 encryption_algorithm=serialization.NoEncryption()
             )
-            print("params", params)
-            # params['x'] = self.key.public_key().public_bytes(
-            #     encoding=serialization.Encoding.PEM,
-            #     format=serialization.PublicFormat.PKCS8,
-            #     encryption_algorithm=serialization.NoEncryption()
-            # )
         else:
             params['x'] = base64.b64decode(self.key.public_bytes(
                 serialization.Encoding.Raw,
                 serialization.PublicFormat.Raw,
                 serialization.NoEncryption(),
             ))
+        # TODO find a better way to
         params['crv'] = 'ed25519'
         return params
 
@@ -461,13 +464,11 @@ class JWKOKP(JWK):
         if "x" not in obj:
             raise errors.DeserializationError('OKP should have "x" parameter')
         x = base64.b64decode(jobj.get("x"))
-        print("x=", x)
 
         try:
             if "d" not in obj:
-                # This is the the public key
-                return jobj["key"].from_public_bytes(x)
+                return jobj["key"]._wrapped.__class__.from_public_bytes(x)  # noqa
             d = base64.b64decode(obj.get("d"))
-            return jobj["key"].from_private_bytes(d)
+            return jobj["key"]._wrapped.__class__.from_private_bytes(d)  # noqa
         except ValueError as err:
             raise errors.DeserializationError("Invalid key parameter") from err

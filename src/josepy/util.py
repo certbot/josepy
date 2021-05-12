@@ -189,11 +189,12 @@ class ComparableOKPKey(ComparableKey):
             )
         )
 
-    def public_key(self) -> Union[ed25519.Ed25519PrivateKey]:
+    def public_key(self) -> Union[
+        ed25519.Ed25519PublicKey, ed448.Ed448PublicKey,
+        x25519.X25519PublicKey, x448.X448PublicKey,
+    ]:
         """Get wrapped public key."""
-        key = self._wrapped.public_key(
-        )
-        return type(key)()
+        return self._wrapped.from_public_bytes(self._wrapped.x)
 
 
 class ImmutableMap(Mapping, Hashable):

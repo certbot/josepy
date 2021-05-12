@@ -3,7 +3,7 @@ import binascii
 import unittest
 
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import x25519
+from cryptography.hazmat.primitives.asymmetric import ed25519, x25519
 
 from josepy import errors, json_util, jwk, test_util, util
 
@@ -390,7 +390,7 @@ class JWKOKPTest(unittest.TestCase):
         # data = """-----BEGIN PRIVATE KEY-----
         # MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
         # -----END PRIVATE KEY-----"""
-        b = x25519.X25519PrivateKey.generate().private_bytes(
+        b = ed25519.Ed25519PrivateKey.generate().private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.NoEncryption()

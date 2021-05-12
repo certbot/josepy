@@ -416,8 +416,7 @@ class JWKOKP(JWK):
         ed25519.Ed25519PublicKey, ed448.Ed448PublicKey,
         x25519.X25519PublicKey, x448.X448PublicKey,
     ]:
-        # work on the class methods instead :)
-        return self._wrapped.public_key()
+        return self._wrapped.__class__.public_key()
 
     def fields_to_partial_json(self) -> Dict:
         params = {}  # type: Dict
@@ -427,7 +426,7 @@ class JWKOKP(JWK):
                 format=serialization.PrivateFormat.PKCS8,
                 encryption_algorithm=serialization.NoEncryption()
             ))
-            params['x'] = self.key.public_bytes(
+            params['x'] = self.key.public_key().public_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PublicFormat.PKCS8,
                 encryption_algorithm=serialization.NoEncryption()
@@ -438,12 +437,13 @@ class JWKOKP(JWK):
                 serialization.PublicFormat.Raw,
                 serialization.NoEncryption(),
             ))
-        # TODO find a better way to
+        # TODO find a better way to get the curve name
         params['crv'] = 'ed25519'
         return params
 
     @classmethod
     def fields_from_json(cls, jobj) -> ComparableOKPKey:
+        # this was mostly copy/pasted from some source. Find out which.
         try:
             if isinstance(jobj, str):
                 obj = json.loads(jobj)

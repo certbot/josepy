@@ -194,7 +194,7 @@ class ComparableOKPKey(ComparableKey):
         x25519.X25519PublicKey, x448.X448PublicKey,
     ]:
         """Get wrapped public key."""
-        return self._wrapped.from_public_bytes(self._wrapped.x)
+        return self._wrapped.public_key()
 
 
 class ImmutableMap(Mapping, Hashable):

@@ -2,10 +2,7 @@
 import binascii
 import unittest
 
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ed25519, x25519
-
-from josepy import errors, json_util, jwk, test_util, util
+from josepy import errors, json_util, test_util, util
 
 DSA_PEM = test_util.load_vector('dsa512_key.pem')
 RSA256_KEY = test_util.load_rsa_private_key('rsa256_key.pem')
@@ -387,21 +384,14 @@ class JWKOKPTest(unittest.TestCase):
     def test_encode_ed25519(self):
         import josepy
         from josepy.jwk import JWKOKP
-        # data = """-----BEGIN PRIVATE KEY-----
-        # MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
-        # -----END PRIVATE KEY-----"""
-        b = ed25519.Ed25519PrivateKey.generate().private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.PKCS8,
-            encryption_algorithm=serialization.NoEncryption()
-        )
-        key = JWKOKP.load(b)
-        # JWKOKP.load(data, backend=default_backend())
+        data = b"""-----BEGIN PRIVATE KEY-----
+        MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
+        -----END PRIVATE KEY-----"""
+        key = JWKOKP.load(data)
         data = key.to_partial_json()
-        import logging
-        logging.warning(josepy.json_util.decode_b64jose(data['x']))
+        print(data)
         # key = jwk.JWKOKP.load(data)
-        # y = josepy.json_util.decode_b64jose(data['y'])
+        # y = josepy.json_util.decode_b64jose(data['x'])
         # self.assertEqual(len(y), 64)
 
     # def test_init_auto_comparable(self):

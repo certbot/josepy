@@ -1,6 +1,5 @@
 """JSON Web Key."""
 import abc
-import base64
 import json
 import logging
 import math
@@ -407,38 +406,45 @@ class JWKOKP(JWK):
     )
     required = ('crv', JWK.type_field_name, 'x')
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs):
         if 'key' in kwargs and not isinstance(kwargs['key'], util.ComparableOKPKey):
             kwargs['key'] = util.ComparableOKPKey(kwargs['key'])
         super().__init__(*args, **kwargs)
 
-    def public_key(self) -> Union[
-        ed25519.Ed25519PublicKey, ed448.Ed448PublicKey,
-        x25519.X25519PublicKey, x448.X448PublicKey,
-    ]:
-        return self._wrapped.__class__.public_key()
+    def public_key(self):
+        return self.key._wrapped.__class__.public_key()
+
+    def _key_to_crv(self):
+        if isinstance(self.key._wrapped, (ed25519.Ed25519PrivateKey, ed25519.Ed25519PrivateKey)):
+            return "Ed25519"
+        elif isinstance(self.key._wrapped, (ed448.Ed448PrivateKey, ed448.Ed448PrivateKey)):
+            return "Ed448"
+        elif isinstance(self.key._wrapped, (x25519.X25519PrivateKey, x25519.X25519PrivateKey)):
+            return "X25519"
+        elif isinstance(self.key._wrapped, (x448.X448PrivateKey, x448.X448PrivateKey)):
+            return "X448"
+        return NotImplemented
 
     def fields_to_partial_json(self) -> Dict:
-        params = {}  # type: Dict
+        params = {}
+        print(dir(self))
         if self.key.is_private():
-            params['d'] = base64.b64encode(self.key.private_bytes(
+            params['d'] = json_util.encode_b64jose(self.key.private_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PrivateFormat.PKCS8,
                 encryption_algorithm=serialization.NoEncryption()
             ))
             params['x'] = self.key.public_key().public_bytes(
                 encoding=serialization.Encoding.PEM,
-                format=serialization.PublicFormat.PKCS8,
-                encryption_algorithm=serialization.NoEncryption()
+                format=serialization.PublicFormat.SubjectPublicKeyInfo,
             )
         else:
-            params['x'] = base64.b64decode(self.key.public_bytes(
+            params['x'] = json_util.encode_b64jose(self.key.public_bytes(
                 serialization.Encoding.Raw,
                 serialization.PublicFormat.Raw,
                 serialization.NoEncryption(),
             ))
-        # TODO find a better way to get the curve name
-        params['crv'] = 'ed25519'
+        params['crv'] = self._key_to_crv()
         return params
 
     @classmethod
@@ -463,12 +469,12 @@ class JWKOKP(JWK):
 
         if "x" not in obj:
             raise errors.DeserializationError('OKP should have "x" parameter')
-        x = base64.b64decode(jobj.get("x"))
+        x = json_util.decode_b64jose(jobj.get("x"))
 
         try:
             if "d" not in obj:
                 return jobj["key"]._wrapped.__class__.from_public_bytes(x)  # noqa
-            d = base64.b64decode(obj.get("d"))
+            d = json_util.decode_b64jose(obj.get("d"))
             return jobj["key"]._wrapped.__class__.from_private_bytes(d)  # noqa
         except ValueError as err:
             raise errors.DeserializationError("Invalid key parameter") from err

@@ -342,7 +342,6 @@ class JWKOKPTest(unittest.TestCase):
         self.private = self.x448_key
         self.jwk = self.private
         # Test vectors taken from
-        #
         self.jwked25519json = {
             'kty': 'OKP',
             'crv': 'Ed25519',
@@ -368,36 +367,31 @@ class JWKOKPTest(unittest.TestCase):
             'x': 'jjQtV-fA7J_tK8dPzYq7jRPNjF8r5p6LW2R25S2Gw5U',
         }
 
-#     def test_encode_ed448(self):
-#         from josepy.jwk import JWKOKP
-#         import josepy
-#         data = """-----BEGIN PRIVATE KEY-----
-# MEcCAQAwBQYDK2VxBDsEOfqsAFWdop10FFPW7Ha2tx2AZh0Ii+jfL2wFXU/dY/fe
-# iU7/vrGmQ+ux26NkgzfploOHZjEmltLJ9w==
-# -----END PRIVATE KEY-----"""
-#         key = JWKOKP.load(data)
-#         data = key.to_partial_json()
-#         # key = JWKOKP.load(data)
-#         x = josepy.json_util.decode_b64jose(data['x'])
-#         self.assertEqual(len(x), 64)
+    def test_encode_ed448(self):
+        from josepy.jwk import JWKOKP
+        import josepy
+        data = b"""-----BEGIN PRIVATE KEY-----
+MEcCAQAwBQYDK2VxBDsEOfqsAFWdop10FFPW7Ha2tx2AZh0Ii+jfL2wFXU/dY/fe
+iU7/vrGmQ+ux26NkgzfploOHZjEmltLJ9w==
+-----END PRIVATE KEY-----"""
+        key = JWKOKP.load(data)
+        data = key.to_partial_json()
+        x = josepy.json_util.encode_b64jose(data['x'])
+        self.assertEqual(len(x), 195)
 
     def test_encode_ed25519(self):
         import josepy
         from josepy.jwk import JWKOKP
         data = b"""-----BEGIN PRIVATE KEY-----
-        MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
-        -----END PRIVATE KEY-----"""
+MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
+-----END PRIVATE KEY-----"""
         key = JWKOKP.load(data)
         data = key.to_partial_json()
-        print(data)
-        # key = jwk.JWKOKP.load(data)
-        # y = josepy.json_util.decode_b64jose(data['x'])
-        # self.assertEqual(len(y), 64)
+        x = josepy.json_util.encode_b64jose(data['x'])
+        self.assertEqual(len(x), 151)
 
-    # def test_init_auto_comparable(self):
-    #     self.assertIsInstance(
-    #         self.jwk256_not_comparable.key, util.ComparableECKey)
-    #     self.assertEqual(self.jwk256, self.jwk256_not_comparable)
+    def test_init_auto_comparable(self):
+        self.assertIsInstance(self.x448_key.key, util.ComparableOKPKey)
 
     def test_unknown_crv_name(self):
         from josepy.jwk import JWK

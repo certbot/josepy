@@ -229,8 +229,7 @@ class JWKECTest(unittest.TestCase, JWKTestBaseMixin):
         self.jwk = self.private
 
     def test_init_auto_comparable(self):
-        self.assertIsInstance(
-            self.jwk256_not_comparable.key, util.ComparableECKey)
+        self.assertIsInstance(self.jwk256_not_comparable.key, util.ComparableECKey)
         self.assertEqual(self.jwk256, self.jwk256_not_comparable)
 
     def test_encode_param_zero(self):
@@ -328,9 +327,9 @@ class JWKOKPTest(unittest.TestCase):
     """Tests for josepy.jwk.JWKOKP."""
     # pylint: disable=too-many-instance-attributes
 
-    # What to put in the thumbprint
+    # TODO: write the thumbprint
     thumbprint = (
-
+        b'kPrK_qmxVWaYVA9wwBF6Iuo3vVzz7TxHCTwXBygrS4k'
     )
 
     def setUp(self):
@@ -341,14 +340,14 @@ class JWKOKPTest(unittest.TestCase):
         self.x448_key = JWKOKP(key=X448_KEY.public_key())
         self.private = self.x448_key
         self.jwk = self.private
-        # Test vectors taken from
+        # Test vectors taken from RFC 8037, A.2
         self.jwked25519json = {
             'kty': 'OKP',
             'crv': 'Ed25519',
-            'x': '',
+            'x': '11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo',
         }
         self.jwked448json = {
-            'kty': 'EC',
+            'kty': 'OKP',
             'crv': 'Ed448',
             'x':
                 "9b08f7cc31b7e3e67d22d5aea121074a273bd2b83de09c63faa73d2c"
@@ -357,27 +356,25 @@ class JWKOKPTest(unittest.TestCase):
         # Test vectors taken from
         # https://datatracker.ietf.org/doc/html/rfc7748#section-6.1
         self.jwkx25519json = {
-            'kty': 'EC',
+            'kty': 'OKP',
             'crv': 'X25519',
             'x': '8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a',
         }
         self.jwkx448json = {
-            'kty': 'EC',
+            'kty': 'OKP',
             'crv': 'X448',
             'x': 'jjQtV-fA7J_tK8dPzYq7jRPNjF8r5p6LW2R25S2Gw5U',
         }
 
     def test_encode_ed448(self):
         from josepy.jwk import JWKOKP
-        import josepy
         data = b"""-----BEGIN PRIVATE KEY-----
 MEcCAQAwBQYDK2VxBDsEOfqsAFWdop10FFPW7Ha2tx2AZh0Ii+jfL2wFXU/dY/fe
 iU7/vrGmQ+ux26NkgzfploOHZjEmltLJ9w==
 -----END PRIVATE KEY-----"""
         key = JWKOKP.load(data)
-        data = key.to_partial_json()
-        x = josepy.json_util.encode_b64jose(data['x'])
-        self.assertEqual(len(x), 195)
+        partial = key.to_partial_json()
+        self.assertEqual(partial['crv'], 'Ed448')
 
     def test_encode_ed25519(self):
         import josepy
@@ -388,7 +385,25 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
         key = JWKOKP.load(data)
         data = key.to_partial_json()
         x = josepy.json_util.encode_b64jose(data['x'])
-        self.assertEqual(len(x), 151)
+        self.assertEqual(x, "9ujoz88QZL05w2lhaqUbBaBpwmM12Y7Y8Ybfwjibk-I")
+
+    def test_from_json_ed25519(self):
+        from josepy.jwk import JWK
+        key = JWK.from_json(self.jwked25519json)
+        with self.subTest(key=[
+            self.jwked448json, self.jwked25519json,
+            self.jwkx25519json, self.jwkx448json,
+        ]):
+            self.assertIsInstance(key.key, util.ComparableOKPKey)
+
+    def test_fields_to_json(self):
+        from josepy.jwk import JWK
+        data = b"""-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
+-----END PRIVATE KEY-----"""
+        key = JWK.load(data)
+        data = key.fields_to_partial_json()
+        self.assertEqual(data['crv'], "Ed25519")
 
     def test_init_auto_comparable(self):
         self.assertIsInstance(self.x448_key.key, util.ComparableOKPKey)

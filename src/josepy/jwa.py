@@ -250,3 +250,6 @@ ES256 = JWASignature.register(_JWAEC('ES256', hashes.SHA256))
 ES384 = JWASignature.register(_JWAEC('ES384', hashes.SHA384))
 #: ECDSA using P-521 and SHA-512
 ES512 = JWASignature.register(_JWAEC('ES512', hashes.SHA512))
+
+# Also implement RFC 8037, signing for OKP key type
+# hashes.BLAKE2b

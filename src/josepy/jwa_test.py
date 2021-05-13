@@ -10,6 +10,10 @@ RSA1024_KEY = test_util.load_rsa_private_key('rsa1024_key.pem')
 EC_P256_KEY = test_util.load_ec_private_key('ec_p256_key.pem')
 EC_P384_KEY = test_util.load_ec_private_key('ec_p384_key.pem')
 EC_P521_KEY = test_util.load_ec_private_key('ec_p521_key.pem')
+OKP_ED25519_KEY = test_util.load_ec_private_key('ed25519_key.pem')
+OKP_ED448_KEY = test_util.load_ec_private_key('ed448_key.pem')
+OKP_X25519_KEY = test_util.load_ec_private_key('x25519_key.pem')
+OKP_X448_KEY = test_util.load_ec_private_key('x448_key.pem')
 
 
 class JWASignatureTest(unittest.TestCase):

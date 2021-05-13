@@ -1,6 +1,5 @@
 """JOSE utilities."""
 from collections.abc import Hashable, Mapping
-from typing import Union
 
 import OpenSSL
 from cryptography.hazmat.backends import default_backend
@@ -168,33 +167,26 @@ class ComparableOKPKey(ComparableKey):
     """Wrapper for ``cryptography`` OKP keys.
 
     Wraps around:
-    - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey`
-    - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey`
-    - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey`
-    - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey`
     """
 
     def __hash__(self):
         return hash((self.__class__, self._wrapped.curve.name, self._wrapped.x))
 
-    def is_private(self):
+    def is_private(self) -> bool:
         return isinstance(
             self._wrapped, (
                 ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey,
                 x25519.X25519PrivateKey, x448.X448PrivateKey
             )
         )
-
-    def public_key(self) -> Union[
-        ed25519.Ed25519PublicKey, ed448.Ed448PublicKey,
-        x25519.X25519PublicKey, x448.X448PublicKey,
-    ]:
-        """Get wrapped public key."""
-        return self._wrapped.public_key()
 
 
 class ImmutableMap(Mapping, Hashable):

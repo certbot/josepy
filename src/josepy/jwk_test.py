@@ -24,7 +24,7 @@ class JWKTest(unittest.TestCase):
         self.assertRaises(errors.Error, JWKRSA.load, DSA_PEM)
 
 
-class JWKTestBaseMixin(object):
+class JWKTestBaseMixin:
     """Mixin test for JWK subclass tests."""
 
     thumbprint: bytes = NotImplemented

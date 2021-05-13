@@ -44,9 +44,6 @@ class JWASignature(JWA, Hashable):
     def __hash__(self):
         return hash((self.__class__, self.name))
 
-    def __ne__(self, other):
-        return not self == other
-
     @classmethod
     def register(cls, signature_cls):
         """Register class for JSON deserialization."""
@@ -78,7 +75,7 @@ class _JWAHS(JWASignature):
     kty = jwk.JWKOct
 
     def __init__(self, name, hash_):
-        super(_JWAHS, self).__init__(name)
+        super().__init__(name)
         self.hash = hash_()
 
     def sign(self, key, msg):
@@ -98,7 +95,7 @@ class _JWAHS(JWASignature):
             return True
 
 
-class _JWARSA(object):
+class _JWARSA:
     kty = jwk.JWKRSA
     padding = NotImplemented
     hash = NotImplemented
@@ -146,7 +143,7 @@ class _JWARSA(object):
 class _JWARS(_JWARSA, JWASignature):
 
     def __init__(self, name, hash_):
-        super(_JWARS, self).__init__(name)
+        super().__init__(name)
         self.padding = padding.PKCS1v15()
         self.hash = hash_()
 
@@ -154,7 +151,7 @@ class _JWARS(_JWARSA, JWASignature):
 class _JWAPS(_JWARSA, JWASignature):
 
     def __init__(self, name, hash_):
-        super(_JWAPS, self).__init__(name)
+        super().__init__(name)
         self.padding = padding.PSS(
             mgf=padding.MGF1(hash_()),
             salt_length=padding.PSS.MAX_LENGTH)
@@ -165,7 +162,7 @@ class _JWAEC(JWASignature):
     kty = jwk.JWKEC
 
     def __init__(self, name, hash_):
-        super(_JWAEC, self).__init__(name)
+        super().__init__(name)
         self.hash = hash_()
 
     def sign(self, key, msg):

@@ -18,15 +18,15 @@ install_requires = [
 
 testing_requires = [
     'coverage>=4.0',
+    'flake8',
+    'mypy',
     'pytest-cache>=1.0',
     'pytest-cov',
-    'flake8',
     'pytest-flake8>=0.5',
     'pytest>=2.8.0',
 ]
 
 dev_extras = [
-    'mypy',
     'pytest',
     'tox',
 ]

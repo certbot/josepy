@@ -16,6 +16,7 @@ distlib==0.3.2
 execnet==1.8.1
 filelock==3.0.12
 flake8==3.9.2
+importlib-metadata==4.4.0
 iniconfig==1.1.1
 mccabe==0.6.1
 mypy==0.812
@@ -38,3 +39,4 @@ tox==3.23.1
 typed-ast==1.4.3
 typing-extensions==3.10.0.0
 virtualenv==20.4.7
+zipp==3.4.1

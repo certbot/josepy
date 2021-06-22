@@ -4,6 +4,8 @@ Changelog
 1.9.0 (master)
 --------------
 
+* Removed pytest-cache testing dependency.
+
 1.8.0 (2021-03-15)
 ------------------
 

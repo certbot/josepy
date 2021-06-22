@@ -20,7 +20,6 @@ testing_requires = [
     'coverage>=4.0',
     'flake8',
     'mypy',
-    'pytest-cache>=1.0',
     'pytest-cov',
     'pytest-flake8>=0.5',
     'pytest>=2.8.0',

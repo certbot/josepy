@@ -286,10 +286,9 @@ ES512 = JWASignature.register(_JWAEC('ES512', hashes.SHA512))
 
 #: Ed25519 uses SHA512
 ES25519 = JWASignature.register(_JWAOKP('ES25519', hashes.SHA512))
-
 #: Ed448 uses SHA3/SHAKE256
 ES448 = JWASignature.register(_JWAOKP('ES448', hashes.SHAKE256))
-
-#: X25519
-
-#: X448
+#: X25519 uses
+X22519 = JWASignature.register(_JWAOKP('X22519', hashes.SHAKE256))
+#: X448 uses
+X448 = JWASignature.register(_JWAOKP('X448', hashes.SHAKE256))

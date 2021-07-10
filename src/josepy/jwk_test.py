@@ -387,12 +387,14 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
         x = josepy.json_util.encode_b64jose(data['x'])
         self.assertEqual(x, "9ujoz88QZL05w2lhaqUbBaBpwmM12Y7Y8Ybfwjibk-I")
 
-    def test_from_json_ed25519(self):
+    def test_from_json(self):
         from josepy.jwk import JWK
         key = JWK.from_json(self.jwked25519json)
         with self.subTest(key=[
-            self.jwked448json, self.jwked25519json,
-            self.jwkx25519json, self.jwkx448json,
+            self.jwked448json,
+            self.jwked25519json,
+            self.jwkx25519json,
+            self.jwkx448json,
         ]):
             self.assertIsInstance(key.key, util.ComparableOKPKey)
 
@@ -418,6 +420,10 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
                 'x': 'jjQtV-fA7J_tK8dPzYq7jRPNjF8r5p6LW2R25S2Gw5U',
             }
         )
+
+    def test_from_json_hashable(self):
+        from josepy.jwk import JWK
+        hash(JWK.from_json(self.jwked25519json))
 
 
 if __name__ == '__main__':

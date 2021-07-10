@@ -3,6 +3,7 @@ from collections.abc import Hashable, Mapping
 
 import OpenSSL
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import (
     ec,
     ed25519, ed448,
@@ -178,7 +179,16 @@ class ComparableOKPKey(ComparableKey):
     """
 
     def __hash__(self):
-        return hash((self.__class__, self._wrapped.curve.name, self._wrapped.x))
+        if self.is_private():
+            priv = self._wrapped.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.PKCS8,
+            )
+            pub = priv.public_key
+            return hash((self.__class__, pub.curve.name, priv))
+        else:
+            pub = self._wrapped.public_key()
+            return hash((self.__class__, pub.curve.name, pub))
 
     def is_private(self) -> bool:
         return isinstance(

@@ -4,7 +4,7 @@ import json
 import logging
 import math
 
-from typing import Dict, Optional, Sequence, Tuple, Type, Union
+from typing import Dict, Optional, Sequence, Type, Union
 
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
@@ -402,7 +402,7 @@ class JWKOKP(JWK):
         x448.X448PrivateKey, x448.X448PublicKey,
     )
     required = ('crv', JWK.type_field_name, 'x')
-    crv_to_pub_priv: Dict[str, Tuple] = {
+    crv_to_pub_priv = {
         "Ed25519": (ed25519.Ed25519PublicKey, ed25519.Ed25519PrivateKey),
         "Ed448": (ed448.Ed448PublicKey, ed448.Ed448PrivateKey),
         "X25519": (x25519.X25519PublicKey, x25519.X25519PrivateKey),
@@ -442,8 +442,8 @@ class JWKOKP(JWK):
             )
         else:
             params['x'] = json_util.encode_b64jose(self.key.public_bytes(
-                serialization.Encoding.Raw,
-                serialization.PublicFormat.Raw,
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PublicFormat.Raw,
             ))
         params['crv'] = self._key_to_crv()
         return params
@@ -473,21 +473,21 @@ class JWKOKP(JWK):
 
         try:
             if "d" not in obj:  # public key
-                pub_class: Union[
+                pub_class: Type[Union[
                     ed25519.Ed25519PublicKey,
                     ed448.Ed448PublicKey,
                     x25519.X25519PublicKey,
                     x448.X448PublicKey,
-                ] = cls.crv_to_pub_priv[curve][0]
+                ]] = cls.crv_to_pub_priv[curve][0]
                 return cls(key=pub_class.from_public_bytes(x))
             else:  # private key
                 d = json_util.decode_b64jose(obj.get("d"))
-                priv_key_class: Union[
+                priv_key_class: Type[Union[
                     ed25519.Ed25519PrivateKey,
                     ed448.Ed448PrivateKey,
                     x25519.X25519PrivateKey,
                     x448.X448PrivateKey,
-                ] = cls.crv_to_pub_priv[curve][1]
+                ]] = cls.crv_to_pub_priv[curve][1]
                 return cls(key=priv_key_class.from_private_bytes(d))
         except ValueError as err:
             raise errors.DeserializationError("Invalid key parameter") from err

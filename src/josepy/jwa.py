@@ -5,15 +5,13 @@ https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
 """
 import abc
 import logging
-from typing import Dict, Type, Union
+from typing import Dict, Type
 
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import hmac
-from cryptography.hazmat.primitives.asymmetric import ec, x25519, x448
-from cryptography.hazmat.primitives.asymmetric import ed25519
-from cryptography.hazmat.primitives.asymmetric import ed448
+from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
 from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature
@@ -233,20 +231,15 @@ class _JWAOKP(JWASignature):
         super().__init__(name)
         self.hash = hash_()
 
-    def sign(self, key: Union[
-        ed25519.Ed25519PrivateKey,
-        ed448.Ed448PrivateKey,
-        x25519.X25519PrivateKey,
-        x448.X448PrivateKey,
-    ], msg: bytes):
+    @classmethod
+    def register(cls, signature_cls):
+        # might need to overwrite this, so I can get the argument in
+        return super().register(signature_cls)
+
+    def sign(self, key, msg: bytes):
         return key.sign(msg)
 
-    def verify(self, key: Union[
-        ed25519.Ed25519PublicKey,
-        ed448.Ed448PublicKey,
-        x25519.X25519PrivateKey,
-        x448.X448PrivateKey,
-    ], msg: bytes, sig: bytes):
+    def verify(self, key, msg: bytes, sig: bytes):
         try:
             key.verify(signature=sig, data=msg)
         except cryptography.exceptions.InvalidSignature as error:
@@ -287,8 +280,8 @@ ES512 = JWASignature.register(_JWAEC('ES512', hashes.SHA512))
 #: Ed25519 uses SHA512
 ES25519 = JWASignature.register(_JWAOKP('ES25519', hashes.SHA512))
 #: Ed448 uses SHA3/SHAKE256
-ES448 = JWASignature.register(_JWAOKP('ES448', hashes.SHAKE256))
-#: X25519 uses
-X22519 = JWASignature.register(_JWAOKP('X22519', hashes.SHAKE256))
-#: X448 uses
-X448 = JWASignature.register(_JWAOKP('X448', hashes.SHAKE256))
+# ES448 = JWASignature.register(_JWAOKP('ES448', hashes.SHAKE256))
+# #: X25519 uses SHA3/SHAKE256
+# X22519 = JWASignature.register(_JWAOKP('X22519', hashes.SHAKE256))
+# #: X448 uses SHA3/SHAKE256
+# X448 = JWASignature.register(_JWAOKP('X448', hashes.SHAKE256))

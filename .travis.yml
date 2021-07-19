@@ -19,7 +19,6 @@ after_success:
 notifications:
   email: false
   webhooks:
-    if: branch = master
     urls:
       - https://opensource.eff.org/hooks/oz7sgbyyr3rc9y8dpxskzm9e3o
     on_cancel: never

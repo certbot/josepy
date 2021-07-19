@@ -21,11 +21,7 @@ notifications:
   webhooks:
     if: branch = master
     urls:
-    # This is set to a secure variable to prevent forks from sending
-    # notifications. This value was created by installing
-    # https://github.com/travis-ci/travis.rb and running
-    # `travis encrypt https://opensource.eff.org/hooks/...`.
-    - secure: W+unm28JdOT2AWyKW2R9+DCy0YFmY62FRS5m15DlVQXr07ez+GeykWLIvvGbLJCHI7J//G4XkvSoK9D+Dbiw5hV81NMIuvYyGq9RGX9BKAvbUiYEhLRgLHknmtW78WdOG207echc45UUmdK1hvF9P9j/oGiOw+ZjmNSMlQOGc5y9jgUS8MRYTHzo7yAmCsmJM//2aKwCDFNywlgwbiN8xr2juBwOa+Kd+6PSlgUk4YbPgCWxSoRYls5yogCIgj6KJlCur3NE07u5qA93eR0kne1YNWdPS1bYNKSfSGQAcBXlkRByzVHRrJhEHSAKnhIf2cblA9/49nWst/KwhOo5wFTQUyh321LczFFZw4ySIYe0c79hr7KDpM0ndFlWtzJh8H5+U9xvbe9zkb3JZ+zqrvmX6KVY6nvnMh977Iba4jUt2enBt653C6zACZRL4cgzkMqlITCuZ0slA/lyhhxmt+SeCLBV6n7xpvnkf1CajV6OYj9vcJqsKBv2LAUHdxxtN71My3EnuUCatsan6MoRHXkJ9s9vdqpYBI40qGHbPTAP2BdO3eshSq0rQWCDNWn2L4ttwBT0d7Ajv8Eqb/k91uMFkMMZDbQsPtQqmYPN5ki1i+fDdhZII92AZPBBhg6qqhJ0dImV/giIAPB+P/ecEQas0KNEYpeiRgpx14CYZ44=
+      - https://opensource.eff.org/hooks/oz7sgbyyr3rc9y8dpxskzm9e3o
     on_cancel: never
     on_success: always
     on_failure: always

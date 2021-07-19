@@ -18,9 +18,7 @@ after_success:
 - codecov
 notifications:
   email: false
-  webhooks:
-    urls:
-      - https://opensource.eff.org/hooks/oz7sgbyyr3rc9y8dpxskzm9e3o
+  webhooks: https://opensource.eff.org/hooks/oz7sgbyyr3rc9y8dpxskzm9e3o
     on_cancel: never
     on_success: always
     on_failure: always

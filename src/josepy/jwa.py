@@ -224,31 +224,6 @@ class _JWAEC(JWASignature):
             return True
 
 
-class _JWAOKP(JWASignature):
-    kty = jwk.JWKOKP
-
-    def __init__(self, name, hash_):
-        super().__init__(name)
-        self.hash = hash_()
-
-    @classmethod
-    def register(cls, signature_cls):
-        # might need to overwrite this, so I can get the argument in
-        return super().register(signature_cls)
-
-    def sign(self, key, msg: bytes):
-        return key.sign(msg)
-
-    def verify(self, key, msg: bytes, sig: bytes):
-        try:
-            key.verify(signature=sig, data=msg)
-        except cryptography.exceptions.InvalidSignature as error:
-            logger.debug(error, exc_info=True)
-            return False
-        else:
-            return True
-
-
 #: HMAC using SHA-256
 HS256 = JWASignature.register(_JWAHS('HS256', hashes.SHA256))
 #: HMAC using SHA-384
@@ -276,12 +251,3 @@ ES256 = JWASignature.register(_JWAEC('ES256', hashes.SHA256))
 ES384 = JWASignature.register(_JWAEC('ES384', hashes.SHA384))
 #: ECDSA using P-521 and SHA-512
 ES512 = JWASignature.register(_JWAEC('ES512', hashes.SHA512))
-
-#: Ed25519 uses SHA512
-ES25519 = JWASignature.register(_JWAOKP('ES25519', hashes.SHA512))
-#: Ed448 uses SHA3/SHAKE256
-# ES448 = JWASignature.register(_JWAOKP('ES448', hashes.SHAKE256))
-# #: X25519 uses SHA3/SHAKE256
-# X22519 = JWASignature.register(_JWAOKP('X22519', hashes.SHAKE256))
-# #: X448 uses SHA3/SHAKE256
-# X448 = JWASignature.register(_JWAOKP('X448', hashes.SHAKE256))

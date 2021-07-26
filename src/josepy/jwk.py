@@ -1,5 +1,6 @@
 """JSON Web Key."""
 import abc
+import collections
 import json
 import logging
 import math
@@ -257,7 +258,7 @@ class JWKRSA(JWK):
 
 @JWK.register
 class JWKEC(JWK):
-    """EC JWK.
+    """RSA JWK.
 
     :ivar key: :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
         or :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey`
@@ -389,12 +390,12 @@ class JWKOKP(JWK):
         or :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey`
         or :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey`
         or :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey`
+    wrapped in :class:`~josepy.util.ComparableOKPKey`
 
     This class requires ``cryptography>=2.6`` to be installed.
     """
     typ = 'OKP'
-    __slots__ = ('key', )
-
+    __slots__ = ('key',)
     cryptography_key_types = (
         ed25519.Ed25519PrivateKey, ed25519.Ed25519PrivateKey,
         ed448.Ed448PublicKey, ed448.Ed448PrivateKey,
@@ -402,11 +403,12 @@ class JWKOKP(JWK):
         x448.X448PrivateKey, x448.X448PublicKey,
     )
     required = ('crv', JWK.type_field_name, 'x')
+    okp_curve = collections.namedtuple('okp_curve', 'pubkey privkey')
     crv_to_pub_priv = {
-        "Ed25519": (ed25519.Ed25519PublicKey, ed25519.Ed25519PrivateKey),
-        "Ed448": (ed448.Ed448PublicKey, ed448.Ed448PrivateKey),
-        "X25519": (x25519.X25519PublicKey, x25519.X25519PrivateKey),
-        "X448": (x448.X448PublicKey, x448.X448PrivateKey),
+        "Ed25519": okp_curve(pubkey=ed25519.Ed25519PublicKey, privkey=ed25519.Ed25519PrivateKey),
+        "Ed448": okp_curve(pubkey=ed448.Ed448PublicKey, privkey=ed448.Ed448PrivateKey),
+        "X25519": okp_curve(pubkey=x25519.X25519PublicKey, privkey=x25519.X25519PrivateKey),
+        "X448": okp_curve(pubkey=x448.X448PublicKey, privkey=x448.X448PrivateKey),
     }
 
     def __init__(self, *args, **kwargs):
@@ -428,20 +430,20 @@ class JWKOKP(JWK):
             return "X448"
         return NotImplemented
 
-    def fields_to_partial_json(self) -> Dict:
+    def fields_to_partial_json(self):
         params = {}
         if self.key.is_private():
-            params['d'] = json_util.encode_b64jose(self.key.private_bytes(
+            params['d'] = json_util.encode_b64jose(self.key._wrapped.private_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PrivateFormat.Raw,
                 encryption_algorithm=serialization.NoEncryption()
             ))
-            params['x'] = self.key.public_key().public_bytes(
+            params['x'] = self.key._wrapped.public_key().public_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PublicFormat.Raw,
             )
         else:
-            params['x'] = json_util.encode_b64jose(self.key.public_bytes(
+            params['x'] = json_util.encode_b64jose(self.key._wrapped.public_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PublicFormat.Raw,
             ))
@@ -460,16 +462,13 @@ class JWKOKP(JWK):
         except ValueError:
             raise errors.DeserializationError("Key is not valid JSON")
 
-        if obj.get("kty") != "OKP":
-            raise errors.DeserializationError("Not an Octet Key Pair")
-
-        curve = obj.get("crv")
+        curve = obj["crv"]
         if curve not in cls.crv_to_pub_priv:
             raise errors.DeserializationError(f"Invalid curve: {curve}")
 
         if "x" not in obj:
             raise errors.DeserializationError('OKP should have "x" parameter')
-        x = json_util.decode_b64jose(jobj.get("x"))
+        x = json_util.decode_b64jose(jobj["x"])
 
         try:
             if "d" not in obj:  # public key
@@ -478,16 +477,16 @@ class JWKOKP(JWK):
                     ed448.Ed448PublicKey,
                     x25519.X25519PublicKey,
                     x448.X448PublicKey,
-                ]] = cls.crv_to_pub_priv[curve][0]
+                ]] = cls.crv_to_pub_priv[curve].pubkey
                 return cls(key=pub_class.from_public_bytes(x))
             else:  # private key
-                d = json_util.decode_b64jose(obj.get("d"))
+                d = json_util.decode_b64jose(obj["d"])
                 priv_key_class: Type[Union[
                     ed25519.Ed25519PrivateKey,
                     ed448.Ed448PrivateKey,
                     x25519.X25519PrivateKey,
                     x448.X448PrivateKey,
-                ]] = cls.crv_to_pub_priv[curve][1]
+                ]] = cls.crv_to_pub_priv[curve].privkey
                 return cls(key=priv_key_class.from_private_bytes(d))
         except ValueError as err:
             raise errors.DeserializationError("Invalid key parameter") from err

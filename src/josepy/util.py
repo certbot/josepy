@@ -4,12 +4,7 @@ from collections.abc import Hashable, Mapping
 import OpenSSL
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import (
-    ec,
-    ed25519, ed448,
-    rsa,
-    x25519, x448,
-)
+from cryptography.hazmat.primitives.asymmetric import ec, rsa
 
 
 class abstractclassmethod(classmethod):
@@ -167,7 +162,7 @@ class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
 class ComparableOKPKey(ComparableKey):
     """Wrapper for ``cryptography`` OKP keys.
 
-    Wraps around:
+    Wraps around any of these available with the compilation
     - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey`
@@ -179,24 +174,22 @@ class ComparableOKPKey(ComparableKey):
     """
 
     def __hash__(self):
+        # Computed using the thumbprint
+        # https://datatracker.ietf.org/doc/html/rfc7638#section-3
         if self.is_private():
-            priv = self._wrapped.private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.PKCS8,
-            )
-            pub = priv.public_key
-            return hash((self.__class__, pub.curve.name, priv))
-        else:
             pub = self._wrapped.public_key()
-            return hash((self.__class__, pub.curve.name, pub))
+        else:
+            pub = self._wrapped
+        return hash(pub.public_bytes(
+            format=serialization.PublicFormat.Raw,
+            encoding=serialization.Encoding.Raw,
+        )[:32])
 
     def is_private(self) -> bool:
-        return isinstance(
-            self._wrapped, (
-                ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey,
-                x25519.X25519PrivateKey, x448.X448PrivateKey
-            )
-        )
+        # Not all of the curves may be available with OpenSSL,
+        # so instead of doing instance checks against the private
+        # key classes, we do this
+        return hasattr(self._wrapped, "private_bytes")
 
 
 class ImmutableMap(Mapping, Hashable):

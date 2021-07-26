@@ -406,6 +406,7 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
         key = JWK.load(data)
         data = key.fields_to_partial_json()
         self.assertEqual(data['crv'], "Ed25519")
+        self.assertIsInstance(data['x'], bytes)
 
     def test_init_auto_comparable(self):
         self.assertIsInstance(self.x448_key.key, util.ComparableOKPKey)
@@ -421,9 +422,29 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
             }
         )
 
+    def test_no_x_name(self):
+        from josepy.jwk import JWK
+        with self.assertRaises(errors.DeserializationError) as warn:
+            JWK.from_json(
+                {
+                    'kty': 'OKP',
+                    'crv': 'Ed448',
+                }
+            )
+        self.assertEqual(
+            warn.exception.__str__(),
+            'Deserialization error: OKP should have "x" parameter'
+        )
+
     def test_from_json_hashable(self):
         from josepy.jwk import JWK
         hash(JWK.from_json(self.jwked25519json))
+
+    def test_deserialize_public_key(self):
+        # should target jwk.py:474-484, but those lines are still marked as missing
+        # in the coverage report
+        from josepy.jwk import JWKOKP
+        JWKOKP.fields_from_json(self.jwked25519json)
 
 
 if __name__ == '__main__':

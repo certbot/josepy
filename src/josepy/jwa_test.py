@@ -10,10 +10,6 @@ RSA1024_KEY = test_util.load_rsa_private_key('rsa1024_key.pem')
 EC_P256_KEY = test_util.load_ec_private_key('ec_p256_key.pem')
 EC_P384_KEY = test_util.load_ec_private_key('ec_p384_key.pem')
 EC_P521_KEY = test_util.load_ec_private_key('ec_p521_key.pem')
-OKP_ED25519_KEY = test_util.load_ec_private_key('ed25519_key.pem')
-OKP_ED448_KEY = test_util.load_ec_private_key('ed448_key.pem')
-OKP_X25519_KEY = test_util.load_ec_private_key('x25519_key.pem')
-OKP_X448_KEY = test_util.load_ec_private_key('x448_key.pem')
 
 
 class JWASignatureTest(unittest.TestCase):
@@ -228,20 +224,6 @@ class JWAECTest(unittest.TestCase):
             decode_patch.return_value = (0, 0)
             sig = ES512.sign(key.key, b"test")
             self.assertEqual(len(sig), 2 * 66)
-
-
-# class JWAOKPTests(JWASignatureTest):
-#     # look up the signature sizes in the RFC
-#
-#     def test_sign_no_private_part(self):
-#         from josepy.jwa import ES25519
-#         self.assertRaises(errors.Error, ES25519.sign, OKP_ED25519_KEY, b'foo')
-#
-#     # def test_can_size_ed25519(self):
-#     #     ES25519.sign(b'foo'), OKP_ED25519_KEY,
-#
-#     def test_signature_size(self):
-#         pass
 
 
 if __name__ == '__main__':

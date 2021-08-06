@@ -135,8 +135,7 @@ class JWSTest(unittest.TestCase):
         mixed = JWS.from_compact(compact)
 
         self.assertNotEqual(self.mixed, mixed)
-        self.assertEqual(
-            set(['alg']), set(mixed.signature.combined.not_omitted()))
+        self.assertEqual({'alg'}, set(mixed.signature.combined.not_omitted()))
 
     def test_from_compact_missing_components(self):
         from josepy.jws import JWS

@@ -7,6 +7,9 @@ on:
   push:
     branches:
       - master
+  schedule:
+    # Run at 4pm UTC or 9am PST
+    - cron: "0 16 * * *"
 
 jobs:
   build:
@@ -42,14 +45,6 @@ jobs:
       - name: Run mypy
         run: |
          mypy src
-      # Report Failure to Webhook
-      - name: Mattermost Hook
-        run: |
-          echo "{\"text\":\"** :warning: certbot/josepy: Build failed :warning: ** | [(see details)]($GITHUB_WORKFLOW_URL) \"}" > mattermost.json
-      - uses: mattermost/action-mattermost-notify@master
-        env:
-          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
-        if: ${{ failure() }}
       # COVERAGE
       - name: Convert Coverage
         run: python -m coverage xml
@@ -57,3 +52,12 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true
+      # Report Failure to Webhook
+      - name: Mattermost Hook
+        run: |
+          echo "{\"text\":\"** :warning: certbot/josepy: Build failed :warning: ** | [(see details)]($GITHUB_WORKFLOW_URL) \"}" > mattermost.json
+        if: ${{ failure() }}
+      - uses: mattermost/action-mattermost-notify@master
+        env:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
+        if: ${{ failure() }}

@@ -7,13 +7,15 @@ on:
   push:
     branches:
       - master
+  schedule:
+    # Run at 4pm UTC or 9am PST
+    - cron: "0 16 * * *"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
       TOXENV: mypy
-      GITHUB_WORKFLOW_URL:  https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
     strategy:
       matrix:
         python: [3.6, 3.7, 3.8, 3.9]
@@ -42,14 +44,6 @@ jobs:
       - name: Run mypy
         run: |
          mypy src
-      # Report Failure to Webhook
-      - name: Mattermost Hook
-        run: |
-          echo "{\"text\":\"** :warning: certbot/josepy: Build failed :warning: ** | [(see details)]($GITHUB_WORKFLOW_URL) \"}" > mattermost.json
-      - uses: mattermost/action-mattermost-notify@master
-        env:
-          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
-        if: ${{ failure() }}
       # COVERAGE
       - name: Convert Coverage
         run: python -m coverage xml
@@ -57,3 +51,17 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true
+  notify:
+    # Only notify about failed builds and do not notify about failed builds for
+    # PRs.
+    if: ${{ failure() && github.event_name != 'pull_request' }}
+    needs: build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Write Mattermost Message
+        run: |
+          WORKFLOW_RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          echo "{\"text\":\"** :warning: $GITHUB_REPOSITORY: Build failed :warning: ** | [(see details)]($WORKFLOW_RUN_URL) \"}" > mattermost.json
+      - uses: mattermost/action-mattermost-notify@master
+        env:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}

@@ -5,6 +5,8 @@ Changelog
 --------------
 
 * Removed pytest-cache testing dependency.
+* Fixed a bug that sometimes caused incorrect padding to be used when
+  serializing Elliptic Curve keys as JSON Web Keys.
 
 1.8.0 (2021-03-15)
 ------------------

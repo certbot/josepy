@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.9.0 (master)
---------------
+1.9.0 (2021-09-09)
+------------------
 
 * Removed pytest-cache testing dependency.
 * Fixed a bug that sometimes caused incorrect padding to be used when

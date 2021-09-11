@@ -10,7 +10,7 @@ warnings.warn("josepy.magic_typing is deprecated and will be removed in a future
 
 class TypingClass:
     """Ignore import errors by getting anything"""
-    def __getattr__(self, name):
+    def __getattr__(self, name) -> None:
         return None
 
 

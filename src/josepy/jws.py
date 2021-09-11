@@ -6,6 +6,7 @@ import sys
 import OpenSSL
 
 from josepy import b64, errors, json_util, jwa, jwk, util
+from typing import List, Optional
 
 
 class MediaType:
@@ -15,7 +16,7 @@ class MediaType:
     """MIME Media Type and Content Type prefix."""
 
     @classmethod
-    def decode(cls, value):
+    def decode(cls, value) -> str:
         """Decoder."""
         # 4.1.10
         if '/' not in value:
@@ -78,7 +79,7 @@ class Header(json_util.JSONObjectWithFields):
                 for name, field in self._fields.items()
                 if not field.omit(getattr(self, name))}
 
-    def __add__(self, other):
+    def __add__(self, other: Header) -> Header:
         if not isinstance(other, type(self)):
             raise TypeError('Header cannot be added to: {0}'.format(
                 type(other)))
@@ -92,7 +93,7 @@ class Header(json_util.JSONObjectWithFields):
         not_omitted_self.update(not_omitted_other)
         return type(self)(**not_omitted_self)  # pylint: disable=star-args
 
-    def find_key(self):
+    def find_key(self) -> json_util.Field:
         """Find key based on header.
 
         .. todo:: Supports only "jwk" header parameter lookup.
@@ -116,12 +117,12 @@ class Header(json_util.JSONObjectWithFields):
     # x5c does NOT use JOSE Base64 (4.1.6)
 
     @x5c.encoder  # type: ignore
-    def x5c(value):  # pylint: disable=missing-docstring,no-self-argument
+    def x5c(value) -> List[bytes]:  # pylint: disable=missing-docstring,no-self-argument
         return [base64.b64encode(OpenSSL.crypto.dump_certificate(
             OpenSSL.crypto.FILETYPE_ASN1, cert.wrapped)) for cert in value]
 
     @x5c.decoder  # type: ignore
-    def x5c(value):  # pylint: disable=missing-docstring,no-self-argument
+    def x5c(value) -> List[bytes]:  # pylint: disable=missing-docstring,no-self-argument
         try:
             return tuple(util.ComparableX509(OpenSSL.crypto.load_certificate(
                 OpenSSL.crypto.FILETYPE_ASN1,
@@ -152,15 +153,15 @@ class Signature(json_util.JSONObjectWithFields):
         encoder=json_util.encode_b64jose)
 
     @protected.encoder  # type: ignore
-    def protected(value):  # pylint: disable=missing-docstring,no-self-argument
+    def protected(value) -> str:  # pylint: disable=missing-docstring,no-self-argument
         # wrong type guess (Signature, not bytes) | pylint: disable=no-member
         return json_util.encode_b64jose(value.encode('utf-8'))
 
     @protected.decoder  # type: ignore
-    def protected(value):  # pylint: disable=missing-docstring,no-self-argument
+    def protected(value) -> str:  # pylint: disable=missing-docstring,no-self-argument
         return json_util.decode_b64jose(value).decode('utf-8')
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         if 'combined' not in kwargs:
             kwargs = self._with_combined(kwargs)
         super().__init__(**kwargs)
@@ -197,8 +198,8 @@ class Signature(json_util.JSONObjectWithFields):
             msg=self._msg(self.protected, payload))
 
     @classmethod
-    def sign(cls, payload, key, alg, include_jwk=True,
-             protect=frozenset(), **kwargs):
+    def sign(cls, payload, key, alg, include_jwk: bool=True,
+             protect=frozenset(), **kwargs) -> Signature:
         """Sign.
 
         :param JWK key: Key for signature.
@@ -255,12 +256,12 @@ class JWS(json_util.JSONObjectWithFields):
 
     signature_cls = Signature
 
-    def verify(self, key=None):
+    def verify(self, key=None) -> bool:
         """Verify."""
         return all(sig.verify(self.payload, key) for sig in self.signatures)
 
     @classmethod
-    def sign(cls, payload, **kwargs):
+    def sign(cls, payload, **kwargs) -> JWS:
         """Sign."""
         return cls(payload=payload, signatures=(
             cls.signature_cls.sign(payload=payload, **kwargs),))
@@ -294,7 +295,7 @@ class JWS(json_util.JSONObjectWithFields):
             b64.b64encode(self.signature.signature))
 
     @classmethod
-    def from_compact(cls, compact):
+    def from_compact(cls, compact) -> JWS:
         """Compact deserialization.
 
         :param bytes compact:
@@ -312,7 +313,7 @@ class JWS(json_util.JSONObjectWithFields):
             signature=b64.b64decode(signature))
         return cls(payload=b64.b64decode(payload), signatures=(sig,))
 
-    def to_partial_json(self, flat=True):  # pylint: disable=arguments-differ
+    def to_partial_json(self, flat: bool=True):  # pylint: disable=arguments-differ
         assert self.signatures
         payload = json_util.encode_b64jose(self.payload)
 
@@ -327,7 +328,7 @@ class JWS(json_util.JSONObjectWithFields):
             }
 
     @classmethod
-    def from_json(cls, jobj):
+    def from_json(cls, jobj) -> JWS:
         if 'signature' in jobj and 'signatures' in jobj:
             raise errors.DeserializationError('Flat mixed with non-flat')
         elif 'signature' in jobj:  # flat
@@ -343,7 +344,7 @@ class CLI:
     """JWS CLI."""
 
     @classmethod
-    def sign(cls, args):
+    def sign(cls, args) -> None:
         """Sign."""
         key = args.alg.kty.load(args.key.read())
         args.key.close()
@@ -361,7 +362,7 @@ class CLI:
             print(sig.json_dumps_pretty())
 
     @classmethod
-    def verify(cls, args):
+    def verify(cls, args) -> int:
         """Verify."""
         if args.compact:
             sig = JWS.from_compact(sys.stdin.read().encode())
@@ -392,12 +393,12 @@ class CLI:
         return arg
 
     @classmethod
-    def _kty_type(cls, arg):
+    def _kty_type(cls, arg: str):
         assert arg in jwk.JWK.TYPES
         return jwk.JWK.TYPES[arg]
 
     @classmethod
-    def run(cls, args=None):
+    def run(cls, args: Optional[List[str]]=None):
         """Parse arguments and sign/verify."""
         if args is None:
             args = sys.argv[1:]

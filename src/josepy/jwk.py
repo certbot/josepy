@@ -4,7 +4,7 @@ import json
 import logging
 import math
 
-from typing import Dict, Optional, Sequence, Type, Union
+from typing import Any, Tuple, Dict, Optional, Sequence, Type, Union
 
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
@@ -15,7 +15,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 
 from josepy import errors, json_util, util
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 class JWK(json_util.TypedJSONObjectWithFields, metaclass=abc.ABCMeta):
@@ -39,7 +39,7 @@ class JWK(json_util.TypedJSONObjectWithFields, metaclass=abc.ABCMeta):
         'sort_keys': True,
     }
 
-    def thumbprint(self, hash_function=hashes.SHA256):
+    def thumbprint(self, hash_function: Type[hashes.SHA256]=hashes.SHA256) -> bytes:
         """Compute JWK Thumbprint.
 
         https://tools.ietf.org/html/rfc7638
@@ -126,9 +126,9 @@ class JWKOct(JWK):
     """Symmetric JWK."""
     typ = 'oct'
     __slots__ = ('key',)
-    required = ('k', JWK.type_field_name)
+    required: Tuple[str, str] = ('k', JWK.type_field_name)
 
-    def fields_to_partial_json(self):
+    def fields_to_partial_json(self) -> Dict[str, str]:
         # TODO: An "alg" member SHOULD also be present to identify the
         # algorithm intended to be used with the key, unless the
         # application uses another means or convention to determine
@@ -136,10 +136,10 @@ class JWKOct(JWK):
         return {'k': json_util.encode_b64jose(self.key)}
 
     @classmethod
-    def fields_from_json(cls, jobj):
+    def fields_from_json(cls, jobj) -> JWKOct:
         return cls(key=json_util.decode_b64jose(jobj['k']))
 
-    def public_key(self):
+    def public_key(self) -> JWKOct:
         return self
 
 
@@ -155,16 +155,16 @@ class JWKRSA(JWK):
     typ = 'RSA'
     cryptography_key_types = (rsa.RSAPublicKey, rsa.RSAPrivateKey)
     __slots__ = ('key',)
-    required = ('e', JWK.type_field_name, 'n')
+    required: Tuple[str, ...] = ('e', JWK.type_field_name, 'n')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         if 'key' in kwargs and not isinstance(
                 kwargs['key'], util.ComparableRSAKey):
             kwargs['key'] = util.ComparableRSAKey(kwargs['key'])
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def _encode_param(cls, data):
+    def _encode_param(cls, data) -> str:
         """Encode Base64urlUInt.
         :type data: long
         :rtype: unicode
@@ -174,7 +174,7 @@ class JWKRSA(JWK):
         return json_util.encode_b64jose(data.to_bytes(byteorder="big", length=length))
 
     @classmethod
-    def _decode_param(cls, data):
+    def _decode_param(cls, data) -> int:
         """Decode Base64urlUInt."""
         try:
             binary = json_util.decode_b64jose(data)
@@ -184,11 +184,11 @@ class JWKRSA(JWK):
         except ValueError:  # invalid literal for long() with base 16
             raise errors.DeserializationError()
 
-    def public_key(self):
+    def public_key(self) -> JWKRSA:
         return type(self)(key=self.key.public_key())
 
     @classmethod
-    def fields_from_json(cls, jobj):
+    def fields_from_json(cls, jobj) -> JWKRSA:
         # pylint: disable=invalid-name
         n, e = (cls._decode_param(jobj[x]) for x in ('n', 'e'))
         public_numbers = rsa.RSAPublicNumbers(e=e, n=n)
@@ -264,16 +264,16 @@ class JWKEC(JWK):
     __slots__ = ('key',)
     cryptography_key_types = (
         ec.EllipticCurvePublicKey, ec.EllipticCurvePrivateKey)
-    required = ('crv', JWK.type_field_name, 'x', 'y')
+    required: Tuple[str, ...] = ('crv', JWK.type_field_name, 'x', 'y')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         if 'key' in kwargs and not isinstance(
                 kwargs['key'], util.ComparableECKey):
             kwargs['key'] = util.ComparableECKey(kwargs['key'])
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def _encode_param(cls, data, length):
+    def _encode_param(cls, data, length) -> str:
         """Encode Base64urlUInt.
         :type data: long
         :type key_size: long
@@ -282,7 +282,7 @@ class JWKEC(JWK):
         return json_util.encode_b64jose(data.to_bytes(byteorder="big", length=length))
 
     @classmethod
-    def _decode_param(cls, data, name, valid_length):
+    def _decode_param(cls, data, name, valid_length) -> int:
         """Decode Base64urlUInt."""
         try:
             binary = json_util.decode_b64jose(data)
@@ -297,7 +297,7 @@ class JWKEC(JWK):
             raise errors.DeserializationError()
 
     @classmethod
-    def _curve_name_to_crv(cls, curve_name):
+    def _curve_name_to_crv(cls, curve_name) -> str:
         if curve_name == 'secp256r1':
             return 'P-256'
         if curve_name == 'secp384r1':
@@ -318,7 +318,7 @@ class JWKEC(JWK):
         raise errors.DeserializationError()
 
     @classmethod
-    def expected_length_for_curve(cls, curve):
+    def expected_length_for_curve(cls, curve: Union[ec.SECP256R1, ec.SECP384R1, ec.SECP521R1]) -> int:
         if isinstance(curve, ec.SECP256R1):
             return 32
         elif isinstance(curve, ec.SECP384R1):
@@ -326,7 +326,7 @@ class JWKEC(JWK):
         elif isinstance(curve, ec.SECP521R1):
             return 66
 
-    def fields_to_partial_json(self):
+    def fields_to_partial_json(self) -> Dict[str, Any]:
         params = {}
         if isinstance(self.key._wrapped, ec.EllipticCurvePublicKey):
             public = self.key.public_numbers()
@@ -344,7 +344,7 @@ class JWKEC(JWK):
         return params
 
     @classmethod
-    def fields_from_json(cls, jobj):
+    def fields_from_json(cls, jobj) -> JWKEC:
         # pylint: disable=invalid-name
         curve = cls._crv_to_curve(jobj['crv'])
         expected_length = cls.expected_length_for_curve(curve)
@@ -358,7 +358,7 @@ class JWKEC(JWK):
                 default_backend())
         return cls(key=key)
 
-    def public_key(self):
+    def public_key(self) -> JWKEC:
         # Unlike RSAPrivateKey, EllipticCurvePrivateKey does not contain public_key()
         if hasattr(self.key, 'public_key'):
             key = self.key.public_key()

@@ -19,7 +19,7 @@ from josepy import errors, interfaces, jwk
 
 from collections.abc import Hashable
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 class JWA(interfaces.JSONDeSerializable):  # pylint: disable=abstract-method
@@ -33,15 +33,15 @@ class JWASignature(JWA, Hashable):
     """Base class for JSON Web Signature Algorithms."""
     SIGNATURES: Dict[str, Type] = {}
 
-    def __init__(self, name):
+    def __init__(self, name) -> None:
         self.name = name
 
-    def __eq__(self, other):
+    def __eq__(self, other: JWASignature):
         if not isinstance(other, JWASignature):
             return NotImplemented
         return self.name == other.name
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.__class__, self.name))
 
     @classmethod
@@ -54,7 +54,7 @@ class JWASignature(JWA, Hashable):
         return self.name
 
     @classmethod
-    def from_json(cls, jobj):
+    def from_json(cls, jobj: str):
         return cls.SIGNATURES[jobj]
 
     @abc.abstractmethod
@@ -74,16 +74,16 @@ class JWASignature(JWA, Hashable):
 class _JWAHS(JWASignature):
     kty = jwk.JWKOct
 
-    def __init__(self, name, hash_):
+    def __init__(self, name, hash_) -> None:
         super().__init__(name)
         self.hash = hash_()
 
-    def sign(self, key, msg):
+    def sign(self, key, msg: bytes) -> bytes:
         signer = hmac.HMAC(key, self.hash, backend=default_backend())
         signer.update(msg)
         return signer.finalize()
 
-    def verify(self, key, msg, sig):
+    def verify(self, key, msg: bytes, sig: bytes) -> bool:
         verifier = hmac.HMAC(key, self.hash, backend=default_backend())
         verifier.update(msg)
         try:
@@ -121,7 +121,7 @@ class _JWARSA:
             logger.debug(error, exc_info=True)
             raise errors.Error(str(error))
 
-    def verify(self, key, msg, sig):
+    def verify(self, key, msg, sig) -> bool:
         """Verify the ``msg` and ``sig`` using ``key``."""
         # If cryptography library supports new style api (v1.4 and later)
         new_api = hasattr(key, "verify")
@@ -142,7 +142,7 @@ class _JWARSA:
 
 class _JWARS(_JWARSA, JWASignature):
 
-    def __init__(self, name, hash_):
+    def __init__(self, name, hash_) -> None:
         super().__init__(name)
         self.padding = padding.PKCS1v15()
         self.hash = hash_()
@@ -150,7 +150,7 @@ class _JWARS(_JWARSA, JWASignature):
 
 class _JWAPS(_JWARSA, JWASignature):
 
-    def __init__(self, name, hash_):
+    def __init__(self, name, hash_) -> None:
         super().__init__(name)
         self.padding = padding.PSS(
             mgf=padding.MGF1(hash_()),
@@ -161,7 +161,7 @@ class _JWAPS(_JWARSA, JWASignature):
 class _JWAEC(JWASignature):
     kty = jwk.JWKEC
 
-    def __init__(self, name, hash_):
+    def __init__(self, name, hash_) -> None:
         super().__init__(name)
         self.hash = hash_()
 
@@ -205,7 +205,7 @@ class _JWAEC(JWASignature):
         )
         return self._verify(key, msg, asn1sig)
 
-    def _verify(self, key, msg, asn1sig):
+    def _verify(self, key, msg, asn1sig) -> bool:
         # If cryptography library supports new style api (v1.4 and later)
         new_api = hasattr(key, 'verify')
         if not new_api:

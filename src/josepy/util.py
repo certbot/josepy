@@ -1,29 +1,10 @@
 """JOSE utilities."""
+from typing import Union, Any, Callable, Iterator, Tuple
 from collections.abc import Hashable, Mapping
 
-import OpenSSL
+from OpenSSL import crypto
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
-
-
-class abstractclassmethod(classmethod):
-    # pylint: disable=invalid-name,too-few-public-methods
-    """Descriptor for an abstract classmethod.
-
-    It augments the :mod:`abc` framework with an abstract
-    classmethod. This is implemented as :class:`abc.abstractclassmethod`
-    in the standard Python library starting with version 3.2.
-
-    This implementation is from a StackOverflow answer that was derived from
-    the implementation in the Python 3.3 abc library.
-    http://stackoverflow.com/questions/11217878/python-2-7-combine-abc-abstractmethod-and-classmethod.
-
-    """
-    __isabstractmethod__ = True
-
-    def __init__(self, target):
-        target.__isabstractmethod__ = True
-        super().__init__(target)
 
 
 class ComparableX509:  # pylint: disable=too-few-public-methods
@@ -34,15 +15,15 @@ class ComparableX509:  # pylint: disable=too-few-public-methods
 
     """
 
-    def __init__(self, wrapped):
-        assert isinstance(wrapped, OpenSSL.crypto.X509) or isinstance(
-            wrapped, OpenSSL.crypto.X509Req)
+    def __init__(self, wrapped: Union[crypto.X509, crypto.X509Req]) -> None:
+        assert isinstance(wrapped, crypto.X509) or isinstance(
+            wrapped, crypto.X509Req)
         self.wrapped = wrapped
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         return getattr(self.wrapped, name)
 
-    def _dump(self, filetype=OpenSSL.crypto.FILETYPE_ASN1):
+    def _dump(self, filetype: int = crypto.FILETYPE_ASN1) -> bytes:
         """Dumps the object into a buffer with the specified encoding.
 
         :param int filetype: The desired encoding. Should be one of
@@ -54,22 +35,22 @@ class ComparableX509:  # pylint: disable=too-few-public-methods
         :rtype: str
 
         """
-        if isinstance(self.wrapped, OpenSSL.crypto.X509):
-            func = OpenSSL.crypto.dump_certificate
-        else:  # assert in __init__ makes sure this is X509Req
-            func = OpenSSL.crypto.dump_certificate_request
-        return func(filetype, self.wrapped)
+        if isinstance(self.wrapped, crypto.X509):
+            return crypto.dump_certificate(filetype, self.wrapped)
 
-    def __eq__(self, other):
+        # assert in __init__ makes sure this is X509Req
+        return crypto.dump_certificate_request(filetype, self.wrapped)
+
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
         # pylint: disable=protected-access
         return self._dump() == other._dump()
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.__class__, self._dump()))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<{0}({1!r})>'.format(self.__class__.__name__, self.wrapped)
 
 
@@ -79,15 +60,20 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
     See https://github.com/pyca/cryptography/issues/2122.
 
     """
-    __hash__ = NotImplemented
+    __hash__: Callable[[], int] = NotImplemented
 
-    def __init__(self, wrapped):
+    def __init__(self,
+                 wrapped: Union[
+                     rsa.RSAPrivateKeyWithSerialization,
+                     rsa.RSAPublicKeyWithSerialization,
+                     ec.EllipticCurvePrivateKeyWithSerialization,
+                     ec.EllipticCurvePublicKeyWithSerialization]):
         self._wrapped = wrapped
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         return getattr(self._wrapped, name)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         # pylint: disable=protected-access
         if (not isinstance(other, self.__class__) or
                 self._wrapped.__class__ is not other._wrapped.__class__):
@@ -99,12 +85,12 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
         else:
             return NotImplemented
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<{0}({1!r})>'.format(self.__class__.__name__, self._wrapped)
 
-    def public_key(self):
+    def public_key(self) -> 'ComparableKey':
         """Get wrapped public key."""
-        return self.__class__(self._wrapped.public_key())
+        return self.__class__(self._wrapped.public_key())  # type: ignore[union-attr]
 
 
 class ComparableRSAKey(ComparableKey):  # pylint: disable=too-few-public-methods
@@ -117,7 +103,7 @@ class ComparableRSAKey(ComparableKey):  # pylint: disable=too-few-public-methods
 
     """
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         # public_numbers() hasn't got stable hash!
         # https://github.com/pyca/cryptography/issues/2143
         if isinstance(self._wrapped, rsa.RSAPrivateKeyWithSerialization):
@@ -129,6 +115,8 @@ class ComparableRSAKey(ComparableKey):  # pylint: disable=too-few-public-methods
             pub = self.public_numbers()
             return hash((self.__class__, pub.n, pub.e))
 
+        raise NotImplementedError()
+
 
 class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
     """Wrapper for ``cryptography`` RSA keys.
@@ -137,7 +125,7 @@ class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
     - :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey`
     """
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         # public_numbers() hasn't got stable hash!
         # https://github.com/pyca/cryptography/issues/2143
         if isinstance(self._wrapped, ec.EllipticCurvePrivateKeyWithSerialization):
@@ -148,13 +136,15 @@ class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
             pub = self.public_numbers()
             return hash((self.__class__, pub.curve.name, pub.x, pub.y))
 
-    def public_key(self):
+        raise NotImplementedError()
+
+    def public_key(self) -> 'ComparableECKey':
         """Get wrapped public key."""
         # Unlike RSAPrivateKey, EllipticCurvePrivateKey does not have public_key()
         if hasattr(self._wrapped, 'public_key'):
-            key = self._wrapped.public_key()
+            key = self._wrapped.public_key()  # type: ignore[union-attr]
         else:
-            key = self._wrapped.public_numbers().public_key(default_backend())
+            key = self._wrapped.public_numbers().public_key(default_backend())  # type: ignore[union-attr]
         return self.__class__(key)
 
 
@@ -162,10 +152,10 @@ class ImmutableMap(Mapping, Hashable):
     # pylint: disable=too-few-public-methods
     """Immutable key to value mapping with attribute access."""
 
-    __slots__ = ()
+    __slots__: Tuple[str, ...] = ()
     """Must be overridden in subclasses."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         if set(kwargs) != set(self.__slots__):
             raise TypeError(
                 '__init__() takes exactly the following arguments: {0} '
@@ -174,30 +164,30 @@ class ImmutableMap(Mapping, Hashable):
         for slot in self.__slots__:
             object.__setattr__(self, slot, kwargs.pop(slot))
 
-    def update(self, **kwargs):
+    def update(self, **kwargs: Any) -> 'ImmutableMap':
         """Return updated map."""
         items = {**self, **kwargs}
         return type(self)(**items)  # pylint: disable=star-args
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         try:
             return getattr(self, key)
         except AttributeError:
             raise KeyError(key)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         return iter(self.__slots__)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.__slots__)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(tuple(getattr(self, slot) for slot in self.__slots__))
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         raise AttributeError("can't set attribute")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{0}({1})'.format(self.__class__.__name__, ', '.join(
             '{0}={1!r}'.format(key, value)
             for key, value in self.items()))
@@ -208,7 +198,8 @@ class frozendict(Mapping, Hashable):
     """Frozen dictionary."""
     __slots__ = ('_items', '_keys')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        items: Mapping
         if kwargs and not args:
             items = dict(kwargs)
         elif len(args) == 1 and isinstance(args[0], Mapping):
@@ -220,30 +211,30 @@ class frozendict(Mapping, Hashable):
         object.__setattr__(self, '_items', items)
         object.__setattr__(self, '_keys', tuple(sorted(items.keys())))
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         return self._items[key]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         return iter(self._keys)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._items)
 
-    def _sorted_items(self):
+    def _sorted_items(self) -> Tuple[Tuple[str, Any], ...]:
         return tuple((key, self[key]) for key in self._keys)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self._sorted_items())
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         try:
             return self._items[name]
         except KeyError:
             raise AttributeError(name)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         raise AttributeError("can't set attribute")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'frozendict({0})'.format(', '.join('{0}={1!r}'.format(
             key, value) for key, value in self._sorted_items()))

@@ -13,7 +13,7 @@
 import base64
 
 
-def b64encode(data):
+def b64encode(data: bytes) -> bytes:
     """JOSE Base64 encode.
 
     :param data: Data to be encoded.
@@ -30,7 +30,7 @@ def b64encode(data):
     return base64.urlsafe_b64encode(data).rstrip(b'=')
 
 
-def b64decode(data):
+def b64decode(data: bytes) -> bytes:
     """JOSE Base64 decode.
 
     :param data: Base64 string to be decoded. If it's unicode, then

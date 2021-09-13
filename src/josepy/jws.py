@@ -73,7 +73,7 @@ class Header(json_util.JSONObjectWithFields):
     cty = json_util.Field('cty', encoder=MediaType.encode,
                           decoder=MediaType.decode, omitempty=True)
     crit = json_util.Field('crit', omitempty=True, default=())
-    _fields: Dict[str, Any]
+    _fields: Dict[str, json_util.Field]
 
     def not_omitted(self) -> Dict[str, Any]:
         """Fields that would not be omitted in the JSON object."""

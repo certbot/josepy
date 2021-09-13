@@ -345,7 +345,7 @@ def encode_hex16(value: bytes) -> str:
     return binascii.hexlify(value).decode()
 
 
-def decode_hex16(value: str, size: Optional[int] = None, minimum: Optional[bool] = False) -> bytes:
+def decode_hex16(value: str, size: Optional[int] = None, minimum: bool = False) -> bytes:
     """Decode hexlified field.
 
     :param unicode value:

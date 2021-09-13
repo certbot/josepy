@@ -1,4 +1,4 @@
-name: Python Tests for Joespy
+name: Python Tests for Josepy
 
 on:
   pull_request:
@@ -17,9 +17,9 @@ jobs:
     env:
       TOXENV: mypy
     strategy:
+      fail-fast: false
       matrix:
         python: [3.6, 3.7, 3.8, 3.9]
-
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python
@@ -42,8 +42,7 @@ jobs:
         run: tox -e py
       # STATIC CHECK
       - name: Run mypy
-        run: |
-         mypy src
+        run: mypy src
       # COVERAGE
       - name: Convert Coverage
         run: python -m coverage xml
@@ -52,8 +51,7 @@ jobs:
         with:
           fail_ci_if_error: true
   notify:
-    # Only notify about failed builds and do not notify about failed builds for
-    # PRs.
+    # Only notify about failed builds for branches (not PRs).
     if: ${{ failure() && github.event_name != 'pull_request' }}
     needs: build
     runs-on: ubuntu-20.04

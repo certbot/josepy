@@ -109,7 +109,7 @@ class _JWARSA:
         try:
             if new_api:
                 return key.sign(msg, self.padding, self.hash)
-            signer = key.signer(self.padding, self.hash)
+            signer = key.signer(self.padding, self.hash)  # type: ignore[attr-defined]
         except AttributeError as error:
             logger.debug(error, exc_info=True)
             raise errors.Error("Public key cannot be used for signing")
@@ -181,7 +181,7 @@ class _JWAEC(JWASignature):
         try:
             if new_api:
                 return key.sign(msg, ec.ECDSA(self.hash))
-            signer = key.signer(ec.ECDSA(self.hash))
+            signer = key.signer(ec.ECDSA(self.hash))  # type: ignore[attr-defined]
         except AttributeError as error:
             logger.debug(error, exc_info=True)
             raise errors.Error('Public key cannot be used for signing')

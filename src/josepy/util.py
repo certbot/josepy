@@ -264,7 +264,7 @@ class _UtilDeprecationModule:
         if attr == 'abstractclassmethod':
             warnings.warn('The abstractclassmethod attribute in josepy.util is deprecated and will '
                           'be removed soon. Please use the built-in decorators @classmethod and '
-                          '@abc.abstractmethod together instead',
+                          '@abc.abstractmethod together instead.',
                           DeprecationWarning, stacklevel=2)
         return getattr(self._module, attr)
 

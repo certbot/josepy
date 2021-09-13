@@ -75,7 +75,7 @@ class Header(json_util.JSONObjectWithFields):
     crit = json_util.Field('crit', omitempty=True, default=())
     _fields: Dict[str, json_util.Field]
 
-    def not_omitted(self) -> Dict[str, Any]:
+    def not_omitted(self) -> Dict[str, json_util.Field]:
         """Fields that would not be omitted in the JSON object."""
         return {name: getattr(self, name)
                 for name, field in self._fields.items()

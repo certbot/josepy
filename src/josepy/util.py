@@ -32,7 +32,7 @@ class ComparableX509:  # pylint: disable=too-few-public-methods
             `OpenSSL.crypto.FILETYPE_TEXT`.
 
         :returns: Encoded X509 object.
-        :rtype: str
+        :rtype: bytes
 
         """
         if isinstance(self.wrapped, crypto.X509):

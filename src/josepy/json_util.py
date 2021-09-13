@@ -311,7 +311,7 @@ def encode_b64jose(data: bytes) -> str:
     return b64.b64encode(data).decode('ascii')
 
 
-def decode_b64jose(data: str, size: Optional[int] = None, minimum: Optional[bool] = False) -> bytes:
+def decode_b64jose(data: str, size: Optional[int] = None, minimum: bool = False) -> bytes:
     """Decode JOSE Base-64 field.
 
     :param unicode data:

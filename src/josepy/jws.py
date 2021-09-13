@@ -373,7 +373,7 @@ class CLI:
             print(sig.json_dumps_pretty())
 
     @classmethod
-    def verify(cls, args: argparse.Namespace) -> int:
+    def verify(cls, args: argparse.Namespace) -> bool:
         """Verify."""
         if args.compact:
             sig = JWS.from_compact(sys.stdin.read().encode())
@@ -382,7 +382,7 @@ class CLI:
                 sig = cast(JWS, JWS.json_loads(sys.stdin.read()))
             except errors.Error as error:
                 print(error)
-                return -1
+                return False
 
         if args.key is not None:
             assert args.kty is not None
@@ -409,7 +409,7 @@ class CLI:
         return jwk.JWK.TYPES[arg]
 
     @classmethod
-    def run(cls, args: List[str] = None) -> Any:
+    def run(cls, args: List[str] = None) -> Optional[bool]:
         """Parse arguments and sign/verify."""
         if args is None:
             args = sys.argv[1:]

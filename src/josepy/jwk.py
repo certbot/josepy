@@ -73,22 +73,22 @@ class JWK(json_util.TypedJSONObjectWithFields, metaclass=abc.ABCMeta):
         exceptions = {}
 
         # private key?
-        for loader in (serialization.load_pem_private_key,
-                       serialization.load_der_private_key):
+        for loader_private in (serialization.load_pem_private_key,
+                               serialization.load_der_private_key):
             try:
-                return loader(data, password, backend)  # type: ignore[operator]
+                return loader_private(data, password, backend)
             except (ValueError, TypeError,
                     cryptography.exceptions.UnsupportedAlgorithm) as error:
-                exceptions[str(loader)] = error
+                exceptions[str(loader_private)] = error
 
         # public key?
-        for loader in (serialization.load_pem_public_key,
-                       serialization.load_der_public_key):
+        for loader_public in (serialization.load_pem_public_key,
+                              serialization.load_der_public_key):
             try:
-                return loader(data, backend)  # type: ignore[operator]
+                return loader_public(data, backend)
             except (ValueError,
                     cryptography.exceptions.UnsupportedAlgorithm) as error:
-                exceptions[str(loader)] = error
+                exceptions[str(loader_public)] = error
 
         # no luck
         raise errors.Error('Unable to deserialize key: {0}'.format(exceptions))

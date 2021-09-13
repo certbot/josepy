@@ -1,10 +1,18 @@
 """JOSE utilities."""
-from typing import Union, Any, Callable, Iterator, Tuple
+import abc
+from types import ModuleType
+from typing import Union, Any, Callable, Iterator, Tuple, List, cast
 from collections.abc import Hashable, Mapping
+import sys
+import warnings
 
 from OpenSSL import crypto
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
+
+
+def abstractclassmethod(func: Callable):
+    return classmethod(abc.abstractmethod(func))
 
 
 class ComparableX509:  # pylint: disable=too-few-public-methods
@@ -238,3 +246,35 @@ class frozendict(Mapping, Hashable):
     def __repr__(self) -> str:
         return 'frozendict({0})'.format(', '.join('{0}={1!r}'.format(
             key, value) for key, value in self._sorted_items()))
+
+
+# This class takes a similar approach to the cryptography project to deprecate attributes
+# in public modules. See the _ModuleWithDeprecation class here:
+# https://github.com/pyca/cryptography/blob/91105952739442a74582d3e62b3d2111365b0dc7/src/cryptography/utils.py#L129
+class _UtilDeprecationModule:
+    """
+    Internal class delegating to a module, and displaying warnings when attributes
+    related to the deprecated "abstractclassmethod" attributes in the josepy.util module.
+    """
+    def __init__(self, module: ModuleType) -> None:
+        self.__dict__['_module'] = module
+
+    def __getattr__(self, attr: str) -> Any:
+        if attr == 'abstractclassmethod':
+            warnings.warn('The abstractclassmethod attribute in josepy.util is deprecated and will '
+                          'be removed soon. Please use the built-in decorators @classmethod and '
+                          '@abc.abstractmethod together instead',
+                          DeprecationWarning, stacklevel=2)
+        return getattr(self._module, attr)
+
+    def __setattr__(self, attr: str, value: Any) -> None:  # pragma: no cover
+        setattr(self._module, attr, value)
+
+    def __delattr__(self, attr: str) -> None:  # pragma: no cover
+        delattr(self._module, attr)
+
+    def __dir__(self) -> List[str]:  # pragma: no cover
+        return ['_module'] + dir(self._module)
+
+# Patching ourselves to warn about deprecation and planned removal of some elements in the module.
+sys.modules[__name__] = cast(ModuleType, _UtilDeprecationModule(sys.modules[__name__]))

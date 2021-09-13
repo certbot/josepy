@@ -99,7 +99,12 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
 
     def public_key(self) -> 'ComparableKey':
         """Get wrapped public key."""
-        return self.__class__(self._wrapped.public_key())  # type: ignore[union-attr]
+        if isinstance(self._wrapped, (rsa.RSAPublicKeyWithSerialization,
+                                      ec.EllipticCurvePublicKeyWithSerialization)):
+            return self
+
+        key = self._wrapped.private_numbers().public_numbers.public_key(default_backend())
+        return self.__class__(key)
 
 
 class ComparableRSAKey(ComparableKey):  # pylint: disable=too-few-public-methods
@@ -146,15 +151,6 @@ class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
             return hash((self.__class__, pub.curve.name, pub.x, pub.y))
 
         raise NotImplementedError()
-
-    def public_key(self) -> 'ComparableECKey':
-        """Get wrapped public key."""
-        # Unlike RSAPrivateKey, EllipticCurvePrivateKey does not have public_key()
-        if hasattr(self._wrapped, 'public_key'):
-            key = self._wrapped.public_key()  # type: ignore[union-attr]
-        else:
-            key = self._wrapped.public_numbers().public_key(default_backend())  # type: ignore[union-attr]
-        return self.__class__(key)
 
 
 class ImmutableMap(Mapping, Hashable):
@@ -276,6 +272,7 @@ class _UtilDeprecationModule:
 
     def __dir__(self) -> List[str]:  # pragma: no cover
         return ['_module'] + dir(self._module)
+
 
 # Patching ourselves to warn about deprecation and planned removal of some elements in the module.
 sys.modules[__name__] = cast(ModuleType, _UtilDeprecationModule(sys.modules[__name__]))

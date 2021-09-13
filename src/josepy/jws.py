@@ -211,7 +211,7 @@ class Signature(json_util.JSONObjectWithFields):
         :param JWK key: Key for signature.
         :param JWASignature alg: Signature algorithm to use to sign.
         :param bool include_jwk: If True, insert the JWK inside the signature headers.
-        :param set protect: List of headers to protect.
+        :param FrozenSet protect: List of headers to protect.
 
         """
         assert isinstance(key, alg.kty)

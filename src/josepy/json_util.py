@@ -19,6 +19,24 @@ from josepy import b64, errors, interfaces, util
 logger = logging.getLogger(__name__)
 
 
+def field(json_name: str, default: Any = None, omitempty: bool = False,
+          decoder: Callable[[Any], Any] = None, encoder: Callable[[Any], Any] = None) -> Any:
+    """Convenient function to declare a :class:`Field` with proper type annotations.
+
+    This function allows to write the following code:
+
+    import josepy
+    class JSON(josepy.JSONObjectWithFields):
+        typ: str = josepy.field('type')
+
+        def other_type(self) -> str:
+            return self.typ
+
+    """
+    return Field(json_name=json_name, default=default, omitempty=omitempty,
+                 decoder=decoder, encoder=encoder)
+
+
 class Field:
     """JSON object field.
 

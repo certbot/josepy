@@ -57,22 +57,22 @@ class Header(json_util.JSONObjectWithFields):
     :ivar str cty: Content-Type, inc. :const:`MediaType.PREFIX`.
 
     """
-    alg = json_util.Field(
+    alg: jwa.JWASignature = json_util.field(
         'alg', decoder=jwa.JWASignature.from_json, omitempty=True)
-    jku = json_util.Field('jku', omitempty=True)
-    jwk = json_util.Field('jwk', decoder=jwk.JWK.from_json, omitempty=True)
-    kid = json_util.Field('kid', omitempty=True)
-    x5u = json_util.Field('x5u', omitempty=True)
-    x5c = json_util.Field('x5c', omitempty=True, default=())
-    x5t = json_util.Field(
+    jku: bytes = json_util.field('jku', omitempty=True)
+    jwk: jwk.JWK = json_util.field('jwk', decoder=jwk.JWK.from_json, omitempty=True)
+    kid: bytes = json_util.field('kid', omitempty=True)
+    x5u: bytes = json_util.field('x5u', omitempty=True)
+    x5c: bytes = json_util.field('x5c', omitempty=True, default=())
+    x5t: bytes = json_util.field(
         'x5t', decoder=json_util.decode_b64jose, omitempty=True)
-    x5tS256 = json_util.Field(
+    x5tS256: bytes = json_util.field(
         'x5t#S256', decoder=json_util.decode_b64jose, omitempty=True)
-    typ = json_util.Field('typ', encoder=MediaType.encode,
-                          decoder=MediaType.decode, omitempty=True)
-    cty = json_util.Field('cty', encoder=MediaType.encode,
-                          decoder=MediaType.decode, omitempty=True)
-    crit = json_util.Field('crit', omitempty=True, default=())
+    typ: MediaType = json_util.field('typ', encoder=MediaType.encode,
+                                     decoder=MediaType.decode, omitempty=True)
+    cty: MediaType = json_util.field('cty', encoder=MediaType.encode,
+                                     decoder=MediaType.decode, omitempty=True)
+    crit: bytes = json_util.field('crit', omitempty=True, default=())
     _fields: Dict[str, json_util.Field]
 
     def not_omitted(self) -> Dict[str, json_util.Field]:
@@ -108,7 +108,7 @@ class Header(json_util.JSONObjectWithFields):
         """
         if self.jwk is None:
             raise errors.Error('No key found')
-        return cast(josepy.JWK, self.jwk)
+        return self.jwk
 
     @crit.decoder  # type: ignore
     def crit(unused_value):
@@ -147,11 +147,11 @@ class Signature(json_util.JSONObjectWithFields):
     combined: Header
 
     __slots__ = ('combined',)
-    protected = json_util.Field('protected', omitempty=True, default='')
-    header = json_util.Field(
+    protected: str = json_util.field('protected', omitempty=True, default='')
+    header: Header = json_util.field(
         'header', omitempty=True, default=header_cls(),
         decoder=header_cls.from_json)
-    signature = json_util.Field(
+    signature: bytes = json_util.field(
         'signature', decoder=json_util.decode_b64jose,
         encoder=json_util.encode_b64jose)
 
@@ -197,9 +197,9 @@ class Signature(json_util.JSONObjectWithFields):
 
         """
         actual_key: josepy.JWK = self.combined.find_key() if key is None else key
-        return cast(josepy.jwa.JWASignature, self.combined.alg).verify(
-            key=actual_key.key, sig=cast(bytes, self.signature),
-            msg=self._msg(cast(str, self.protected), payload))
+        return self.combined.alg.verify(
+            key=actual_key.key, sig=self.signature,
+            msg=self._msg(self.protected, payload))
 
     @classmethod
     def sign(cls, payload: bytes, key: josepy.JWK, alg: josepy.JWASignature,
@@ -295,7 +295,7 @@ class JWS(json_util.JSONObjectWithFields):
         """
         assert len(self.signatures) == 1
 
-        assert 'alg' not in cast(Header, self.signature.header).not_omitted()
+        assert 'alg' not in self.signature.header.not_omitted()
         # ... it must be in protected
 
         return (
@@ -303,7 +303,7 @@ class JWS(json_util.JSONObjectWithFields):
             b'.' +
             b64.b64encode(self.payload) +
             b'.' +
-            b64.b64encode(cast(bytes, self.signature.signature)))
+            b64.b64encode(self.signature.signature))
 
     @classmethod
     def from_compact(cls, compact: bytes) -> 'JWS':

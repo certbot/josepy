@@ -111,7 +111,7 @@ class Header(json_util.JSONObjectWithFields):
         return cast(josepy.JWK, self.jwk)
 
     @crit.decoder  # type: ignore
-    def crit(unused_value):
+    def crit(unused_value: Any) -> Any:
         # pylint: disable=missing-docstring,no-self-argument,no-self-use
         raise errors.DeserializationError(
             '"crit" is not supported, please subclass')
@@ -185,7 +185,7 @@ class Signature(json_util.JSONObjectWithFields):
         return kwargs
 
     @classmethod
-    def _msg(cls, protected: str, payload: bytes):
+    def _msg(cls, protected: str, payload: bytes) -> bytes:
         return (b64.b64encode(protected.encode('utf-8')) + b'.' +
                 b64.b64encode(payload))
 

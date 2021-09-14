@@ -103,8 +103,7 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
                                       ec.EllipticCurvePublicKeyWithSerialization)):
             return self
 
-        key = self._wrapped.private_numbers().public_numbers.public_key(default_backend())
-        return self.__class__(key)
+        return self.__class__(self._wrapped.public_key())
 
 
 class ComparableRSAKey(ComparableKey):  # pylint: disable=too-few-public-methods

@@ -7,7 +7,7 @@ from typing import Dict, Any, Optional, FrozenSet, Mapping, List, Type, cast
 from OpenSSL import crypto
 
 import josepy
-from josepy import b64, errors, json_util, jwa, jwk, util
+from josepy import b64, errors, json_util, jwa, jwk as jwk_mod, util
 
 
 class MediaType:
@@ -60,7 +60,7 @@ class Header(json_util.JSONObjectWithFields):
     alg: jwa.JWASignature = json_util.field(
         'alg', decoder=jwa.JWASignature.from_json, omitempty=True)
     jku: bytes = json_util.field('jku', omitempty=True)
-    jwk: jwk.JWK = json_util.field('jwk', decoder=jwk.JWK.from_json, omitempty=True)
+    jwk: jwk_mod.JWK = json_util.field('jwk', decoder=jwk_mod.JWK.from_json, omitempty=True)
     kid: bytes = json_util.field('kid', omitempty=True)
     x5u: bytes = json_util.field('x5u', omitempty=True)
     x5c: bytes = json_util.field('x5c', omitempty=True, default=())
@@ -404,9 +404,9 @@ class CLI:
         return arg
 
     @classmethod
-    def _kty_type(cls, arg: Any) -> Type[jwk.JWK]:
-        assert arg in jwk.JWK.TYPES
-        return jwk.JWK.TYPES[arg]
+    def _kty_type(cls, arg: Any) -> Type[jwk_mod.JWK]:
+        assert arg in jwk_mod.JWK.TYPES
+        return jwk_mod.JWK.TYPES[arg]
 
     @classmethod
     def run(cls, args: List[str] = None) -> Optional[bool]:

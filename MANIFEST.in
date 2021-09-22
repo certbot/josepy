@@ -5,3 +5,4 @@ include README.rst
 include .coveragerc pytest.ini tox.ini
 recursive-include docs *
 recursive-include src/josepy/testdata *
+recursive-include tests *

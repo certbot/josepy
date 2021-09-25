@@ -2,7 +2,8 @@
 import binascii
 import unittest
 
-from josepy import errors, json_util, test_util, util
+from josepy import errors, json_util, util
+import test_util
 
 DSA_PEM = test_util.load_vector('dsa512_key.pem')
 RSA256_KEY = test_util.load_rsa_private_key('rsa256_key.pem')

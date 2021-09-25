@@ -20,6 +20,18 @@ class FieldTest(unittest.TestCase):
         self.assertEqual(test.json_name, "foo")
         self.assertEqual(test.default, "bar")
 
+    def test_type_field_control(self):
+        from josepy.json_util import field, JSONObjectWithFields
+
+        class DummyProperlyTyped(JSONObjectWithFields):
+            type: str = field('type')
+            index: int = field('index')
+
+        with self.assertRaises(ValueError):
+            class DummyImproperlyTyped(JSONObjectWithFields):
+                type = field('type')
+                index: int = field('index')
+
     def test_no_omit_boolean(self):
         from josepy.json_util import Field
         for default, omitempty, value in itertools.product(

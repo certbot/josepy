@@ -3,5 +3,6 @@ include CONTRIBUTING.md
 include LICENSE.txt
 include README.rst
 include .coveragerc pytest.ini tox.ini
+include src/josepy/py.typed
 recursive-include docs *
 recursive-include src/josepy/testdata *

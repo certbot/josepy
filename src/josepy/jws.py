@@ -2,7 +2,7 @@
 import argparse
 import base64
 import sys
-from typing import Dict, Any, Optional, FrozenSet, Mapping, List, Type, cast
+from typing import Dict, Any, Optional, FrozenSet, Mapping, List, Type, Tuple, cast
 
 from OpenSSL import crypto
 
@@ -63,7 +63,7 @@ class Header(json_util.JSONObjectWithFields):
     jwk: jwk_mod.JWK = json_util.field('jwk', decoder=jwk_mod.JWK.from_json, omitempty=True)
     kid: bytes = json_util.field('kid', omitempty=True)
     x5u: bytes = json_util.field('x5u', omitempty=True)
-    x5c: bytes = json_util.field('x5c', omitempty=True, default=())
+    x5c: Tuple[util.ComparableX509, ...] = json_util.field('x5c', omitempty=True, default=())
     x5t: bytes = json_util.field(
         'x5t', decoder=json_util.decode_b64jose, omitempty=True)
     x5tS256: bytes = json_util.field(
@@ -72,7 +72,7 @@ class Header(json_util.JSONObjectWithFields):
                                      decoder=MediaType.decode, omitempty=True)
     cty: MediaType = json_util.field('cty', encoder=MediaType.encode,
                                      decoder=MediaType.decode, omitempty=True)
-    crit: bytes = json_util.field('crit', omitempty=True, default=())
+    crit: Tuple[Any, ...] = json_util.field('crit', omitempty=True, default=())
     _fields: Dict[str, json_util.Field]
 
     def not_omitted(self) -> Dict[str, json_util.Field]:

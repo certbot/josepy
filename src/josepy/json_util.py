@@ -19,6 +19,24 @@ from josepy import b64, errors, interfaces, util
 logger = logging.getLogger(__name__)
 
 
+def field(json_name: str, default: Any = None, omitempty: bool = False,
+          decoder: Callable[[Any], Any] = None, encoder: Callable[[Any], Any] = None) -> Any:
+    """Convenient function to declare a :class:`Field` with proper type annotations.
+
+    This function allows to write the following code:
+
+    import josepy
+    class JSON(josepy.JSONObjectWithFields):
+        typ: str = josepy.field('type')
+
+        def other_type(self) -> str:
+            return self.typ
+
+    """
+    return _TypedField(json_name=json_name, default=default, omitempty=omitempty,
+                       decoder=decoder, encoder=encoder)
+
+
 class Field:
     """JSON object field.
 
@@ -124,6 +142,15 @@ class Field:
         return value
 
 
+class _TypedField(Field):
+    """Specialized class to mark a JSON object field with typed annotations.
+
+    This class is kept private because fields are supposed to be declared
+    using the :function:`field` in this situation.
+
+    In the future the :class:`Field` may be removed in favor of this one."""
+
+
 class JSONObjectWithFieldsMeta(abc.ABCMeta):
     """Metaclass for :class:`JSONObjectWithFields` and its subclasses.
 
@@ -167,24 +194,29 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
     _fields: Dict[str, Field] = {}
 
     def __new__(mcs, name: str, bases: List[str],
-                dikt: Dict[str, Any]) -> 'JSONObjectWithFieldsMeta':
+                namespace: Dict[str, Any]) -> 'JSONObjectWithFieldsMeta':
         fields = {}
 
         for base in bases:
             fields.update(getattr(base, '_fields', {}))
         # Do not reorder, this class might override fields from base classes!
-        # We create a tuple based on dikt.items() here because the loop
-        # modifies dikt.
-        for key, value in tuple(dikt.items()):
+        # We use a copy of namespace in the loop because the loop modifies it.
+        for key, value in namespace.copy().items():
             if isinstance(value, Field):
-                fields[key] = dikt.pop(key)
+                if isinstance(value, _TypedField):
+                    # Ensure the type annotation has been set for the field.
+                    # Error out if it is not the case.
+                    if key not in namespace.get('__annotations__', {}):
+                        raise ValueError(
+                            f'Field `{key}` in JSONObject `{name}` has no type annotation.')
+                fields[key] = namespace.pop(key)
 
-        dikt['_orig_slots'] = dikt.get('__slots__', ())
-        dikt['__slots__'] = tuple(
-            list(dikt['_orig_slots']) + list(fields.keys()))
-        dikt['_fields'] = fields
+        namespace['_orig_slots'] = namespace.get('__slots__', ())
+        namespace['__slots__'] = tuple(
+            list(namespace['_orig_slots']) + list(fields.keys()))
+        namespace['_fields'] = fields
 
-        return abc.ABCMeta.__new__(mcs, name, bases, dikt)  # type: ignore[call-overload]
+        return abc.ABCMeta.__new__(mcs, name, bases, namespace)  # type: ignore[call-overload]
 
 
 class JSONObjectWithFields(util.ImmutableMap,

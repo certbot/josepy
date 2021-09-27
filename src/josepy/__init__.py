@@ -52,6 +52,7 @@ from josepy.json_util import (
     encode_cert,
     encode_csr,
     encode_hex16,
+    field,
 )
 
 from josepy.jwa import (

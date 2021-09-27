@@ -148,7 +148,7 @@ class _TypedField(Field):
     This class is kept private because fields are supposed to be declared
     using the :function:`field` in this situation.
 
-    In the future the :class:`Field` will be removed in favor of this one."""
+    In the future the :class:`Field` may be removed in favor of this one."""
 
 
 class JSONObjectWithFieldsMeta(abc.ABCMeta):

@@ -206,7 +206,7 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
                 if isinstance(value, _TypedField):
                     # Ensure the type annotation has been set for the field.
                     # Error out if it is not the case.
-                    if not namespace.get('__annotations__', {}).get(key):
+                    if key not in namespace.get('__annotations__', {}):
                         raise ValueError(
                             f'Field `{key}` in JSONObject `{name}` has no type annotation.')
                 fields[key] = namespace.pop(key)

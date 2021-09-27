@@ -4,6 +4,8 @@ Changelog
 1.10.0 (master)
 ---------------
 
+* josepy is now compliant with PEP-561: type checkers will fetch types from the inline
+  types annotations when josepy is installed as a dependency in a Python project.
 * Added a `field` function to assist in adding type annotations for Fields in classes.
   If the field function is used to define a `Field` in a `JSONObjectWithFields` based
   class without a type annotation, an error will be raised.

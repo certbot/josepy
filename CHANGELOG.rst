@@ -4,6 +4,10 @@ Changelog
 1.10.0 (master)
 ---------------
 
+* Added a `field` function to assist in adding type annotations for Fields in classes.
+  If the field function is used to define a `Field` in a `JSONObjectWithFields` based
+  class without a type annotation, an error will be raised.
+
 1.9.0 (2021-09-09)
 ------------------
 

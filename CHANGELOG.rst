@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.10.0 (master)
----------------
+1.10.0 (2021-09-27)
+-------------------
 
 * josepy is now compliant with PEP-561: type checkers will fetch types from the inline
   types annotations when josepy is installed as a dependency in a Python project.

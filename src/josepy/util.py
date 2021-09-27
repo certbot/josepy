@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives.asymmetric import ec, rsa
 
 
 # Deprecated. Please use built-in decorators @classmethod and abc.abstractmethod together instead.
-def abstractclassmethod(func: Callable):
+def abstractclassmethod(func: Callable) -> classmethod:
     return classmethod(abc.abstractmethod(func))
 
 

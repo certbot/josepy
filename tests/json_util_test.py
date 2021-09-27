@@ -3,7 +3,8 @@ import itertools
 import unittest
 from unittest import mock
 
-from josepy import errors, interfaces, test_util, util
+from josepy import errors, interfaces, util
+import test_util
 
 CERT = test_util.load_comparable_cert('cert.pem')
 CSR = test_util.load_comparable_csr('csr.pem')

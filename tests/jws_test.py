@@ -5,7 +5,8 @@ from unittest import mock
 
 import OpenSSL
 
-from josepy import errors, json_util, jwa, jwk, test_util
+from josepy import errors, json_util, jwa, jwk
+import test_util
 
 CERT = test_util.load_comparable_cert('cert.pem')
 KEY = jwk.JWKRSA.load(test_util.load_vector('rsa512_key.pem'))

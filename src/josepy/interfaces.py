@@ -131,7 +131,7 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
         :returns: Fully serialized object.
 
         """
-        def _serialize(obj):
+        def _serialize(obj: Any) -> Any:
             if isinstance(obj, JSONDeSerializable):
                 return _serialize(obj.to_partial_json())
             if isinstance(obj, str):  # strings are Sequence

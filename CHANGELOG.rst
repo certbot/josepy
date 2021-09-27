@@ -9,6 +9,9 @@ Changelog
 * Added a `field` function to assist in adding type annotations for Fields in classes.
   If the field function is used to define a `Field` in a `JSONObjectWithFields` based
   class without a type annotation, an error will be raised.
+* josepy's tests can no longer be imported under the name josepy, however, they are still
+  included in the package and you can run them by installing josepy with "tests" extras and
+  running `python -m pytest`.
 
 1.9.0 (2021-09-09)
 ------------------

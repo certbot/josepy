@@ -2,7 +2,8 @@
 import unittest
 from unittest import mock
 
-from josepy import errors, test_util
+from josepy import errors
+import test_util
 
 RSA256_KEY = test_util.load_rsa_private_key('rsa256_key.pem')
 RSA512_KEY = test_util.load_rsa_private_key('rsa512_key.pem')

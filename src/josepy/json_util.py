@@ -9,7 +9,7 @@ The framework presented here is somewhat based on `Go's "json" package`_
 import abc
 import binascii
 import logging
-from typing import Dict, Type, Any, Callable, List, Mapping, Optional
+from typing import Dict, Type, Any, Callable, List, Mapping, Optional, TypeVar
 
 from OpenSSL import crypto
 import josepy.util
@@ -219,6 +219,9 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
         return abc.ABCMeta.__new__(mcs, name, bases, namespace)  # type: ignore[call-overload]
 
 
+T = TypeVar('T', bound='JSONObjectWithFields')
+
+
 class JSONObjectWithFields(util.ImmutableMap,
                            interfaces.JSONDeSerializable,
                            metaclass=JSONObjectWithFieldsMeta):
@@ -328,7 +331,7 @@ class JSONObjectWithFields(util.ImmutableMap,
         return fields
 
     @classmethod
-    def from_json(cls, jobj: Dict[str, Any]) -> 'JSONObjectWithFields':
+    def from_json(cls: Type[T], jobj: Mapping[str, Any]) -> T:
         return cls(**cls.fields_from_json(jobj))
 
 

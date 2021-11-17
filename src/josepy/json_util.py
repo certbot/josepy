@@ -219,7 +219,7 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
         return abc.ABCMeta.__new__(mcs, name, bases, namespace)  # type: ignore[call-overload]
 
 
-T = TypeVar('T', bound='JSONObjectWithFields')
+GenericJSONObjectWithFields = TypeVar('GenericJSONObjectWithFields', bound='JSONObjectWithFields')
 
 
 class JSONObjectWithFields(util.ImmutableMap,
@@ -331,7 +331,7 @@ class JSONObjectWithFields(util.ImmutableMap,
         return fields
 
     @classmethod
-    def from_json(cls: Type[T], jobj: Mapping[str, Any]) -> T:
+    def from_json(cls: Type[GenericJSONObjectWithFields], jobj: Mapping[str, Any]) -> GenericJSONObjectWithFields:
         return cls(**cls.fields_from_json(jobj))
 
 

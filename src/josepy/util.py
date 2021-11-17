@@ -151,7 +151,7 @@ class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
         raise NotImplementedError()
 
 
-T = TypeVar('T', bound='ImmutableMap')
+GenericImmutableMap = TypeVar('GenericImmutableMap', bound='ImmutableMap')
 
 
 class ImmutableMap(Mapping, Hashable):
@@ -170,7 +170,7 @@ class ImmutableMap(Mapping, Hashable):
         for slot in self.__slots__:
             object.__setattr__(self, slot, kwargs.pop(slot))
 
-    def update(self: T, **kwargs: Any) -> T:
+    def update(self: GenericImmutableMap, **kwargs: Any) -> GenericImmutableMap:
         """Return updated map."""
         items: Mapping[str, Any] = {**self, **kwargs}
         return type(self)(**items)  # pylint: disable=star-args

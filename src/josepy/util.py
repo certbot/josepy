@@ -1,7 +1,7 @@
 """JOSE utilities."""
 import abc
 from types import ModuleType
-from typing import Union, Any, Callable, Iterator, Tuple, List, cast
+from typing import Union, Any, Callable, Iterator, Tuple, List, TypeVar, cast
 from collections.abc import Hashable, Mapping
 import sys
 import warnings
@@ -151,6 +151,9 @@ class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
         raise NotImplementedError()
 
 
+GenericImmutableMap = TypeVar('GenericImmutableMap', bound='ImmutableMap')
+
+
 class ImmutableMap(Mapping, Hashable):
     # pylint: disable=too-few-public-methods
     """Immutable key to value mapping with attribute access."""
@@ -167,9 +170,9 @@ class ImmutableMap(Mapping, Hashable):
         for slot in self.__slots__:
             object.__setattr__(self, slot, kwargs.pop(slot))
 
-    def update(self, **kwargs: Any) -> 'ImmutableMap':
+    def update(self: GenericImmutableMap, **kwargs: Any) -> GenericImmutableMap:
         """Return updated map."""
-        items = {**self, **kwargs}
+        items: Mapping[str, Any] = {**self, **kwargs}
         return type(self)(**items)  # pylint: disable=star-args
 
     def __getitem__(self, key: str) -> Any:

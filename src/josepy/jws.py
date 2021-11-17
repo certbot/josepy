@@ -339,12 +339,13 @@ class JWS(json_util.JSONObjectWithFields):
             }
 
     @classmethod
-    def from_json(cls, jobj: Dict[str, Any]) -> 'JWS':
+    def from_json(cls, jobj: Mapping[str, Any]) -> 'JWS':
         if 'signature' in jobj and 'signatures' in jobj:
             raise errors.DeserializationError('Flat mixed with non-flat')
         elif 'signature' in jobj:  # flat
-            return cls(payload=json_util.decode_b64jose(jobj.pop('payload')),
-                       signatures=(cls.signature_cls.from_json(jobj),))
+            filtered = {key: value for key, value in jobj.items() if key != "payload"}
+            return cls(payload=json_util.decode_b64jose(jobj['payload']),
+                       signatures=(cls.signature_cls.from_json(filtered),))
         else:
             return cls(payload=json_util.decode_b64jose(jobj['payload']),
                        signatures=tuple(cls.signature_cls.from_json(sig)

@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.11.0 (master)
+1.11.0 (2021-11-17)
 ---------------
 
 * Added support for Python 3.10.

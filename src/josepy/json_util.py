@@ -485,7 +485,8 @@ class TypedJSONObjectWithFields(JSONObjectWithFields):
         return type_cls
 
     @classmethod
-    def get_type_cls(cls: Type[GenericTypedJSONObjectWithFields], jobj: Mapping[str, Any]) -> Type[GenericTypedJSONObjectWithFields]:
+    def get_type_cls(cls: Type[GenericTypedJSONObjectWithFields],
+                     jobj: Mapping[str, Any]) -> Type[GenericTypedJSONObjectWithFields]:
         """Get the registered class for ``jobj``."""
         if cls in cls.TYPES.values():
             if cls.type_field_name not in jobj:
@@ -523,7 +524,8 @@ class TypedJSONObjectWithFields(JSONObjectWithFields):
         return jobj
 
     @classmethod
-    def from_json(cls: Type[GenericTypedJSONObjectWithFields], jobj: Mapping[str, Any]) -> GenericTypedJSONObjectWithFields:
+    def from_json(cls: Type[GenericTypedJSONObjectWithFields],
+                  jobj: Mapping[str, Any]) -> GenericTypedJSONObjectWithFields:
         """Deserialize ACME object from valid JSON object.
 
         :raises josepy.errors.UnrecognizedTypeError: if type

@@ -61,7 +61,7 @@ class Header(json_util.JSONObjectWithFields):
         'alg', decoder=jwa.JWASignature.from_json, omitempty=True)
     jku: Optional[bytes] = json_util.field('jku', omitempty=True)
     jwk: jwk_mod.JWK = json_util.field('jwk', decoder=jwk_mod.JWK.from_json, omitempty=True)
-    kid: Optional[bytes] = json_util.field('kid', omitempty=True)
+    kid: Optional[str] = json_util.field('kid', omitempty=True)
     x5u: Optional[bytes] = json_util.field('x5u', omitempty=True)
     x5c: Tuple[util.ComparableX509, ...] = json_util.field('x5c', omitempty=True, default=())
     x5t: Optional[bytes] = json_util.field(

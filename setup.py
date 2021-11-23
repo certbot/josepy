@@ -18,7 +18,8 @@ install_requires = [
 
 testing_requires = [
     'coverage>=4.0',
-    'flake8',
+    # Issue with flake8 4.0.0 and 4.0.1, see https://github.com/tholo/pytest-flake8/issues/81
+    'flake8<4',
     'mypy',
     'pytest-cov',
     'pytest-flake8>=0.5',
@@ -32,7 +33,7 @@ dev_extras = [
 
 docs_extras = [
     'Sphinx>=1.0',  # autodoc_member_order = 'bysource', autodoc_default_flags
-    'sphinx_rtd_theme',
+    'sphinx_rtd_theme>=1.0',
 ]
 
 

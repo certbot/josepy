@@ -69,9 +69,9 @@ class Header(json_util.JSONObjectWithFields):
     x5tS256: bytes = json_util.field(
         'x5t#S256', decoder=json_util.decode_b64jose, omitempty=True)
     typ: Optional[MediaType] = json_util.field('typ', encoder=MediaType.encode,
-                                     decoder=MediaType.decode, omitempty=True)
+                                               decoder=MediaType.decode, omitempty=True)
     cty: Optional[MediaType] = json_util.field('cty', encoder=MediaType.encode,
-                                     decoder=MediaType.decode, omitempty=True)
+                                               decoder=MediaType.decode, omitempty=True)
     crit: Tuple[Any, ...] = json_util.field('crit', omitempty=True, default=())
     _fields: Dict[str, json_util.Field]
 

@@ -73,6 +73,7 @@ class JWK(json_util.TypedJSONObjectWithFields, metaclass=abc.ABCMeta):
         exceptions = {}
 
         # private key?
+        loader_private: Any
         for loader_private in (serialization.load_pem_private_key,
                                serialization.load_der_private_key):
             try:
@@ -82,6 +83,7 @@ class JWK(json_util.TypedJSONObjectWithFields, metaclass=abc.ABCMeta):
                 exceptions[str(loader_private)] = error
 
         # public key?
+        loader_public: Any
         for loader_public in (serialization.load_pem_public_key,
                               serialization.load_der_public_key):
             try:

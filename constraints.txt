@@ -57,6 +57,15 @@ sphinxcontrib-serializinghtml==1.1.5
 toml==0.10.2
 tomli==1.2.2
 tox==3.24.4
+types-cryptography==3.3.5
+types-enum34==1.1.0
+types-ipaddress==1.0.0
+types-pyOpenSSL==20.0.6
+types-pyRFC3339==0.1.2
+types-requests==2.25.6
+types-setuptools==57.0.2
+typing-extensions==3.10.0.2
+typing-inspect==0.7.1
 typed-ast==1.4.3
 typing_extensions==4.0.0
 urllib3==1.26.7

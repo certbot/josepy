@@ -29,7 +29,9 @@ jobs:
       - name: Cache Dependencies
         uses: actions/cache@v2
         with:
-          path: ~/.cache/pypoetry
+          path: |
+            ~/.cache/pip
+            ~/.cache/pypoetry
           # Look to see if there is a cache hit for the corresponding lock file
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
           restore-keys: |

@@ -60,13 +60,14 @@ class Header(json_util.JSONObjectWithFields):
     alg: Optional[jwa.JWASignature] = json_util.field(
         'alg', decoder=jwa.JWASignature.from_json, omitempty=True)
     jku: Optional[bytes] = json_util.field('jku', omitempty=True)
-    jwk: jwk_mod.JWK = json_util.field('jwk', decoder=jwk_mod.JWK.from_json, omitempty=True)
+    jwk: Optional[jwk_mod.JWK] = json_util.field(
+        'jwk', decoder=jwk_mod.JWK.from_json, omitempty=True)
     kid: Optional[str] = json_util.field('kid', omitempty=True)
     x5u: Optional[bytes] = json_util.field('x5u', omitempty=True)
     x5c: Tuple[util.ComparableX509, ...] = json_util.field('x5c', omitempty=True, default=())
     x5t: Optional[bytes] = json_util.field(
         'x5t', decoder=json_util.decode_b64jose, omitempty=True)
-    x5tS256: bytes = json_util.field(
+    x5tS256: Optional[bytes] = json_util.field(
         'x5t#S256', decoder=json_util.decode_b64jose, omitempty=True)
     typ: Optional[MediaType] = json_util.field('typ', encoder=MediaType.encode,
                                                decoder=MediaType.decode, omitempty=True)

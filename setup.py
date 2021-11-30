@@ -24,6 +24,10 @@ testing_requires = [
     'pytest-cov',
     'pytest-flake8>=0.5',
     'pytest>=2.8.0',
+    'types-pyOpenSSL',
+    'types-pyRFC3339',
+    'types-requests',
+    'types-setuptools',
 ]
 
 dev_extras = [

@@ -29,25 +29,21 @@ jobs:
       - name: Cache Dependencies
         uses: actions/cache@v2
         with:
-          path: |
-            ~/.cache/pip
-            ~/.cache/pypoetry
+          path: ~/.cache/pypoetry
           # Look to see if there is a cache hit for the corresponding lock file
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
           restore-keys: |
             ${{ runner.os }}-poetry-
             ${{ runner.os }}-
-      - name: Install Poetry & Dependencies
-        run: pip install poetry && poetry install
+      - name: Install Poetry & Tox
+        run: pip install poetry>1.0.0 tox>3.3.0
       # TEST
       - name: Run Tox
-        run: .venv/bin/tox -e py
+        run: tox -e py
       # STATIC CHECK
       - name: Run mypy
-        run: .venv/bin/tox -e mypy
+        run: tox -e mypy
       # COVERAGE
-      - name: Convert Coverage
-        run: .venv/bin/python -m coverage xml
       - name: Upload Coverage
         uses: codecov/codecov-action@v2
         with:

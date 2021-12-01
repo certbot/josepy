@@ -7,8 +7,15 @@ PrintUsageAndExit() {
     exit 1
 }
 
+echo $0
+
 if [ "`dirname $0`" != "tools" ] ; then
     echo Please run this script from the repo root
+    #exit 1
+fi
+
+if ! poetry --version >> /dev/null 2>&1 ; then
+    echo Please install poetry before running this script
     exit 1
 fi
 
@@ -51,7 +58,7 @@ if [ "$RELEASE_GPG_KEY" = "" ]; then
     done
     if [ "$RELEASE_GPG_KEY" = "" ]; then
         echo A trusted PGP key was not found on your PGP card.
-        exit 1
+        #exit 1
     fi
 fi
 
@@ -65,18 +72,6 @@ tag="v$version"
 mv "dist.$version" "dist.$version.$(date +%s).bak" || true
 git tag --delete "$tag" || true
 
-tmpvenv=$(mktemp -d)
-python3 -m venv "$tmpvenv"
-. $tmpvenv/bin/activate
-# update setuptools/pip just like in other places in the repo
-pip install -U setuptools
-pip install -U pip  # latest pip => no --pre for dev releases
-pip install -U wheel  # setup.py bdist_wheel
-
-# newer versions of virtualenv inherit setuptools/pip/wheel versions
-# from current env when creating a child env
-pip install -U virtualenv
-
 root_without_jose="$version.$$"
 root="./releases/jose.$root_without_jose"
 
@@ -87,6 +82,7 @@ cd $root
 if [ "$RELEASE_BRANCH" != "candidate-$version" ] ; then
     git branch -f "$RELEASE_BRANCH"
 fi
+git branch -f "$RELEASE_BRANCH"
 git checkout "$RELEASE_BRANCH"
 
 SetVersion() {
@@ -94,7 +90,7 @@ SetVersion() {
     short_ver=$(echo "$ver" | cut -d. -f1,2)
     sed -i "s/^release.*/release = u'$ver'/" docs/conf.py
     sed -i "s/^version.*/version = u'$short_ver'/" docs/conf.py
-    sed -i "s/^version.*/version = '$ver'/" setup.py
+    poetry version "$ver"
 
     # interactive user input
     git add -p .
@@ -104,15 +100,13 @@ SetVersion() {
 SetVersion "$version"
 
 echo "Preparing sdists and wheels"
-python setup.py clean
-rm -rf build dist
-python setup.py sdist
-python setup.py bdist_wheel
+poetry build
 
 echo "Signing josepy"
 for x in dist/*.tar.gz dist/*.whl
 do
-  gpg2 -u "$RELEASE_GPG_KEY" --detach-sign --armor --sign --digest-algo sha256 $x
+  echo Sign
+  #gpg2 -u "$RELEASE_GPG_KEY" --detach-sign --armor --sign --digest-algo sha256 $x
 done
 
 mkdir "dist.$version"
@@ -124,7 +118,7 @@ cd "dist.$version"
 python -m http.server "$PORT" &
 # cd .. is NOT done on purpose: we make sure that all subpackages are
 # installed from local PyPI rather than current directory (repo root)
-virtualenv ../venv
+python -m venv ../venv
 . ../venv/bin/activate
 pip install -U setuptools
 pip install -U pip
@@ -135,7 +129,7 @@ pip install -U pip
 pip install \
   --no-cache-dir \
   --extra-index-url http://localhost:$PORT \
-  josepy[tests]
+  josepy[dev]
 # stop local PyPI
 kill $!
 cd ~-
@@ -156,12 +150,12 @@ pytest --pyargs josepy
 cd ~-
 deactivate
 
-git commit --gpg-sign="$RELEASE_GPG_KEY" -m "Release $version"
-git tag --local-user "$RELEASE_GPG_KEY" --sign --message "Release $version" "$tag"
+#git commit --gpg-sign="$RELEASE_GPG_KEY" -m "Release $version"
+#git tag --local-user "$RELEASE_GPG_KEY" --sign --message "Release $version" "$tag"
 
 echo Now run twine upload "$root/dist.$version/*/*"
 
 if [ "$RELEASE_BRANCH" = candidate-"$version" ] ; then
     SetVersion "$nextversion".dev0
-    git commit -m "Bump version to $nextversion"
+    #git commit -m "Bump version to $nextversion"
 fi

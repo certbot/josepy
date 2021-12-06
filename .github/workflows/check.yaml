@@ -49,8 +49,9 @@ jobs:
         with:
           fail_ci_if_error: true
   notify:
-    # Only notify about failed builds for branches (not PRs).
-    if: ${{ failure() && github.event_name != 'pull_request' }}
+    # Only notify about failed builds, do not notify about failed builds for
+    # PRs, and only notify about failed pushes to master.
+    if: ${{ failure() && github.event_name != 'pull_request' && (github.event_name != 'push' || github.ref == 'refs/heads/master') }}
     needs: build
     runs-on: ubuntu-20.04
     steps:

@@ -42,7 +42,7 @@ jobs:
         run: tox -e py
       # STATIC CHECK
       - name: Run mypy
-        run: mypy src
+        run: tox -e mypy
       # COVERAGE
       - name: Convert Coverage
         run: python -m coverage xml

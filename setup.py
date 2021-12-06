@@ -8,7 +8,8 @@ version = '1.12.0.dev0'
 install_requires = [
     # load_pem_private/public_key (>=0.6)
     # rsa_recover_prime_factors (>=0.8)
-    'cryptography>=0.8',
+    # add sign() and verify() to asymetric keys (RSA >=1.4, ECDSA >=1.5)
+    'cryptography>=1.5',
     # Connection.set_tlsext_host_name (>=0.13)
     'PyOpenSSL>=0.13',
     # For pkg_resources. >=1.0 so pip resolves it to a version cryptography
@@ -18,11 +19,16 @@ install_requires = [
 
 testing_requires = [
     'coverage>=4.0',
-    'flake8',
+    # Issue with flake8 4.0.0 and 4.0.1, see https://github.com/tholo/pytest-flake8/issues/81
+    'flake8<4',
     'mypy',
     'pytest-cov',
     'pytest-flake8>=0.5',
     'pytest>=2.8.0',
+    'types-pyOpenSSL',
+    'types-pyRFC3339',
+    'types-requests',
+    'types-setuptools',
 ]
 
 dev_extras = [
@@ -32,7 +38,7 @@ dev_extras = [
 
 docs_extras = [
     'Sphinx>=1.0',  # autodoc_member_order = 'bysource', autodoc_default_flags
-    'sphinx_rtd_theme',
+    'sphinx_rtd_theme>=1.0',
 ]
 
 

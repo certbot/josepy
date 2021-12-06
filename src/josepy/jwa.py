@@ -104,7 +104,6 @@ class _JWARSA:
 
     def sign(self, key: rsa.RSAPrivateKey, msg: bytes) -> bytes:
         """Sign the ``msg`` using ``key``."""
-        # If cryptography library supports new style api (v1.4 and later)
         try:
             return key.sign(msg, self.padding, self.hash)
         except AttributeError as error:

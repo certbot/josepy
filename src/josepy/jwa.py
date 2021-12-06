@@ -181,7 +181,6 @@ class _JWAEC(JWASignature):
         return self._verify(key, msg, asn1sig)
 
     def _verify(self, key: ec.EllipticCurvePublicKey, msg: bytes, asn1sig: bytes) -> bool:
-        # If cryptography library supports new style api (v1.4 and later)
         try:
             key.verify(asn1sig, msg, ec.ECDSA(self.hash))
         except cryptography.exceptions.InvalidSignature as error:

@@ -116,7 +116,6 @@ class _JWARSA:
 
     def verify(self, key: rsa.RSAPublicKey, msg: bytes, sig: bytes) -> bool:
         """Verify the ``msg` and ``sig`` using ``key``."""
-        # If cryptography library supports new style api (v1.4 and later)
         try:
             key.verify(sig, msg, self.padding, self.hash)
         except cryptography.exceptions.InvalidSignature as error:

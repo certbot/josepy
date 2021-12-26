@@ -73,6 +73,8 @@ from josepy.jwa import (
 
 from josepy.jwk import (
     JWK,
+    JWKEC,
+    JWKOct,
     JWKRSA,
 )
 
@@ -83,6 +85,7 @@ from josepy.jws import (
 )
 
 from josepy.util import (
+    ComparableECKey,
     ComparableX509,
     ComparableKey,
     ComparableRSAKey,

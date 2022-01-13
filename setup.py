@@ -2,13 +2,14 @@ import io
 
 from setuptools import find_packages, setup
 
-version = '1.10.0.dev0'
+version = '1.13.0.dev0'
 
 # Please update tox.ini when modifying dependency version requirements
 install_requires = [
     # load_pem_private/public_key (>=0.6)
     # rsa_recover_prime_factors (>=0.8)
     # ed25519, ed448, x25519 and x448 support (>= 2.6)
+    # add sign() and verify() to asymetric keys (RSA >=1.4, ECDSA >=1.5)
     'cryptography>=2.6',
     # Connection.set_tlsext_host_name (>=0.13)
     'PyOpenSSL>=0.13',
@@ -19,11 +20,16 @@ install_requires = [
 
 testing_requires = [
     'coverage>=4.0',
-    'flake8',
+    # Issue with flake8 4.0.0 and 4.0.1, see https://github.com/tholo/pytest-flake8/issues/81
+    'flake8<4',
     'mypy',
     'pytest-cov',
     'pytest-flake8>=0.5',
     'pytest>=2.8.0',
+    'types-pyOpenSSL',
+    'types-pyRFC3339',
+    'types-requests',
+    'types-setuptools',
 ]
 
 dev_extras = [
@@ -33,7 +39,7 @@ dev_extras = [
 
 docs_extras = [
     'Sphinx>=1.0',  # autodoc_member_order = 'bysource', autodoc_default_flags
-    'sphinx_rtd_theme',
+    'sphinx_rtd_theme>=1.0',
 ]
 
 
@@ -61,6 +67,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Security',
     ],

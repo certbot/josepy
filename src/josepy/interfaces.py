@@ -1,9 +1,9 @@
 """JOSE interfaces."""
 import abc
 import json
+from typing import Any
 
-
-from josepy import errors, util
+from josepy import errors
 
 from collections.abc import Sequence, Mapping
 
@@ -100,7 +100,7 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def to_partial_json(self):  # pragma: no cover
+    def to_partial_json(self) -> Any:  # pragma: no cover
         """Partially serialize.
 
         Following the example, **partial serialization** means the following::
@@ -118,7 +118,7 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
         """
         raise NotImplementedError()
 
-    def to_json(self):
+    def to_json(self) -> Any:
         """Fully serialize.
 
         Again, following the example from before, **full serialization**
@@ -131,7 +131,7 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
         :returns: Fully serialized object.
 
         """
-        def _serialize(obj):
+        def _serialize(obj: Any) -> Any:
             if isinstance(obj, JSONDeSerializable):
                 return _serialize(obj.to_partial_json())
             if isinstance(obj, str):  # strings are Sequence
@@ -150,8 +150,9 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
 
         return _serialize(self)
 
-    @util.abstractclassmethod
-    def from_json(cls, jobj):  # pylint: disable=unused-argument
+    @classmethod
+    @abc.abstractmethod
+    def from_json(cls, jobj: Any) -> 'JSONDeSerializable':
         """Deserialize a decoded JSON document.
 
         :param jobj: Python object, composed of only other basic data
@@ -169,7 +170,7 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
         return cls()  # pylint: disable=abstract-class-instantiated
 
     @classmethod
-    def json_loads(cls, json_string):
+    def json_loads(cls, json_string: str) -> 'JSONDeSerializable':
         """Deserialize from JSON document string."""
         try:
             loads = json.loads(json_string)
@@ -177,7 +178,7 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
             raise errors.DeserializationError(error)
         return cls.from_json(loads)
 
-    def json_dumps(self, **kwargs):
+    def json_dumps(self, **kwargs: Any) -> str:
         """Dump to JSON string using proper serializer.
 
         :returns: JSON document string.
@@ -186,7 +187,7 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
         """
         return json.dumps(self, default=self.json_dump_default, **kwargs)
 
-    def json_dumps_pretty(self):
+    def json_dumps_pretty(self) -> str:
         """Dump the object to pretty JSON document string.
 
         :rtype: str
@@ -195,7 +196,7 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
         return self.json_dumps(sort_keys=True, indent=4, separators=(',', ': '))
 
     @classmethod
-    def json_dump_default(cls, python_object):
+    def json_dump_default(cls, python_object: 'JSONDeSerializable') -> Any:
         """Serialize Python object.
 
         This function is meant to be passed as ``default`` to

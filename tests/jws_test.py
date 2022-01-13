@@ -5,7 +5,8 @@ from unittest import mock
 
 import OpenSSL
 
-from josepy import errors, json_util, jwa, jwk, test_util
+from josepy import errors, json_util, jwa, jwk
+import test_util
 
 CERT = test_util.load_comparable_cert('cert.pem')
 KEY = jwk.JWKRSA.load(test_util.load_vector('rsa512_key.pem'))
@@ -202,7 +203,7 @@ class CLITest(unittest.TestCase):
         with mock.patch('sys.stdin') as sin:
             sin.read.return_value = '{"payload": "foo", "signature": "xxx"}'
             with mock.patch('sys.stdout'):
-                self.assertEqual(-1, CLI.run(['verify']))
+                self.assertEqual(False, CLI.run(['verify']))
 
     def test_json(self):
         from josepy.jws import CLI

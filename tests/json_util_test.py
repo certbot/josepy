@@ -3,14 +3,35 @@ import itertools
 import unittest
 from unittest import mock
 
-from josepy import errors, interfaces, test_util, util
+from josepy import errors, interfaces, util
+import test_util
 
 CERT = test_util.load_comparable_cert('cert.pem')
 CSR = test_util.load_comparable_csr('csr.pem')
 
 
 class FieldTest(unittest.TestCase):
-    """Tests for josepy.json_util.Field."""
+    """Tests for josepy.json_util.field and josepy.json_util.Field."""
+
+    def test_field_function(self):
+        from josepy.json_util import field, Field
+
+        test = field("foo", default="bar")
+        self.assertIsInstance(test, Field)
+        self.assertEqual(test.json_name, "foo")
+        self.assertEqual(test.default, "bar")
+
+    def test_type_field_control(self):
+        from josepy.json_util import field, JSONObjectWithFields
+
+        class DummyProperlyTyped(JSONObjectWithFields):
+            type: str = field('type')
+            index: int = field('index')
+
+        with self.assertRaises(ValueError):
+            class DummyImproperlyTyped(JSONObjectWithFields):
+                type = field('type')
+                index: int = field('index')
 
     def test_no_omit_boolean(self):
         from josepy.json_util import Field

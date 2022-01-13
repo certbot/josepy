@@ -52,6 +52,7 @@ from josepy.json_util import (
     encode_cert,
     encode_csr,
     encode_hex16,
+    field,
 )
 
 from josepy.jwa import (
@@ -73,6 +74,8 @@ from josepy.jwa import (
 
 from josepy.jwk import (
     JWK,
+    JWKEC,
+    JWKOct,
     JWKRSA,
 )
 
@@ -83,6 +86,7 @@ from josepy.jws import (
 )
 
 from josepy.util import (
+    ComparableECKey,
     ComparableX509,
     ComparableKey,
     ComparableRSAKey,

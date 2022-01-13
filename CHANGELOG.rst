@@ -1,13 +1,45 @@
 Changelog
 =========
 
-1.10.0 (master)
+1.13.0 (master)
 ---------------
 * Added support for Ed25519, Ed448, X25519 and X448 keys (see `RFC 8037 <https://tools.ietf.org/html/rfc8037>`_).
   These are also known as Bernstein curves.
 * Added support for signing with Ed25519, Ed448, X25519 and X448 keys
   (see `RFC 8032 <https://datatracker.ietf.org/doc/html/rfc8032>`_). See JWA.
 * Minimum requirement of ``cryptography`` is now 2.6+.
+
+1.12.0 (2022-01-11)
+-------------------
+
+* Corrected some type annotations.
+* Dropped support for cryptography<1.5.
+* Added the top level attributes josepy.JWKEC, josepy.JWKOct, and
+  josepy.ComparableECKey for convenience and consistency.
+
+1.11.0 (2021-11-17)
+-------------------
+
+* Added support for Python 3.10.
+* We changed the PGP key used to sign the packages we upload to PyPI. Going
+  forward, releases will be signed with one of three different keys. All of
+  these keys are available on major key servers and signed by our previous PGP
+  key. The fingerprints of these new keys are:
+    - BF6BCFC89E90747B9A680FD7B6029E8500F7DB16
+    - 86379B4F0AF371B50CD9E5FF3402831161D1D280
+    - 20F201346BF8F3F455A73F9A780CC99432A28621
+
+1.10.0 (2021-09-27)
+-------------------
+
+* josepy is now compliant with PEP-561: type checkers will fetch types from the inline
+  types annotations when josepy is installed as a dependency in a Python project.
+* Added a `field` function to assist in adding type annotations for Fields in classes.
+  If the field function is used to define a `Field` in a `JSONObjectWithFields` based
+  class without a type annotation, an error will be raised.
+* josepy's tests can no longer be imported under the name josepy, however, they are still
+  included in the package and you can run them by installing josepy with "tests" extras and
+  running `python -m pytest`.
 
 1.9.0 (2021-09-09)
 ------------------

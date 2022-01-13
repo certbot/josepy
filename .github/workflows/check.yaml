@@ -1,12 +1,10 @@
-name: Python Tests for Joespy
+name: Python Tests for Josepy
 
 on:
   pull_request:
     branches:
       - master
   push:
-    branches:
-      - master
   schedule:
     # Run at 4pm UTC or 9am PST
     - cron: "0 16 * * *"
@@ -17,9 +15,9 @@ jobs:
     env:
       TOXENV: mypy
     strategy:
+      fail-fast: false
       matrix:
-        python: [3.6, 3.7, 3.8, 3.9]
-
+        python: ["3.6", "3.7", "3.8", "3.9", "3.10"]
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python
@@ -42,8 +40,7 @@ jobs:
         run: tox -e py
       # STATIC CHECK
       - name: Run mypy
-        run: |
-         mypy src
+        run: tox -e mypy
       # COVERAGE
       - name: Convert Coverage
         run: python -m coverage xml
@@ -52,9 +49,9 @@ jobs:
         with:
           fail_ci_if_error: true
   notify:
-    # Only notify about failed builds and do not notify about failed builds for
-    # PRs.
-    if: ${{ failure() && github.event_name != 'pull_request' }}
+    # Only notify about failed builds, do not notify about failed builds for
+    # PRs, and only notify about failed pushes to master.
+    if: ${{ failure() && github.event_name != 'pull_request' && (github.event_name != 'push' || github.ref == 'refs/heads/master') }}
     needs: build
     runs-on: ubuntu-20.04
     steps:

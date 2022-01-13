@@ -2,7 +2,7 @@
 import functools
 import unittest
 
-from josepy import test_util
+import test_util
 
 
 class ComparableX509Test(unittest.TestCase):

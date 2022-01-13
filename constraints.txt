@@ -1,42 +1,73 @@
 # Specifies Python package versions for testing.
 # To update:
 # python3 -m venv venv && source venv/bin/activate
-# python3 -m pip install -e '.[dev,tests]' && pip freeze
+# python3 -m pip install -e '.[dev,docs,tests]' && pip freeze
 # Examine the produced list and update invididual entries here.
 # If anything changes about this file's contents or location, we may
 # need to submit a PR to pyca/cryptography, since they rely on it.
 
-apipkg==1.5
-appdirs==1.4.4
+alabaster==0.7.12
 attrs==21.2.0
-cffi==1.14.5
-coverage==5.5
-cryptography==3.4.7
-distlib==0.3.2
-execnet==1.8.1
-filelock==3.0.12
+Babel==2.9.1
+backports.entry-points-selectable==1.1.1
+certifi==2021.10.8
+cffi==1.15.0
+charset-normalizer==2.0.8
+coverage==6.2
+cryptography==36.0.0
+distlib==0.3.3
+docutils==0.17.1
+filelock==3.4.0
 flake8==3.9.2
-importlib-metadata==4.4.0
+idna==3.3
+imagesize==1.3.0
+importlib-metadata==4.8.2
+importlib-resources==5.4.0
 iniconfig==1.1.1
+Jinja2==3.0.3
+MarkupSafe==2.0.1
 mccabe==0.6.1
-mypy==0.812
+mypy==0.910
 mypy-extensions==0.4.3
-packaging==20.9
-pluggy==0.13.1
-py==1.10.0
+packaging==21.3
+platformdirs==2.4.0
+pluggy==1.0.0
+py==1.11.0
 pycodestyle==2.7.0
-pycparser==2.20
+pycparser==2.21
 pyflakes==2.3.1
-pyOpenSSL==20.0.1
-pyparsing==2.4.7
-pytest==6.2.4
-pytest-cache==1.0
-pytest-cov==2.12.1
+Pygments==2.10.0
+pyOpenSSL==21.0.0
+pyparsing==3.0.6
+pytest==6.2.5
+pytest-cov==3.0.0
 pytest-flake8==1.0.7
+pytz==2021.3
+requests==2.26.0
 six==1.16.0
+snowballstemmer==2.2.0
+Sphinx==4.3.1
+sphinx-rtd-theme==1.0.0
+sphinxcontrib-applehelp==1.0.2
+sphinxcontrib-devhelp==1.0.2
+sphinxcontrib-htmlhelp==2.0.0
+sphinxcontrib-jsmath==1.0.1
+sphinxcontrib-qthelp==1.0.3
+sphinxcontrib-serializinghtml==1.1.5
 toml==0.10.2
-tox==3.23.1
+tomli==1.2.2
+tox==3.24.4
 typed-ast==1.4.3
-typing-extensions==3.10.0.0
-virtualenv==20.4.7
-zipp==3.4.1
+types-cryptography==3.3.5
+types-enum34==1.1.0
+types-ipaddress==1.0.0
+types-pyOpenSSL==20.0.6
+types-pyRFC3339==0.1.2
+types-requests==2.25.6
+types-setuptools==57.0.2
+typing-inspect==0.7.1
+typed-ast==1.4.3
+typing_extensions==4.0.1
+urllib3==1.26.7
+virtualenv==20.10.0
+zipp==3.6.0

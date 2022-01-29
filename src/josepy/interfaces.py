@@ -1,7 +1,7 @@
 """JOSE interfaces."""
 import abc
 import json
-from typing import Any, Type, TypeVar
+from typing import Any, Type, TypeVar, Union
 
 from josepy import errors
 
@@ -172,7 +172,7 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
         return cls()  # pylint: disable=abstract-class-instantiated
 
     @classmethod
-    def json_loads(cls: Type[JSONDeSerializableTypeVar], json_string: str) -> JSONDeSerializableTypeVar:
+    def json_loads(cls: Type[JSONDeSerializableTypeVar], json_string: Union[str, bytes]) -> JSONDeSerializableTypeVar:
         """Deserialize from JSON document string."""
         try:
             loads = json.loads(json_string)

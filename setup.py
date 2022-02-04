@@ -21,6 +21,7 @@ testing_requires = [
     'coverage>=4.0',
     # Issue with flake8 4.0.0 and 4.0.1, see https://github.com/tholo/pytest-flake8/issues/81
     'flake8<4',
+    'isort',
     'mypy',
     'pytest-cov',
     'pytest-flake8>=0.5',

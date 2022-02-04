@@ -3,17 +3,24 @@ import abc
 import json
 import logging
 import math
-
-from typing import Dict, Optional, Sequence, Type, Union, Callable, Any, Tuple, Mapping
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+)
 
 import cryptography.exceptions
-import josepy.util
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import ec, rsa
 
+import josepy.util
 from josepy import errors, json_util, util
 
 logger = logging.getLogger(__name__)

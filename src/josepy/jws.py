@@ -2,12 +2,24 @@
 import argparse
 import base64
 import sys
-from typing import Dict, Any, Optional, FrozenSet, Mapping, List, Type, Tuple, cast
+from typing import (  # NOQA
+    Any,
+    Dict,
+    FrozenSet,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    cast,
+)
 
 from OpenSSL import crypto
 
 import josepy
-from josepy import b64, errors, json_util, jwa, jwk as jwk_mod, util
+from josepy import b64, errors, json_util, jwa
+from josepy import jwk as jwk_mod
+from josepy import util
 
 
 class MediaType:

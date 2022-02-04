@@ -1,11 +1,10 @@
 """JOSE interfaces."""
 import abc
 import json
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from josepy import errors
-
-from collections.abc import Sequence, Mapping
 
 # pylint: disable=no-self-argument,no-method-argument,no-init,inherit-non-class
 # pylint: disable=too-few-public-methods

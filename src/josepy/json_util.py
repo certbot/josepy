@@ -9,11 +9,11 @@ The framework presented here is somewhat based on `Go's "json" package`_
 import abc
 import binascii
 import logging
-from typing import Dict, Type, Any, Callable, List, Mapping, Optional, TypeVar
+from typing import Any, Callable, Dict, List, Mapping, Optional, Type, TypeVar
 
 from OpenSSL import crypto
-import josepy.util
 
+import josepy.util
 from josepy import b64, errors, interfaces, util
 
 logger = logging.getLogger(__name__)

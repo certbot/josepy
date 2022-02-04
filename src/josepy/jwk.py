@@ -427,15 +427,15 @@ class JWKOKP(JWK):
         "X448": okp_curve(pubkey=x448.X448PublicKey, privkey=x448.X448PrivateKey),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         if 'key' in kwargs and not isinstance(kwargs['key'], util.ComparableOKPKey):
             kwargs['key'] = util.ComparableOKPKey(kwargs['key'])
         super().__init__(*args, **kwargs)
 
-    def public_key(self):
+    def public_key(self) -> util.ComparableOKPKey:
         return self.key._wrapped.__class__.public_key()
 
-    def _key_to_crv(self):
+    def _key_to_crv(self) -> str:
         if isinstance(self.key._wrapped, (ed25519.Ed25519PublicKey, ed25519.Ed25519PrivateKey)):
             return "Ed25519"
         elif isinstance(self.key._wrapped, (ed448.Ed448PublicKey, ed448.Ed448PrivateKey)):
@@ -446,7 +446,7 @@ class JWKOKP(JWK):
             return "X448"
         return NotImplemented
 
-    def fields_to_partial_json(self):
+    def fields_to_partial_json(self) -> Dict[str, Any]:
         params = {}
         if self.key.is_private():
             params['d'] = json_util.encode_b64jose(self.key._wrapped.private_bytes(
@@ -464,10 +464,11 @@ class JWKOKP(JWK):
                 format=serialization.PublicFormat.Raw,
             ))
         params['crv'] = self._key_to_crv()
+        params['kty'] = "OKP"
         return params
 
     @classmethod
-    def fields_from_json(cls, jobj):
+    def fields_from_json(cls, jobj: Mapping[str, Any]) -> "JWKOKP":
         try:
             if isinstance(jobj, str):
                 obj = json.loads(jobj)

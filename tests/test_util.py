@@ -75,7 +75,6 @@ def load_ec_private_key(*names: str) -> josepy.util.ComparableECKey:
         load_vector(*names), password=None, backend=default_backend()))
 
 
-<<<<<<< HEAD:src/josepy/test_util.py
 def load_okp_private_key(*names):
     """Load OKP private key."""
     loader = _guess_loader(

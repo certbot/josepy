@@ -6,8 +6,8 @@ from collections.abc import Hashable, Mapping
 import sys
 import warnings
 
-import OpenSSL
-from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import ed25519
+from cryptography.hazmat.primitives.asymmetric import ed448
 from cryptography.hazmat.primitives import serialization
 from OpenSSL import crypto
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
@@ -73,16 +73,19 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
     """
     __hash__: Callable[[], int] = NotImplemented
 
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._wrapped, name)
+
     def __init__(self,
                  wrapped: Union[
                      rsa.RSAPrivateKeyWithSerialization,
                      rsa.RSAPublicKeyWithSerialization,
                      ec.EllipticCurvePrivateKeyWithSerialization,
-                     ec.EllipticCurvePublicKeyWithSerialization]):
+                     ec.EllipticCurvePublicKeyWithSerialization,
+                     ed25519.Ed25519PublicKey,
+                     ed25519.Ed25519PrivateKey,
+                 ]):
         self._wrapped = wrapped
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self._wrapped, name)
 
     def __eq__(self, other: Any) -> bool:
         # pylint: disable=protected-access
@@ -101,8 +104,12 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
 
     def public_key(self) -> 'ComparableKey':
         """Get wrapped public key."""
-        if isinstance(self._wrapped, (rsa.RSAPublicKeyWithSerialization,
-                                      ec.EllipticCurvePublicKeyWithSerialization)):
+        if isinstance(self._wrapped, (
+            rsa.RSAPublicKeyWithSerialization,
+            ec.EllipticCurvePublicKeyWithSerialization,
+            ed25519.Ed25519PublicKey,
+            ed448.Ed448PublicKey,
+        )):
             return self
 
         return self.__class__(self._wrapped.public_key())
@@ -171,17 +178,21 @@ class ComparableOKPKey(ComparableKey):
     - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey`
     """
 
-    def __hash__(self):
-        # Computed using the thumbprint
-        # https://datatracker.ietf.org/doc/html/rfc7638#section-3
-        if self.is_private():
-            pub = self._wrapped.public_key()
-        else:
-            pub = self._wrapped
+    def __hash__(self) -> int:
+        # if isinstance(self._wrapped, (ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey)):
+        #     d = self._wrapped.private_bytes(
+        #         format=serialization.PrivateFormat.Raw,
+        #         encoding=serialization.Encoding.Raw,
+        #         encryption_algorithm=serialization.NoEncryption(),
+        #     )
+        pub = self._wrapped.public_key()
         return hash(pub.public_bytes(
             format=serialization.PublicFormat.Raw,
             encoding=serialization.Encoding.Raw,
         )[:32])
+
+    def public_key(self) -> 'ComparableKey':
+        return super().public_key()
 
     def is_private(self) -> bool:
         # Not all of the curves may be available with OpenSSL,

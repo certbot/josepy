@@ -69,7 +69,6 @@ from josepy.jwa import (
     ES256,
     ES384,
     ES512,
-    EdDSA,
 )
 
 from josepy.jwk import (

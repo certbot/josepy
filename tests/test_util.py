@@ -2,12 +2,12 @@
 import os
 from typing import Any
 
-import josepy.util
-from OpenSSL import crypto
 import pkg_resources
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
+from OpenSSL import crypto
 
+import josepy.util
 from josepy import ComparableRSAKey, ComparableX509
 from josepy.util import ComparableECKey
 

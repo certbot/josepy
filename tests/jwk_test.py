@@ -2,8 +2,9 @@
 import binascii
 import unittest
 
-from josepy import errors, json_util, util
 import test_util
+
+from josepy import errors, json_util, util
 
 DSA_PEM = test_util.load_vector('dsa512_key.pem')
 RSA256_KEY = test_util.load_rsa_private_key('rsa256_key.pem')
@@ -114,6 +115,7 @@ class JWKRSATest(unittest.TestCase, JWKTestBaseMixin):
 
     def test_encode_param_zero(self):
         from josepy.jwk import JWKRSA
+
         # pylint: disable=protected-access
         # TODO: move encode/decode _param to separate class
         self.assertEqual('AA', JWKRSA._encode_param(0))
@@ -232,6 +234,7 @@ class JWKECTest(unittest.TestCase, JWKTestBaseMixin):
 
     def test_encode_param_zero(self):
         from josepy.jwk import JWKEC
+
         # pylint: disable=protected-access
         # TODO: move encode/decode _param to separate class
         self.assertEqual('AA', JWKEC._encode_param(0, 1))
@@ -306,8 +309,8 @@ class JWKECTest(unittest.TestCase, JWKTestBaseMixin):
                            'y': 'EPAw8_8z7PYKsHH6hlGSlsWxFoFl7-0vM0QRGbmnvCc'})
 
     def test_encode_y_leading_zero_p256(self):
-        from josepy.jwk import JWKEC, JWK
         import josepy
+        from josepy.jwk import JWK, JWKEC
         data = b"""-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEICZ7LCI99Na2KZ/Fq8JmJROakGJ5+J7rHiGSPoO36kOAoAoGCCqGSM49
 AwEHoUQDQgAEGS5RvStca15z2FEanCM3juoX7tE/LB7iD44GWawGE40APAl/iZuH

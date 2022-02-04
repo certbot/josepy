@@ -2,8 +2,9 @@
 import unittest
 from unittest import mock
 
-from josepy import errors
 import test_util
+
+from josepy import errors
 
 RSA256_KEY = test_util.load_rsa_private_key('rsa256_key.pem')
 RSA512_KEY = test_util.load_rsa_private_key('rsa512_key.pem')
@@ -50,8 +51,7 @@ class JWASignatureTest(unittest.TestCase):
         self.assertEqual(self.Sig2.to_partial_json(), 'Sig2')
 
     def test_from_json(self):
-        from josepy.jwa import JWASignature
-        from josepy.jwa import RS256
+        from josepy.jwa import RS256, JWASignature
         self.assertIs(JWASignature.from_json('RS256'), RS256)
 
 
@@ -75,8 +75,7 @@ class JWARSTest(unittest.TestCase):
         self.assertRaises(errors.Error, RS256.sign, RSA512_KEY.public_key(), b'foo')
 
     def test_sign_key_too_small(self):
-        from josepy.jwa import RS256
-        from josepy.jwa import PS256
+        from josepy.jwa import PS256, RS256
         self.assertRaises(errors.Error, RS256.sign, RSA256_KEY, b'foo')
         self.assertRaises(errors.Error, PS256.sign, RSA256_KEY, b'foo')
 
@@ -139,9 +138,10 @@ class JWAECTest(unittest.TestCase):
         self.assertIs(ES384.verify(EC_P384_KEY.public_key(), message, signature), False)
 
     def test_verify_with_different_key(self):
-        from josepy.jwa import ES256
-        from cryptography.hazmat.primitives.asymmetric import ec
         from cryptography.hazmat.backends import default_backend
+        from cryptography.hazmat.primitives.asymmetric import ec
+
+        from josepy.jwa import ES256
 
         message = b'foo'
         signature = ES256.sign(EC_P256_KEY, message)
@@ -149,8 +149,9 @@ class JWAECTest(unittest.TestCase):
         self.assertIs(ES256.verify(different_key.public_key(), message, signature), False)
 
     def test_sign_new_api(self):
-        from josepy.jwa import ES256
         from cryptography.hazmat.primitives.asymmetric.ec import SECP256R1
+
+        from josepy.jwa import ES256
         key = mock.MagicMock(curve=SECP256R1())
         with mock.patch("josepy.jwa.decode_dss_signature") as decode_patch:
             decode_patch.return_value = (0, 0)
@@ -159,8 +160,10 @@ class JWAECTest(unittest.TestCase):
 
     def test_verify_new_api(self):
         import math
-        from josepy.jwa import ES256
+
         from cryptography.hazmat.primitives.asymmetric.ec import SECP256R1
+
+        from josepy.jwa import ES256
         key = mock.MagicMock(key_size=256, curve=SECP256R1())
         ES256.verify(key, "message", b'\x00' * math.ceil(key.key_size / 8) * 2)
         self.assertIs(key.verify.called, True)

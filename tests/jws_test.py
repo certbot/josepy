@@ -4,9 +4,9 @@ import unittest
 from unittest import mock
 
 import OpenSSL
+import test_util
 
 from josepy import errors, json_util, jwa, jwk
-import test_util
 
 CERT = test_util.load_comparable_cert('cert.pem')
 KEY = jwk.JWKRSA.load(test_util.load_vector('rsa512_key.pem'))
@@ -81,8 +81,7 @@ class SignatureTest(unittest.TestCase):
     """Tests for josepy.jws.Signature."""
 
     def test_from_json(self):
-        from josepy.jws import Header
-        from josepy.jws import Signature
+        from josepy.jws import Header, Signature
         self.assertEqual(
             Signature(signature=b'foo', header=Header(alg=jwa.RS256)),
             Signature.from_json(

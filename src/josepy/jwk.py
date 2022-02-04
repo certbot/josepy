@@ -432,7 +432,7 @@ class JWKOKP(JWK):
             kwargs['key'] = util.ComparableOKPKey(kwargs['key'])
         super().__init__(*args, **kwargs)
 
-    def public_key(self) -> util.ComparableOKPKey:
+    def public_key(self) -> "JWKOKP":
         return self.key._wrapped.__class__.public_key()
 
     def _key_to_crv(self) -> str:

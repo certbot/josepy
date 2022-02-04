@@ -82,8 +82,6 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
                      rsa.RSAPublicKeyWithSerialization,
                      ec.EllipticCurvePrivateKeyWithSerialization,
                      ec.EllipticCurvePublicKeyWithSerialization,
-                     ed25519.Ed25519PublicKey,
-                     ed25519.Ed25519PrivateKey,
                  ]):
         self._wrapped = wrapped
 
@@ -96,6 +94,18 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
             return self.private_numbers() == other.private_numbers()
         elif hasattr(self._wrapped, 'public_numbers'):
             return self.public_numbers() == other.public_numbers()
+        elif hasattr(self._wrapped, 'private_bytes'):
+            kwargs = {
+                "encoding": serialization.Encoding.Raw,
+                "format": serialization.PrivateFormat.Raw,
+            }
+            return self._wrapped.private_bytes(**kwargs) == other._wrapped.private_bytes(**kwargs)
+        elif hasattr(self._wrapped, 'public_bytes'):
+            kwargs = {
+                "encoding": serialization.Encoding.Raw,
+                "format": serialization.PublicFormat.Raw,
+            }
+            return self._wrapped.public_bytes(**kwargs) == other._wrapped.public_bytes(**kwargs)
         else:
             return NotImplemented
 
@@ -178,21 +188,26 @@ class ComparableOKPKey(ComparableKey):
     - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey`
     """
 
+    # TODO fix the mypy warnings
+    def __init__(self, wrapped: Union[
+        ed25519.Ed25519PublicKey,
+        ed25519.Ed25519PrivateKey,
+        ed448.Ed448PublicKey,
+        ed448.Ed448PrivateKey,
+    ]):
+        self._wrapped = wrapped
+
     def __hash__(self) -> int:
-        # if isinstance(self._wrapped, (ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey)):
-        #     d = self._wrapped.private_bytes(
-        #         format=serialization.PrivateFormat.Raw,
-        #         encoding=serialization.Encoding.Raw,
-        #         encryption_algorithm=serialization.NoEncryption(),
-        #     )
-        pub = self._wrapped.public_key()
+        pub = self._wrapped.from_public_bytes(
+            self._wrapped.public_bytes(
+                format=serialization.PublicFormat.Raw,
+                encoding=serialization.Encoding.Raw,
+            )
+        )
         return hash(pub.public_bytes(
             format=serialization.PublicFormat.Raw,
             encoding=serialization.Encoding.Raw,
         )[:32])
-
-    def public_key(self) -> 'ComparableKey':
-        return super().public_key()
 
     def is_private(self) -> bool:
         # Not all of the curves may be available with OpenSSL,

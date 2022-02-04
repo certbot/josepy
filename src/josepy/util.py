@@ -198,12 +198,10 @@ class ComparableOKPKey(ComparableKey):
         self._wrapped = wrapped
 
     def __hash__(self) -> int:
-        pub = self._wrapped.from_public_bytes(
-            self._wrapped.public_bytes(
-                format=serialization.PublicFormat.Raw,
-                encoding=serialization.Encoding.Raw,
-            )
-        )
+        if self.is_private():
+            pub = self._wrapped.public_key()
+        else:
+            pub = self._wrapped
         return hash(pub.public_bytes(
             format=serialization.PublicFormat.Raw,
             encoding=serialization.Encoding.Raw,

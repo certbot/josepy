@@ -2,7 +2,7 @@
 import argparse
 import base64
 import sys
-from typing import (  # NOQA
+from typing import (
     Any,
     Dict,
     FrozenSet,

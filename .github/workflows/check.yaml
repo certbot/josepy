@@ -41,6 +41,11 @@ jobs:
       # STATIC CHECK
       - name: Run mypy
         run: tox -e mypy
+      # LINTING
+      - name: Run flake8 and isort
+        run:
+          tox -e flake8
+          tox -e isort
       # COVERAGE
       - name: Convert Coverage
         run: python -m coverage xml

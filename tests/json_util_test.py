@@ -3,8 +3,9 @@ import itertools
 import unittest
 from unittest import mock
 
-from josepy import errors, interfaces, util
 import test_util
+
+from josepy import errors, interfaces, util
 
 CERT = test_util.load_comparable_cert('cert.pem')
 CSR = test_util.load_comparable_csr('csr.pem')
@@ -14,7 +15,7 @@ class FieldTest(unittest.TestCase):
     """Tests for josepy.json_util.field and josepy.json_util.Field."""
 
     def test_field_function(self):
-        from josepy.json_util import field, Field
+        from josepy.json_util import Field, field
 
         test = field("foo", default="bar")
         self.assertIsInstance(test, Field)
@@ -22,7 +23,7 @@ class FieldTest(unittest.TestCase):
         self.assertEqual(test.default, "bar")
 
     def test_type_field_control(self):
-        from josepy.json_util import field, JSONObjectWithFields
+        from josepy.json_util import JSONObjectWithFields, field
 
         class DummyProperlyTyped(JSONObjectWithFields):
             type: str = field('type')
@@ -102,8 +103,7 @@ class JSONObjectWithFieldsMetaTest(unittest.TestCase):
     """Tests for josepy.json_util.JSONObjectWithFieldsMeta."""
 
     def setUp(self):
-        from josepy.json_util import Field
-        from josepy.json_util import JSONObjectWithFieldsMeta
+        from josepy.json_util import Field, JSONObjectWithFieldsMeta
         self.field = Field('Baz')
         self.field2 = Field('Baz2')
         # pylint: disable=invalid-name,missing-docstring,too-few-public-methods
@@ -147,8 +147,7 @@ class JSONObjectWithFieldsTest(unittest.TestCase):
     # pylint: disable=protected-access
 
     def setUp(self):
-        from josepy.json_util import JSONObjectWithFields
-        from josepy.json_util import Field
+        from josepy.json_util import Field, JSONObjectWithFields
 
         class MockJSONObjectWithFields(JSONObjectWithFields):
             # pylint: disable=invalid-name,missing-docstring,no-self-argument

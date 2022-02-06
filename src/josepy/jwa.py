@@ -5,20 +5,20 @@ https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
 """
 import abc
 import logging
-from typing import Dict, Any, Callable
+from collections.abc import Hashable
+from typing import Any, Callable, Dict
 
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives import hmac
-from cryptography.hazmat.primitives.asymmetric import padding, ec, rsa
-from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
-from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature
+from cryptography.hazmat.primitives import hashes, hmac
+from cryptography.hazmat.primitives.asymmetric import ec, padding, rsa
+from cryptography.hazmat.primitives.asymmetric.utils import (
+    decode_dss_signature,
+    encode_dss_signature,
+)
 from cryptography.hazmat.primitives.hashes import HashAlgorithm
 
 from josepy import errors, interfaces, jwk
-
-from collections.abc import Hashable
 
 logger = logging.getLogger(__name__)
 

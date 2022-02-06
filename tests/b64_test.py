@@ -1,7 +1,6 @@
 """Tests for josepy.b64."""
 import unittest
 
-
 # https://en.wikipedia.org/wiki/Base64#Examples
 B64_PADDING_EXAMPLES = {
     b'any carnal pleasure.': (b'YW55IGNhcm5hbCBwbGVhc3VyZS4', b'='),

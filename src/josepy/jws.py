@@ -339,7 +339,7 @@ class JWS(json_util.JSONObjectWithFields):
             signature=b64.b64decode(signature))
         return cls(payload=b64.b64decode(payload), signatures=(sig,))
 
-    def to_partial_json(self, flat: bool = True) -> Dict[str, Any]:  # pylint: disable=arguments-differ
+    def to_partial_json(self, flat: bool = True) -> Dict[str, Any]:
         assert self.signatures
         payload = json_util.encode_b64jose(self.payload)
 

@@ -7,11 +7,9 @@ PrintUsageAndExit() {
     exit 1
 }
 
-echo $0
-
 if [ "`dirname $0`" != "tools" ] ; then
     echo Please run this script from the repo root
-    #exit 1
+    exit 1
 fi
 
 if ! poetry --version >> /dev/null 2>&1 ; then
@@ -58,7 +56,7 @@ if [ "$RELEASE_GPG_KEY" = "" ]; then
     done
     if [ "$RELEASE_GPG_KEY" = "" ]; then
         echo A trusted PGP key was not found on your PGP card.
-        #exit 1
+        exit 1
     fi
 fi
 
@@ -82,7 +80,6 @@ cd $root
 if [ "$RELEASE_BRANCH" != "candidate-$version" ] ; then
     git branch -f "$RELEASE_BRANCH"
 fi
-git branch -f "$RELEASE_BRANCH"
 git checkout "$RELEASE_BRANCH"
 
 SetVersion() {
@@ -105,8 +102,7 @@ poetry build
 echo "Signing josepy"
 for x in dist/*.tar.gz dist/*.whl
 do
-  echo Sign
-  #gpg2 -u "$RELEASE_GPG_KEY" --detach-sign --armor --sign --digest-algo sha256 $x
+  gpg2 -u "$RELEASE_GPG_KEY" --detach-sign --armor --sign --digest-algo sha256 $x
 done
 
 mkdir "dist.$version"
@@ -150,12 +146,12 @@ pytest --pyargs josepy
 cd ~-
 deactivate
 
-#git commit --gpg-sign="$RELEASE_GPG_KEY" -m "Release $version"
-#git tag --local-user "$RELEASE_GPG_KEY" --sign --message "Release $version" "$tag"
+git commit --gpg-sign="$RELEASE_GPG_KEY" -m "Release $version"
+git tag --local-user "$RELEASE_GPG_KEY" --sign --message "Release $version" "$tag"
 
 echo Now run twine upload "$root/dist.$version/*/*"
 
 if [ "$RELEASE_BRANCH" = candidate-"$version" ] ; then
     SetVersion "$nextversion".dev0
-    #git commit -m "Bump version to $nextversion"
+    git commit -m "Bump version to $nextversion"
 fi

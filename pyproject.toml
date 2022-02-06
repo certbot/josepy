@@ -65,15 +65,9 @@ show_error_codes = true
 disallow_untyped_defs = true
 
 [tool.pytest.ini_options]
-addopts = "-v --flake8 --cov-report xml --cov-report=term-missing --cov=josepy --cov-config .coveragerc"
-filterwarnings = [
-    "error",
-    # Ignore some deprecation warnings related to interaction between flake8 and pytest.
-    "ignore::pytest.PytestDeprecationWarning",
-    "ignore:SelectableGroups:DeprecationWarning",
-]
+addopts = "-v --cov-report xml --cov-report=term-missing --cov=josepy --cov-config .coveragerc"
+filterwarnings = ["error"]
 norecursedirs = "*.egg .eggs dist build docs .tox"
-flake8-ignore = "W504 E501"
 
 [tool.isort]
 combine_as_imports = false

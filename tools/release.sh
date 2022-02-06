@@ -129,7 +129,7 @@ pip install -U pip
 pip install \
   --no-cache-dir \
   --extra-index-url http://localhost:$PORT \
-  josepy[dev]
+  josepy
 # stop local PyPI
 kill $!
 cd ~-
@@ -144,7 +144,7 @@ fi
 mkdir kgs
 kgs="kgs/$version"
 pip freeze | tee $kgs
-pip install pytest
+pip install pytest pytest-cov
 echo testing josepy
 pytest --pyargs josepy
 cd ~-

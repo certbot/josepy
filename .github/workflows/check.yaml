@@ -36,7 +36,7 @@ jobs:
       - name: Install Poetry & Tox
         run: pip install poetry>1.0.0 tox>3.3.0
       # TEST
-      - name: Run Tox
+      - name: Run pytest and coverage
         run: tox -e py
       # STATIC CHECK
       - name: Run mypy
@@ -47,7 +47,7 @@ jobs:
           tox -e flake8
           tox -e isort
       # COVERAGE
-      - name: Upload Coverage
+      - name: Upload coverage
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true

@@ -1,8 +1,16 @@
 Changelog
 =========
 
-1.12.0 (master)
+1.13.0 (master)
 ---------------
+
+1.12.0 (2022-01-11)
+-------------------
+
+* Corrected some type annotations.
+* Dropped support for cryptography<1.5.
+* Added the top level attributes josepy.JWKEC, josepy.JWKOct, and
+  josepy.ComparableECKey for convenience and consistency.
 
 1.11.0 (2021-11-17)
 -------------------

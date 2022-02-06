@@ -3,17 +3,24 @@ import abc
 import json
 import logging
 import math
-
-from typing import Dict, Optional, Sequence, Type, Union, Callable, Any, Tuple, Mapping
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+)
 
 import cryptography.exceptions
-import josepy.util
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import ec, rsa
 
+import josepy.util
 from josepy import errors, json_util, util
 
 logger = logging.getLogger(__name__)
@@ -300,9 +307,8 @@ class JWKEC(JWK):
             binary = json_util.decode_b64jose(data)
             if len(binary) != valid_length:
                 raise errors.DeserializationError(
-                    'Expected parameter "{name}" to be {valid_lengths} bytes '
-                    'after base64-decoding; got {length} bytes instead'.format(
-                        name=name, valid_lengths=valid_length, length=len(binary))
+                    f'Expected parameter "{name}" to be {valid_length} bytes '
+                    f'after base64-decoding; got {len(binary)} bytes instead'
                 )
             return int.from_bytes(binary, byteorder="big")
         except ValueError:  # invalid literal for long() with base 16
@@ -349,10 +355,15 @@ class JWKEC(JWK):
             params['d'] = private.private_value
         else:
             raise errors.SerializationError(
-                'Supplied key is neither of type EllipticCurvePublicKey nor EllipticCurvePrivateKey')
+                'Supplied key is neither of type EllipticCurvePublicKey '
+                'nor EllipticCurvePrivateKey'
+            )
         params['x'] = public.x
         params['y'] = public.y
-        params = {key: self._encode_param(value, self.expected_length_for_curve(public.curve)) for key, value in params.items()}
+        params = {
+            key: self._encode_param(value, self.expected_length_for_curve(public.curve))
+            for key, value in params.items()
+        }
         params['crv'] = self._curve_name_to_crv(public.curve.name)
         return params
 
@@ -370,8 +381,7 @@ class JWKEC(JWK):
 
         # private key
         d = cls._decode_param(jobj['d'], 'd', expected_length)
-        key = ec.EllipticCurvePrivateNumbers(d, public_numbers).private_key(
-            default_backend())
+        key = ec.EllipticCurvePrivateNumbers(d, public_numbers).private_key(default_backend())
         return cls(key=key)
 
     def public_key(self) -> 'JWKEC':

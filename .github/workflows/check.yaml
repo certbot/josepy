@@ -5,8 +5,6 @@ on:
     branches:
       - master
   push:
-    branches:
-      - master
   schedule:
     # Run at 4pm UTC or 9am PST
     - cron: "0 16 * * *"
@@ -43,14 +41,20 @@ jobs:
       # STATIC CHECK
       - name: Run mypy
         run: tox -e mypy
+      # LINTING
+      - name: Run flake8 and isort
+        run:
+          tox -e flake8
+          tox -e isort
       # COVERAGE
       - name: Upload Coverage
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true
   notify:
-    # Only notify about failed builds for branches (not PRs).
-    if: ${{ failure() && github.event_name != 'pull_request' }}
+    # Only notify about failed builds, do not notify about failed builds for
+    # PRs, and only notify about failed pushes to master.
+    if: ${{ failure() && github.event_name != 'pull_request' && (github.event_name != 'push' || github.ref == 'refs/heads/master') }}
     needs: build
     runs-on: ubuntu-20.04
     steps:

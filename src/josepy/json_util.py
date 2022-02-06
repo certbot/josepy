@@ -9,11 +9,11 @@ The framework presented here is somewhat based on `Go's "json" package`_
 import abc
 import binascii
 import logging
-from typing import Dict, Type, Any, Callable, List, Mapping, Optional, TypeVar
+from typing import Any, Callable, Dict, List, Mapping, Optional, Type, TypeVar
 
 from OpenSSL import crypto
-import josepy.util
 
+import josepy.util
 from josepy import b64, errors, interfaces, util
 
 logger = logging.getLogger(__name__)
@@ -325,13 +325,14 @@ class JSONObjectWithFields(util.ImmutableMap,
                 try:
                     fields[slot] = field.decode(value)
                 except errors.DeserializationError as error:
-                    raise errors.DeserializationError(
-                        'Could not decode {0!r} ({1!r}): {2}'.format(
-                            slot, value, error))
+                    raise errors.DeserializationError('Could not decode {0!r} ({1!r}): {2}'.format(
+                        slot, value, error))
         return fields
 
     @classmethod
-    def from_json(cls: Type[GenericJSONObjectWithFields], jobj: Mapping[str, Any]) -> GenericJSONObjectWithFields:
+    def from_json(
+        cls: Type[GenericJSONObjectWithFields], jobj: Mapping[str, Any]
+    ) -> GenericJSONObjectWithFields:
         return cls(**cls.fields_from_json(jobj))
 
 
@@ -457,6 +458,10 @@ def decode_csr(b64der: str) -> josepy.util.ComparableX509:
         raise errors.DeserializationError(error)
 
 
+GenericTypedJSONObjectWithFields = TypeVar(
+    'GenericTypedJSONObjectWithFields', bound='TypedJSONObjectWithFields')
+
+
 class TypedJSONObjectWithFields(JSONObjectWithFields):
     """JSON object with type."""
 
@@ -474,15 +479,15 @@ class TypedJSONObjectWithFields(JSONObjectWithFields):
     """Types registered for JSON deserialization"""
 
     @classmethod
-    def register(cls, type_cls: Type['TypedJSONObjectWithFields'],
-                 typ: Optional[str] = None) -> Type['TypedJSONObjectWithFields']:
+    def register(cls, type_cls: Type[GenericTypedJSONObjectWithFields],
+                 typ: Optional[str] = None) -> Type[GenericTypedJSONObjectWithFields]:
         """Register class for JSON deserialization."""
         typ = type_cls.typ if typ is None else typ
         cls.TYPES[typ] = type_cls
         return type_cls
 
     @classmethod
-    def get_type_cls(cls, jobj: Mapping[str, Any]) -> Type['TypedJSONObjectWithFields']:
+    def get_type_cls(cls, jobj: Mapping[str, Any]) -> Type["TypedJSONObjectWithFields"]:
         """Get the registered class for ``jobj``."""
         if cls in cls.TYPES.values():
             if cls.type_field_name not in jobj:
@@ -520,7 +525,7 @@ class TypedJSONObjectWithFields(JSONObjectWithFields):
         return jobj
 
     @classmethod
-    def from_json(cls, jobj: Mapping[str, Any]) -> 'TypedJSONObjectWithFields':
+    def from_json(cls, jobj: Mapping[str, Any]) -> "TypedJSONObjectWithFields":
         """Deserialize ACME object from valid JSON object.
 
         :raises josepy.errors.UnrecognizedTypeError: if type

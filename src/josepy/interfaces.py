@@ -1,14 +1,15 @@
 """JOSE interfaces."""
 import abc
 import json
-from typing import Any
+from collections.abc import Mapping, Sequence
+from typing import Any, Type, TypeVar, Union
 
 from josepy import errors
 
-from collections.abc import Sequence, Mapping
-
 # pylint: disable=no-self-argument,no-method-argument,no-init,inherit-non-class
 # pylint: disable=too-few-public-methods
+
+GenericJSONDeSerializable = TypeVar("GenericJSONDeSerializable", bound="JSONDeSerializable")
 
 
 class JSONDeSerializable(object, metaclass=abc.ABCMeta):
@@ -152,7 +153,7 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
 
     @classmethod
     @abc.abstractmethod
-    def from_json(cls, jobj: Any) -> 'JSONDeSerializable':
+    def from_json(cls: Type[GenericJSONDeSerializable], jobj: Any) -> GenericJSONDeSerializable:
         """Deserialize a decoded JSON document.
 
         :param jobj: Python object, composed of only other basic data
@@ -170,7 +171,8 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
         return cls()  # pylint: disable=abstract-class-instantiated
 
     @classmethod
-    def json_loads(cls, json_string: str) -> 'JSONDeSerializable':
+    def json_loads(cls: Type[GenericJSONDeSerializable],
+                   json_string: Union[str, bytes]) -> GenericJSONDeSerializable:
         """Deserialize from JSON document string."""
         try:
             loads = json.loads(json_string)

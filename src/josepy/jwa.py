@@ -5,20 +5,20 @@ https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
 """
 import abc
 import logging
-from typing import Dict, Any, Callable
+from collections.abc import Hashable
+from typing import Any, Callable, Dict
 
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives import hmac
-from cryptography.hazmat.primitives.asymmetric import padding, ec, rsa
-from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
-from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature
+from cryptography.hazmat.primitives import hashes, hmac
+from cryptography.hazmat.primitives.asymmetric import ec, padding, rsa
+from cryptography.hazmat.primitives.asymmetric.utils import (
+    decode_dss_signature,
+    encode_dss_signature,
+)
 from cryptography.hazmat.primitives.hashes import HashAlgorithm
 
 from josepy import errors, interfaces, jwk
-
-from collections.abc import Hashable
 
 logger = logging.getLogger(__name__)
 
@@ -104,37 +104,19 @@ class _JWARSA:
 
     def sign(self, key: rsa.RSAPrivateKey, msg: bytes) -> bytes:
         """Sign the ``msg`` using ``key``."""
-        # If cryptography library supports new style api (v1.4 and later)
-        new_api = hasattr(key, "sign")
         try:
-            if new_api:
-                return key.sign(msg, self.padding, self.hash)
-            signer = key.signer(self.padding, self.hash)  # type: ignore[attr-defined]
+            return key.sign(msg, self.padding, self.hash)
         except AttributeError as error:
             logger.debug(error, exc_info=True)
             raise errors.Error("Public key cannot be used for signing")
         except ValueError as error:  # digest too large
             logger.debug(error, exc_info=True)
             raise errors.Error(str(error))
-        signer.update(msg)
-        try:
-            return signer.finalize()
-        except ValueError as error:
-            logger.debug(error, exc_info=True)
-            raise errors.Error(str(error))
 
     def verify(self, key: rsa.RSAPublicKey, msg: bytes, sig: bytes) -> bool:
         """Verify the ``msg` and ``sig`` using ``key``."""
-        # If cryptography library supports new style api (v1.4 and later)
-        new_api = hasattr(key, "verify")
-        if not new_api:
-            verifier = key.verifier(sig, self.padding, self.hash)
-            verifier.update(msg)
         try:
-            if new_api:
-                key.verify(sig, msg, self.padding, self.hash)
-            else:
-                verifier.verify()
+            key.verify(sig, msg, self.padding, self.hash)
         except cryptography.exceptions.InvalidSignature as error:
             logger.debug(error, exc_info=True)
             return False
@@ -176,22 +158,12 @@ class _JWAEC(JWASignature):
                 ds.to_bytes(length=length, byteorder='big'))
 
     def _sign(self, key: ec.EllipticCurvePrivateKey, msg: bytes) -> bytes:
-        # If cryptography library supports new style api (v1.4 and later)
-        new_api = hasattr(key, 'sign')
         try:
-            if new_api:
-                return key.sign(msg, ec.ECDSA(self.hash))
-            signer = key.signer(ec.ECDSA(self.hash))  # type: ignore[attr-defined]
+            return key.sign(msg, ec.ECDSA(self.hash))
         except AttributeError as error:
             logger.debug(error, exc_info=True)
             raise errors.Error('Public key cannot be used for signing')
         except ValueError as error:  # digest too large
-            logger.debug(error, exc_info=True)
-            raise errors.Error(str(error))
-        signer.update(msg)
-        try:
-            return signer.finalize()
-        except ValueError as error:
             logger.debug(error, exc_info=True)
             raise errors.Error(str(error))
 
@@ -208,16 +180,8 @@ class _JWAEC(JWASignature):
         return self._verify(key, msg, asn1sig)
 
     def _verify(self, key: ec.EllipticCurvePublicKey, msg: bytes, asn1sig: bytes) -> bool:
-        # If cryptography library supports new style api (v1.4 and later)
-        new_api = hasattr(key, 'verify')
-        if not new_api:
-            verifier = key.verifier(asn1sig, ec.ECDSA(self.hash))
-            verifier.update(msg)
         try:
-            if new_api:
-                key.verify(asn1sig, msg, ec.ECDSA(self.hash))
-            else:
-                verifier.verify()
+            key.verify(asn1sig, msg, ec.ECDSA(self.hash))
         except cryptography.exceptions.InvalidSignature as error:
             logger.debug(error, exc_info=True)
             return False

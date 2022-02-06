@@ -2,12 +2,24 @@
 import argparse
 import base64
 import sys
-from typing import Dict, Any, Optional, FrozenSet, Mapping, List, Type, Tuple, cast
+from typing import (
+    Any,
+    Dict,
+    FrozenSet,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    cast,
+)
 
 from OpenSSL import crypto
 
 import josepy
-from josepy import b64, errors, json_util, jwa, jwk as jwk_mod, util
+from josepy import b64, errors, json_util, jwa
+from josepy import jwk as jwk_mod
+from josepy import util
 
 
 class MediaType:
@@ -57,21 +69,22 @@ class Header(json_util.JSONObjectWithFields):
     :ivar str cty: Content-Type, inc. :const:`MediaType.PREFIX`.
 
     """
-    alg: jwa.JWASignature = json_util.field(
+    alg: Optional[jwa.JWASignature] = json_util.field(
         'alg', decoder=jwa.JWASignature.from_json, omitempty=True)
-    jku: bytes = json_util.field('jku', omitempty=True)
-    jwk: jwk_mod.JWK = json_util.field('jwk', decoder=jwk_mod.JWK.from_json, omitempty=True)
-    kid: bytes = json_util.field('kid', omitempty=True)
-    x5u: bytes = json_util.field('x5u', omitempty=True)
+    jku: Optional[bytes] = json_util.field('jku', omitempty=True)
+    jwk: Optional[jwk_mod.JWK] = json_util.field(
+        'jwk', decoder=jwk_mod.JWK.from_json, omitempty=True)
+    kid: Optional[str] = json_util.field('kid', omitempty=True)
+    x5u: Optional[bytes] = json_util.field('x5u', omitempty=True)
     x5c: Tuple[util.ComparableX509, ...] = json_util.field('x5c', omitempty=True, default=())
-    x5t: bytes = json_util.field(
+    x5t: Optional[bytes] = json_util.field(
         'x5t', decoder=json_util.decode_b64jose, omitempty=True)
-    x5tS256: bytes = json_util.field(
+    x5tS256: Optional[bytes] = json_util.field(
         'x5t#S256', decoder=json_util.decode_b64jose, omitempty=True)
-    typ: MediaType = json_util.field('typ', encoder=MediaType.encode,
-                                     decoder=MediaType.decode, omitempty=True)
-    cty: MediaType = json_util.field('cty', encoder=MediaType.encode,
-                                     decoder=MediaType.decode, omitempty=True)
+    typ: Optional[MediaType] = json_util.field('typ', encoder=MediaType.encode,
+                                               decoder=MediaType.decode, omitempty=True)
+    cty: Optional[MediaType] = json_util.field('cty', encoder=MediaType.encode,
+                                               decoder=MediaType.decode, omitempty=True)
     crit: Tuple[Any, ...] = json_util.field('crit', omitempty=True, default=())
     _fields: Dict[str, json_util.Field]
 
@@ -197,6 +210,8 @@ class Signature(json_util.JSONObjectWithFields):
 
         """
         actual_key: josepy.JWK = self.combined.find_key() if key is None else key
+        if not self.combined.alg:
+            raise josepy.Error("Not signature algorithm defined.")
         return self.combined.alg.verify(
             key=actual_key.key, sig=self.signature,
             msg=self._msg(self.protected, payload))
@@ -324,7 +339,7 @@ class JWS(json_util.JSONObjectWithFields):
             signature=b64.b64decode(signature))
         return cls(payload=b64.b64decode(payload), signatures=(sig,))
 
-    def to_partial_json(self, flat: bool = True) -> Dict[str, Any]:  # pylint: disable=arguments-differ
+    def to_partial_json(self, flat: bool = True) -> Dict[str, Any]:
         assert self.signatures
         payload = json_util.encode_b64jose(self.payload)
 

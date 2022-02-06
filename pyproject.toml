@@ -35,8 +35,7 @@ setuptools = ">=1.0"
 
 [tool.poetry.dev-dependencies]
 coverage = ">=4.0"
-# Issue with flake8 4.0.0 and 4.0.1, see https://github.com/tholo/pytest-flake8/issues/81
-flake8 = "<4"
+flake8 = "*"
 isort = "*"
 mypy = "*"
 types-pyOpenSSL = "*"
@@ -67,10 +66,10 @@ disallow_untyped_defs = true
 
 [tool.pytest.ini_options]
 addopts = "-v --flake8 --cov-report xml --cov-report=term-missing --cov=josepy --cov-config .coveragerc"
-# SelectableGroups:DeprecationWarning is ignored because it is raised by
-# flake8. See https://github.com/PyCQA/flake8/issues/1397.
 filterwarnings = [
     "error",
+    # Ignore some deprecation warnings related to interaction between flake8 and pytest.
+    "ignore::pytest.PytestDeprecationWarning",
     "ignore:SelectableGroups:DeprecationWarning",
 ]
 norecursedirs = "*.egg .eggs dist build docs .tox"

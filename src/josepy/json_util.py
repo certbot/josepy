@@ -195,7 +195,7 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
 
     def __new__(mcs, name: str, bases: List[str],
                 namespace: Dict[str, Any]) -> 'JSONObjectWithFieldsMeta':
-        fields = {}
+        fields: Dict[str, Field] = {}
 
         for base in bases:
             fields.update(getattr(base, '_fields', {}))

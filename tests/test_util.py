@@ -21,8 +21,7 @@ def vector_path(*names: str) -> str:
 def load_vector(*names: str) -> bytes:
     """Load contents of a test vector."""
     # luckily, resource_string opens file in binary mode
-    return pkg_resources.resource_string(
-        __name__, os.path.join('testdata', *names))
+    return pkg_resources.resource_string(__name__, os.path.join('testdata', *names))
 
 
 def _guess_loader(filename: str, loader_pem: Any, loader_der: Any) -> Any:

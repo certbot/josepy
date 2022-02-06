@@ -173,9 +173,12 @@ class JWAECTest(unittest.TestCase):
         from josepy.jwk import JWK
         key = JWK.from_json(
             {
-                'd': 'Af9KP6DqLRbtit6NS_LRIaCP_-NdC5l5R2ugbILdfpv6dS9R4wUPNxiGw-vVWumA56Yo1oBnEm8ZdR4W-u1lPHw5',
-                'x': 'AD4i4STyJ07iZJkHkpKEOuICpn6IHknzwAlrf-1w1a5dqOsRe30EECSN4vFxaeAmtdBSCKBwCq7h1q4bPgMrMUvF',
-                'y': 'AHAlXxrabjcx_yBxGObnm_DkEQMJK1E69OHY3x3VxF5VXoKc93CG4GLoaPvphZQvZnt5EfExQoPktwOMIVhBHaFR',
+                'd': 'Af9KP6DqLRbtit6NS_LRIaCP_-NdC5l5R2ugbILdfpv6dS9R4wUPNxiGw'
+                     '-vVWumA56Yo1oBnEm8ZdR4W-u1lPHw5',
+                'x': 'AD4i4STyJ07iZJkHkpKEOuICpn6IHknzwAlrf-1w1a5dqOsRe30EECSN4vFxae'
+                     'AmtdBSCKBwCq7h1q4bPgMrMUvF',
+                'y': 'AHAlXxrabjcx_yBxGObnm_DkEQMJK1E69OHY3x3VxF5VXoKc93CG4GLoaPvphZQv'
+                     'Znt5EfExQoPktwOMIVhBHaFR',
                 'crv': 'P-521',
                 'kty': 'EC'
             })

@@ -19,14 +19,12 @@ class MediaTypeTest(unittest.TestCase):
         from josepy.jws import MediaType
         self.assertEqual('application/app', MediaType.decode('application/app'))
         self.assertEqual('application/app', MediaType.decode('app'))
-        self.assertRaises(
-            errors.DeserializationError, MediaType.decode, 'app;foo')
+        self.assertRaises(errors.DeserializationError, MediaType.decode, 'app;foo')
 
     def test_encode(self):
         from josepy.jws import MediaType
         self.assertEqual('app', MediaType.encode('application/app'))
-        self.assertEqual('application/app;foo',
-                         MediaType.encode('application/app;foo'))
+        self.assertEqual('application/app;foo', MediaType.encode('application/app;foo'))
 
 
 class HeaderTest(unittest.TestCase):

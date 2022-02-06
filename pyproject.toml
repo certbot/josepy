@@ -1,3 +1,11 @@
+# PEP-517 build
+
+[build-system]
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+# Poetry tooling configuration
+
 [tool.poetry]
 name = "josepy"
 version = "1.12.0.dev0"
@@ -34,7 +42,7 @@ pyopenssl = ">=0.13"
 setuptools = ">=1.0"
 
 [tool.poetry.dev-dependencies]
-coverage = ">=4.0"
+coverage = {version = ">=4.0", extras = ["toml"]}
 flake8 = "*"
 isort = "*"
 mypy = "*"
@@ -58,16 +66,22 @@ docs = [
 [tool.poetry.scripts]
 jws = "josepy.jws:CLI.run"
 
+# Mypy tooling configuration
+
 [tool.mypy]
 ignore_missing_imports = true
 warn_unused_ignores = true
 show_error_codes = true
 disallow_untyped_defs = true
 
+# Pytest tooling configuration
+
 [tool.pytest.ini_options]
 addopts = "-v --cov-report xml --cov-report=term-missing --cov=josepy --cov-config .coveragerc"
 filterwarnings = ["error"]
 norecursedirs = "*.egg .eggs dist build docs .tox"
+
+# Isort tooling configuration
 
 [tool.isort]
 combine_as_imports = false
@@ -77,6 +91,17 @@ known_first_party = "josepy"
 line_length = 79
 multi_line_output = 3
 
-[build-system]
-requires = ["poetry_core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+# Coverage tooling configuration
+
+[tool.coverage.run]
+branch = true
+source = ["josepy"]
+
+[tool.coverage.paths]
+source = [
+   ".tox/*/lib/python*/site-packages/josepy",
+   ".tox/pypy*/site-packages/josepy",
+]
+
+[tool.coverage.report]
+show_missing = true

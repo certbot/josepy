@@ -269,11 +269,11 @@ class JWKRSA(JWK):
 
 @JWK.register
 class JWKEC(JWK):
-    """RSA JWK.
+    """EC JWK.
 
     :ivar key: :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
-        or :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey`
-        wrapped in :class:`~josepy.util.ComparableECKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey` wrapped
+        in :class:`~josepy.util.ComparableECKey`
 
     """
     typ = 'EC'

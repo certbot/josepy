@@ -82,6 +82,10 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
                      rsa.RSAPublicKeyWithSerialization,
                      ec.EllipticCurvePrivateKeyWithSerialization,
                      ec.EllipticCurvePublicKeyWithSerialization,
+                     ed25519.Ed25519PrivateKey,
+                     ed25519.Ed25519PublicKey,
+                     ed448.Ed448PrivateKey,
+                     ed448.Ed448PublicKey,
                  ]):
         self._wrapped = wrapped
 
@@ -95,17 +99,23 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
         elif hasattr(self._wrapped, 'public_numbers'):
             return self.public_numbers() == other.public_numbers()
         elif hasattr(self._wrapped, 'private_bytes'):
-            kwargs = {
-                "encoding": serialization.Encoding.Raw,
-                "format": serialization.PrivateFormat.Raw,
-            }
-            return self._wrapped.private_bytes(**kwargs) == other._wrapped.private_bytes(**kwargs)
+            return self._wrapped.private_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PrivateFormat.Raw,
+                encryption_algorithm=serialization.NoEncryption(),
+            ) == other._wrapped.private_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PrivateFormat.Raw,
+                encryption_algorithm=serialization.NoEncryption(),
+            )
         elif hasattr(self._wrapped, 'public_bytes'):
-            kwargs = {
-                "encoding": serialization.Encoding.Raw,
-                "format": serialization.PublicFormat.Raw,
-            }
-            return self._wrapped.public_bytes(**kwargs) == other._wrapped.public_bytes(**kwargs)
+            return self._wrapped.public_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PublicFormat.Raw,
+            ) == other._wrapped.public_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PublicFormat.Raw,
+            )
         else:
             return NotImplemented
 

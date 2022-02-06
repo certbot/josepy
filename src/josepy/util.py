@@ -98,7 +98,8 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
             return self.private_numbers() == other.private_numbers()
         elif hasattr(self._wrapped, 'public_numbers'):
             return self.public_numbers() == other.public_numbers()
-        elif hasattr(self._wrapped, 'private_bytes'):
+        elif (isinstance(self._wrapped, (ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey))
+                and isinstance(other._wrapped, (ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey))):
             return self._wrapped.private_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PrivateFormat.Raw,
@@ -108,7 +109,8 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
                 format=serialization.PrivateFormat.Raw,
                 encryption_algorithm=serialization.NoEncryption(),
             )
-        elif hasattr(self._wrapped, 'public_bytes'):
+        elif (isinstance(self._wrapped, (ed25519.Ed25519PublicKey, ed448.Ed448PublicKey)) and
+                isinstance(other._wrapped, (ed25519.Ed25519PublicKey, ed448.Ed448PublicKey))):
             return self._wrapped.public_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PublicFormat.Raw,
@@ -192,36 +194,26 @@ class ComparableOKPKey(ComparableKey):
     - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey`
+
+    These are not yet supported
     - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey`
     """
 
-    # TODO fix the mypy warnings
-    def __init__(self, wrapped: Union[
-        ed25519.Ed25519PublicKey,
-        ed25519.Ed25519PrivateKey,
-        ed448.Ed448PublicKey,
-        ed448.Ed448PrivateKey,
-    ]):
-        self._wrapped = wrapped
-
     def __hash__(self) -> int:
-        if self.is_private():
-            pub = self._wrapped.public_key()
-        else:
-            pub = self._wrapped
-        return hash(pub.public_bytes(
-            format=serialization.PublicFormat.Raw,
-            encoding=serialization.Encoding.Raw,
-        )[:32])
-
-    def is_private(self) -> bool:
-        # Not all of the curves may be available with OpenSSL,
-        # so instead of doing instance checks against the private
-        # key classes, we do this
-        return hasattr(self._wrapped, "private_bytes")
+        if isinstance(self._wrapped, (ed25519.Ed25519PublicKey, ed448.Ed448PublicKey)):
+            return hash(self._wrapped.public_bytes(
+                format=serialization.PublicFormat.Raw,
+                encoding=serialization.Encoding.Raw,
+            )[:32])
+        elif isinstance(self._wrapped, (ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey)):
+            return hash(self._wrapped.public_key().public_bytes(
+                format=serialization.PublicFormat.Raw,
+                encoding=serialization.Encoding.Raw,
+            )[:32])
+        return 0
 
 
 class ImmutableMap(Mapping, Hashable):

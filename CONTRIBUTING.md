@@ -33,3 +33,37 @@ started. In particular, we recommend you read these sections
  - [Finding issues to work on](https://certbot.eff.org/docs/contributing.html#find-issues-to-work-on)
  - [Coding style](https://certbot.eff.org/docs/contributing.html#coding-style)
  - [Submitting a pull request](https://certbot.eff.org/docs/contributing.html#submitting-a-pull-request)
+
+# Specific instructions for Josepy
+
+## Configure a development environment
+
+1) Install Poetry: https://python-poetry.org/docs/#installation
+2) Setup a Python virtual environment
+```bash
+$ cd josepy
+$ poetry install
+```
+3) Activate the Python virtual environment
+```bash
+# (On Linux)
+$ source .venv/bin/activate
+# (On Windows Powershell)
+$ .\.venv\Script\activate
+```
+
+## Run the tests and quality checks
+
+1) Configure a development environment ([see above](#configure-a-development-environment))
+2) Run the unit tests
+```bash
+$ tox -e py
+```
+3) Run the linter and import format checker
+```bash
+$ tox -e flake8 isort
+```
+4) Run the type checker
+```bash
+$ tox -e mypy
+```

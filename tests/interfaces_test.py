@@ -3,12 +3,9 @@ import unittest
 
 
 class JSONDeSerializableTest(unittest.TestCase):
-    # pylint: disable=too-many-instance-attributes
 
     def setUp(self):
         from josepy.interfaces import JSONDeSerializable
-
-        # pylint: disable=missing-docstring,invalid-name
 
         class Basic(JSONDeSerializable):
             def __init__(self, v):
@@ -53,7 +50,6 @@ class JSONDeSerializableTest(unittest.TestCase):
         self.nested = Basic([[self.basic1]])
         self.tuple = Basic(('foo',))
 
-        # pylint: disable=invalid-name
         self.Basic = Basic
         self.Sequence = Sequence
         self.Mapping = Mapping

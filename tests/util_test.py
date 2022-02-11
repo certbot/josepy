@@ -68,7 +68,6 @@ class ComparableRSAKeyTest(unittest.TestCase):
         self.assertNotEqual(self.key, 5)
 
     def test_ne_not_wrapped(self):
-        # pylint: disable=protected-access
         self.assertNotEqual(self.key, self.key_same._wrapped)
 
     def test_ne_no_serialization(self):
@@ -113,7 +112,6 @@ class ComparableECKeyTest(unittest.TestCase):
         self.assertNotEqual(self.p256_key, 5)
 
     def test_ne_not_wrapped(self):
-        # pylint: disable=protected-access
         self.assertNotEqual(self.p256_key, self.p256_key_same._wrapped)
 
     def test_ne_no_serialization(self):
@@ -139,8 +137,6 @@ class ImmutableMapTest(unittest.TestCase):
     """Tests for josepy.util.ImmutableMap."""
 
     def setUp(self):
-        # pylint: disable=invalid-name,too-few-public-methods
-        # pylint: disable=missing-docstring
         from josepy.util import ImmutableMap
 
         class A(ImmutableMap):
@@ -203,7 +199,7 @@ class ImmutableMapTest(unittest.TestCase):
         self.assertEqual("B(x='foo', y='bar')", repr(self.B(x='foo', y='bar')))
 
 
-class frozendictTest(unittest.TestCase):  # pylint: disable=invalid-name
+class frozendictTest(unittest.TestCase):
     """Tests for josepy.util.frozendict."""
 
     def setUp(self):

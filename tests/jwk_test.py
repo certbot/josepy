@@ -396,9 +396,9 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
         key = JWKOKP.load(data)
         data = key.to_partial_json()
         x = josepy.json_util.encode_b64jose(data['x'])
-        d = josepy.json_util.encode_b64jose(data['d'])
+        d = data['d']
         self.assertEqual(x, "9ujoz88QZL05w2lhaqUbBaBpwmM12Y7Y8Ybfwjibk-I")
-        # remember the d part
+        self.assertEqual(d, "8gCFr1WrIceljUa0RbwldaotTmas9GFc_AmoK0vdtZk")
 
     def test_from_json(self):
         from josepy.jwk import JWK

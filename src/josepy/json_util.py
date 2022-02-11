@@ -13,7 +13,6 @@ from typing import Any, Callable, Dict, List, Mapping, Optional, Type, TypeVar
 
 from OpenSSL import crypto
 
-import josepy.util
 from josepy import b64, errors, interfaces, util
 
 logger = logging.getLogger(__name__)
@@ -398,7 +397,7 @@ def decode_hex16(value: str, size: Optional[int] = None, minimum: bool = False) 
         raise errors.DeserializationError(error)
 
 
-def encode_cert(cert: josepy.util.ComparableX509) -> str:
+def encode_cert(cert: util.ComparableX509) -> str:
     """Encode certificate as JOSE Base-64 DER.
 
     :type cert: `OpenSSL.crypto.X509` wrapped in `.ComparableX509`
@@ -412,7 +411,7 @@ def encode_cert(cert: josepy.util.ComparableX509) -> str:
         crypto.FILETYPE_ASN1, cert.wrapped))
 
 
-def decode_cert(b64der: str) -> josepy.util.ComparableX509:
+def decode_cert(b64der: str) -> util.ComparableX509:
     """Decode JOSE Base-64 DER-encoded certificate.
 
     :param unicode b64der:
@@ -426,7 +425,7 @@ def decode_cert(b64der: str) -> josepy.util.ComparableX509:
         raise errors.DeserializationError(error)
 
 
-def encode_csr(csr: josepy.util.ComparableX509) -> str:
+def encode_csr(csr: util.ComparableX509) -> str:
     """Encode CSR as JOSE Base-64 DER.
 
     :type csr: `OpenSSL.crypto.X509Req` wrapped in `.ComparableX509`
@@ -440,7 +439,7 @@ def encode_csr(csr: josepy.util.ComparableX509) -> str:
         crypto.FILETYPE_ASN1, csr.wrapped))
 
 
-def decode_csr(b64der: str) -> josepy.util.ComparableX509:
+def decode_csr(b64der: str) -> util.ComparableX509:
     """Decode JOSE Base-64 DER-encoded CSR.
 
     :param unicode b64der:

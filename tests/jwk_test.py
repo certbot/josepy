@@ -336,7 +336,6 @@ AwEHoUQDQgAEGS5RvStca15z2FEanCM3juoX7tE/LB7iD44GWawGE40APAl/iZuH
 
 class JWKOKPTest(unittest.TestCase):
     """Tests for josepy.jwk.JWKOKP."""
-    # pylint: disable=too-many-instance-attributes
 
     # TODO: write the thumbprint
     thumbprint = (
@@ -360,9 +359,10 @@ class JWKOKPTest(unittest.TestCase):
         self.jwked448json = {
             'kty': 'OKP',
             'crv': 'Ed448',
-            'x':
+            'x': (
                 "9b08f7cc31b7e3e67d22d5aea121074a273bd2b83de09c63faa73d2c"
                 "22c5d9bbc836647241d953d40c5b12da88120d53177f80e532c41fa0"
+            )
         }
         # Test vectors taken from
         # https://datatracker.ietf.org/doc/html/rfc7748#section-6.1
@@ -396,7 +396,7 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
         key = JWKOKP.load(data)
         data = key.to_partial_json()
         x = josepy.json_util.encode_b64jose(data['x'])
-        # d = josepy.json_util.encode_b64jose(data['d'])
+        d = josepy.json_util.encode_b64jose(data['d'])
         self.assertEqual(x, "9ujoz88QZL05w2lhaqUbBaBpwmM12Y7Y8Ybfwjibk-I")
         # remember the d part
 

@@ -19,11 +19,14 @@ from typing import (
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import ec, rsa
-
 # TODO import with try/except as some curves may not be available
 from cryptography.hazmat.primitives.asymmetric import (
-    ed25519, ed448, x25519, x448,
+    ec,
+    ed448,
+    ed25519,
+    rsa,
+    x448,
+    x25519,
 )
 
 import josepy.util

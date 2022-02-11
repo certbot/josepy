@@ -106,7 +106,7 @@ class Header(json_util.JSONObjectWithFields):
             raise TypeError('Addition of overlapping headers not defined')
 
         not_omitted_self.update(not_omitted_other)
-        return type(self)(**not_omitted_self)  # pylint: disable=star-args
+        return type(self)(**not_omitted_self)
 
     def find_key(self) -> josepy.JWK:
         """Find key based on header.
@@ -125,19 +125,18 @@ class Header(json_util.JSONObjectWithFields):
 
     @crit.decoder  # type: ignore
     def crit(unused_value: Any) -> Any:
-        # pylint: disable=missing-docstring,no-self-argument,no-self-use
         raise errors.DeserializationError(
             '"crit" is not supported, please subclass')
 
     # x5c does NOT use JOSE Base64 (4.1.6)
 
     @x5c.encoder  # type: ignore
-    def x5c(value):  # pylint: disable=missing-docstring,no-self-argument
+    def x5c(value):
         return [base64.b64encode(crypto.dump_certificate(
             crypto.FILETYPE_ASN1, cert.wrapped)) for cert in value]
 
     @x5c.decoder  # type: ignore
-    def x5c(value):  # pylint: disable=missing-docstring,no-self-argument
+    def x5c(value):
         try:
             return tuple(util.ComparableX509(crypto.load_certificate(
                 crypto.FILETYPE_ASN1,
@@ -169,12 +168,12 @@ class Signature(json_util.JSONObjectWithFields):
         encoder=json_util.encode_b64jose)
 
     @protected.encoder  # type: ignore
-    def protected(value: str) -> str:  # pylint: disable=missing-docstring,no-self-argument
+    def protected(value: str) -> str:
         # wrong type guess (Signature, not bytes) | pylint: disable=no-member
         return json_util.encode_b64jose(value.encode('utf-8'))
 
     @protected.decoder  # type: ignore
-    def protected(value: str) -> str:  # pylint: disable=missing-docstring,no-self-argument
+    def protected(value: str) -> str:
         return json_util.decode_b64jose(value).decode('utf-8')
 
     def __init__(self, **kwargs: Any) -> None:
@@ -244,12 +243,11 @@ class Signature(json_util.JSONObjectWithFields):
             if header in header_params:
                 protected_params[header] = header_params.pop(header)
         if protected_params:
-            # pylint: disable=star-args
             protected = cls.header_cls(**protected_params).json_dumps()
         else:
             protected = ''
 
-        header = cls.header_cls(**header_params)  # pylint: disable=star-args
+        header = cls.header_cls(**header_params)
         signature = alg.sign(key.key, cls._msg(protected, payload))
 
         return cls(protected=protected, header=header, signature=signature)

@@ -66,7 +66,6 @@ class Field:
     def __init__(self, json_name: str, default: Any = None, omitempty: bool = False,
                  decoder: Callable[[Any], Any] = None,
                  encoder: Callable[[Any], Any] = None) -> None:
-        # pylint: disable=too-many-arguments
         self.json_name = json_name
         self.default = default
         self.omitempty = omitempty
@@ -97,7 +96,7 @@ class Field:
             "encoder": self.fenc,
             **kwargs,
         }
-        return type(self)(**current)  # type: ignore[arg-type]  # pylint: disable=star-args
+        return type(self)(**current)  # type: ignore[arg-type]
 
     def decoder(self, fdec: Callable[[Any], Any]) -> 'Field':
         """Descriptor to change the decoder on JSON object field."""
@@ -225,7 +224,6 @@ GenericJSONObjectWithFields = TypeVar('GenericJSONObjectWithFields', bound='JSON
 class JSONObjectWithFields(util.ImmutableMap,
                            interfaces.JSONDeSerializable,
                            metaclass=JSONObjectWithFieldsMeta):
-    # pylint: disable=too-few-public-methods
     """JSON object with fields.
 
     Example::
@@ -259,9 +257,7 @@ class JSONObjectWithFields(util.ImmutableMap,
         }
 
     def __init__(self, **kwargs: Any) -> None:
-        # pylint: disable=star-args
-        super().__init__(
-            **{**self._defaults(), **kwargs})
+        super().__init__(**{**self._defaults(), **kwargs})
 
     def encode(self, name: str) -> Any:
         """Encode a single field.

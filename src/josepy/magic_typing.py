@@ -4,7 +4,6 @@ import sys
 import warnings
 from typing import Any
 
-
 warnings.warn("josepy.magic_typing is deprecated and will be removed in a future release.",
               DeprecationWarning)
 

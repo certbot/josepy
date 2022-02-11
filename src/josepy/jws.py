@@ -2,12 +2,24 @@
 import argparse
 import base64
 import sys
-from typing import Dict, Any, Optional, FrozenSet, Mapping, List, Type, Tuple, cast
+from typing import (
+    Any,
+    Dict,
+    FrozenSet,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    cast,
+)
 
 from OpenSSL import crypto
 
 import josepy
-from josepy import b64, errors, json_util, jwa, jwk as jwk_mod, util
+from josepy import b64, errors, json_util, jwa
+from josepy import jwk as jwk_mod
+from josepy import util
 
 
 class MediaType:
@@ -327,7 +339,7 @@ class JWS(json_util.JSONObjectWithFields):
             signature=b64.b64decode(signature))
         return cls(payload=b64.b64decode(payload), signatures=(sig,))
 
-    def to_partial_json(self, flat: bool = True) -> Dict[str, Any]:  # pylint: disable=arguments-differ
+    def to_partial_json(self, flat: bool = True) -> Dict[str, Any]:
         assert self.signatures
         payload = json_util.encode_b64jose(self.payload)
 

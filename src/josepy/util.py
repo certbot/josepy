@@ -1,16 +1,14 @@
 """JOSE utilities."""
 import abc
-from types import ModuleType
-from typing import Union, Any, Callable, Iterator, Tuple, List, TypeVar, cast
-from collections.abc import Hashable, Mapping
 import sys
 import warnings
+from collections.abc import Hashable, Mapping
+from types import ModuleType
+from typing import Any, Callable, Iterator, List, Tuple, TypeVar, Union, cast
 
-from cryptography.hazmat.primitives.asymmetric import ed25519
-from cryptography.hazmat.primitives.asymmetric import ed448
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ec, ed448, ed25519, rsa
 from OpenSSL import crypto
-from cryptography.hazmat.primitives.asymmetric import ec, rsa
 
 
 # Deprecated. Please use built-in decorators @classmethod and abc.abstractmethod together instead.

@@ -98,8 +98,8 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
             return self.private_numbers() == other.private_numbers()
         elif hasattr(self._wrapped, 'public_numbers'):
             return self.public_numbers() == other.public_numbers()
-        elif (isinstance(self._wrapped, (ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey))
-                and isinstance(other._wrapped, (ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey))):
+        elif (isinstance(self._wrapped, (ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey)) and
+                isinstance(other._wrapped, (ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey))):
             return self._wrapped.private_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PrivateFormat.Raw,

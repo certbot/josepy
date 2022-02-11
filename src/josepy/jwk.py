@@ -15,6 +15,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import rsa
 
+# TODO import with try/except as some curves may not be available
 from cryptography.hazmat.primitives.asymmetric import (
     ed25519, ed448, x25519, x448,
 )
@@ -447,8 +448,11 @@ class JWKOKP(JWK):
         return NotImplemented
 
     def fields_to_partial_json(self) -> Dict[str, Any]:
-        params = {}
-        if self.key.is_private():
+        params = {
+            "crv": self._key_to_crv(),
+            "kty": "OKP",
+        }
+        if hasattr(self.key._wrapped, "private_bytes"):
             params['d'] = json_util.encode_b64jose(self.key._wrapped.private_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PrivateFormat.Raw,
@@ -463,32 +467,20 @@ class JWKOKP(JWK):
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PublicFormat.Raw,
             ))
-        params['crv'] = self._key_to_crv()
-        params['kty'] = "OKP"
         return params
 
     @classmethod
     def fields_from_json(cls, jobj: Mapping[str, Any]) -> "JWKOKP":
-        try:
-            if isinstance(jobj, str):
-                obj = json.loads(jobj)
-            elif isinstance(jobj, dict):
-                obj = jobj
-            else:
-                raise ValueError
-        except ValueError:
-            raise errors.DeserializationError("Key is not valid JSON")
-
-        curve = obj["crv"]
+        curve = jobj["crv"]
         if curve not in cls.crv_to_pub_priv:
             raise errors.DeserializationError(f"Invalid curve: {curve}")
 
-        if "x" not in obj:
+        if "x" not in jobj:
             raise errors.DeserializationError('OKP should have "x" parameter')
         x = json_util.decode_b64jose(jobj["x"])
 
         try:
-            if "d" not in obj:  # public key
+            if "d" not in jobj:  # public key
                 pub_class: Type[Union[
                     ed25519.Ed25519PublicKey,
                     ed448.Ed448PublicKey,
@@ -497,7 +489,7 @@ class JWKOKP(JWK):
                 ]] = cls.crv_to_pub_priv[curve].pubkey
                 return cls(key=pub_class.from_public_bytes(x))
             else:  # private key
-                d = json_util.decode_b64jose(obj["d"])
+                d = json_util.decode_b64jose(jobj["d"])
                 priv_key_class: Type[Union[
                     ed25519.Ed25519PrivateKey,
                     ed448.Ed448PrivateKey,

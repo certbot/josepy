@@ -16,7 +16,7 @@ def abstractclassmethod(func: Callable) -> classmethod:
     return classmethod(abc.abstractmethod(func))
 
 
-class ComparableX509:  # pylint: disable=too-few-public-methods
+class ComparableX509:
     """Wrapper for OpenSSL.crypto.X509** objects that supports __eq__.
 
     :ivar wrapped: Wrapped certificate or certificate request.
@@ -53,7 +53,6 @@ class ComparableX509:  # pylint: disable=too-few-public-methods
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
-        # pylint: disable=protected-access
         return self._dump() == other._dump()
 
     def __hash__(self) -> int:
@@ -63,7 +62,7 @@ class ComparableX509:  # pylint: disable=too-few-public-methods
         return '<{0}({1!r})>'.format(self.__class__.__name__, self.wrapped)
 
 
-class ComparableKey:  # pylint: disable=too-few-public-methods
+class ComparableKey:
     """Comparable wrapper for ``cryptography`` keys.
 
     See https://github.com/pyca/cryptography/issues/2122.
@@ -88,7 +87,6 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
         self._wrapped = wrapped
 
     def __eq__(self, other: Any) -> bool:
-        # pylint: disable=protected-access
         if (not isinstance(other, self.__class__) or
                 self._wrapped.__class__ is not other._wrapped.__class__):
             return NotImplemented
@@ -135,7 +133,7 @@ class ComparableKey:  # pylint: disable=too-few-public-methods
         return self.__class__(self._wrapped.public_key())
 
 
-class ComparableRSAKey(ComparableKey):  # pylint: disable=too-few-public-methods
+class ComparableRSAKey(ComparableKey):
     """Wrapper for ``cryptography`` RSA keys.
 
     Wraps around:
@@ -160,7 +158,7 @@ class ComparableRSAKey(ComparableKey):  # pylint: disable=too-few-public-methods
         raise NotImplementedError()
 
 
-class ComparableECKey(ComparableKey):  # pylint: disable=too-few-public-methods
+class ComparableECKey(ComparableKey):
     """Wrapper for ``cryptography`` EC keys.
     Wraps around:
     - :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
@@ -215,7 +213,6 @@ class ComparableOKPKey(ComparableKey):
 
 
 class ImmutableMap(Mapping, Hashable):
-    # pylint: disable=too-few-public-methods
     """Immutable key to value mapping with attribute access."""
 
     __slots__: Tuple[str, ...] = ()
@@ -233,7 +230,7 @@ class ImmutableMap(Mapping, Hashable):
     def update(self: GenericImmutableMap, **kwargs: Any) -> GenericImmutableMap:
         """Return updated map."""
         items: Mapping[str, Any] = {**self, **kwargs}
-        return type(self)(**items)  # pylint: disable=star-args
+        return type(self)(**items)
 
     def __getitem__(self, key: str) -> Any:
         try:
@@ -260,7 +257,6 @@ class ImmutableMap(Mapping, Hashable):
 
 
 class frozendict(Mapping, Hashable):
-    # pylint: disable=invalid-name,too-few-public-methods
     """Frozen dictionary."""
     __slots__ = ('_items', '_keys')
 

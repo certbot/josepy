@@ -23,8 +23,7 @@ from josepy import errors, interfaces, jwk
 logger = logging.getLogger(__name__)
 
 
-class JWA(interfaces.JSONDeSerializable):  # pylint: disable=abstract-method
-    # pylint: disable=too-few-public-methods
+class JWA(interfaces.JSONDeSerializable):
     # for some reason disable=abstract-method has to be on the line
     # above...
     """JSON Web Algorithm."""

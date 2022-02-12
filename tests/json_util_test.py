@@ -44,8 +44,6 @@ class FieldTest(unittest.TestCase):
     def test_descriptors(self):
         mock_value = mock.MagicMock()
 
-        # pylint: disable=missing-docstring
-
         def decoder(unused_value):
             return 'd'
 
@@ -64,7 +62,6 @@ class FieldTest(unittest.TestCase):
 
     def test_default_encoder_is_partial(self):
         class MockField(interfaces.JSONDeSerializable):
-            # pylint: disable=missing-docstring
             def to_partial_json(self):
                 return 'foo'  # pragma: no cover
 
@@ -106,10 +103,8 @@ class JSONObjectWithFieldsMetaTest(unittest.TestCase):
         from josepy.json_util import Field, JSONObjectWithFieldsMeta
         self.field = Field('Baz')
         self.field2 = Field('Baz2')
-        # pylint: disable=invalid-name,missing-docstring,too-few-public-methods
-        # pylint: disable=blacklisted-name
 
-        class A(object, metaclass=JSONObjectWithFieldsMeta):
+        class A(metaclass=JSONObjectWithFieldsMeta):
             __slots__ = ('bar',)
             baz = self.field
 
@@ -124,12 +119,10 @@ class JSONObjectWithFieldsMetaTest(unittest.TestCase):
         self.c_cls = C
 
     def test_fields(self):
-        # pylint: disable=protected-access,no-member
         self.assertEqual({'baz': self.field}, self.a_cls._fields)
         self.assertEqual({'baz': self.field}, self.b_cls._fields)
 
     def test_fields_inheritance(self):
-        # pylint: disable=protected-access,no-member
         self.assertEqual({'baz': self.field2}, self.c_cls._fields)
 
     def test_slots(self):
@@ -137,21 +130,17 @@ class JSONObjectWithFieldsMetaTest(unittest.TestCase):
         self.assertEqual(('baz',), self.b_cls.__slots__)
 
     def test_orig_slots(self):
-        # pylint: disable=protected-access,no-member
         self.assertEqual(('bar',), self.a_cls._orig_slots)
         self.assertEqual((), self.b_cls._orig_slots)
 
 
 class JSONObjectWithFieldsTest(unittest.TestCase):
     """Tests for josepy.json_util.JSONObjectWithFields."""
-    # pylint: disable=protected-access
 
     def setUp(self):
         from josepy.json_util import Field, JSONObjectWithFields
 
         class MockJSONObjectWithFields(JSONObjectWithFields):
-            # pylint: disable=invalid-name,missing-docstring,no-self-argument
-            # pylint: disable=too-few-public-methods
             x = Field('x', omitempty=True,
                       encoder=(lambda x: x * 2),
                       decoder=(lambda x: x / 2))
@@ -170,7 +159,6 @@ class JSONObjectWithFieldsTest(unittest.TestCase):
                     raise errors.DeserializationError()
                 return value
 
-        # pylint: disable=invalid-name
         self.MockJSONObjectWithFields = MockJSONObjectWithFields
         self.mock = MockJSONObjectWithFields(x=None, y=2, z=3)
 
@@ -341,9 +329,6 @@ class TypedJSONObjectWithFieldsTest(unittest.TestCase):
 
     def setUp(self):
         from josepy.json_util import TypedJSONObjectWithFields
-
-        # pylint: disable=missing-docstring,abstract-method
-        # pylint: disable=too-few-public-methods
 
         class MockParentTypedJSONObjectWithFields(TypedJSONObjectWithFields):
             TYPES = {}

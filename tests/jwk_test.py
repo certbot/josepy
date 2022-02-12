@@ -75,7 +75,6 @@ class JWKOctTest(unittest.TestCase, JWKTestBaseMixin):
 
 class JWKRSATest(unittest.TestCase, JWKTestBaseMixin):
     """Tests for josepy.jwk.JWKRSA."""
-    # pylint: disable=too-many-instance-attributes
 
     thumbprint = (b'\x83K\xdc#3\x98\xca\x98\xed\xcb\x80\x80<\x0c'
                   b'\xf0\x95\xb9H\xb2*l\xbd$\xe5&|O\x91\xd4 \xb0Y')
@@ -88,9 +87,7 @@ class JWKRSATest(unittest.TestCase, JWKTestBaseMixin):
             'e': 'AQAB',
             'n': 'm2Fylv-Uz7trgTW8EBHP3FQSMeZs2GNQ6VRo1sIVJEk',
         }
-        # pylint: disable=protected-access
-        self.jwk256_not_comparable = JWKRSA(
-            key=RSA256_KEY.public_key()._wrapped)
+        self.jwk256_not_comparable = JWKRSA(key=RSA256_KEY.public_key()._wrapped)
         self.jwk512 = JWKRSA(key=RSA512_KEY.public_key())
         self.jwk512json = {
             'kty': 'RSA',
@@ -120,7 +117,6 @@ class JWKRSATest(unittest.TestCase, JWKTestBaseMixin):
     def test_encode_param_zero(self):
         from josepy.jwk import JWKRSA
 
-        # pylint: disable=protected-access
         # TODO: move encode/decode _param to separate class
         self.assertEqual('AA', JWKRSA._encode_param(0))
 

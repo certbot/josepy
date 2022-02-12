@@ -21,15 +21,12 @@ class JWASignatureTest(unittest.TestCase):
         from josepy.jwa import JWASignature
 
         class MockSig(JWASignature):
-            # pylint: disable=missing-docstring,too-few-public-methods
-            # pylint: disable=abstract-class-not-used
             def sign(self, key, msg):
                 raise NotImplementedError()  # pragma: no cover
 
             def verify(self, key, msg, sig):
                 raise NotImplementedError()  # pragma: no cover
 
-        # pylint: disable=invalid-name
         self.Sig1 = MockSig('Sig1')
         self.Sig2 = MockSig('Sig2')
 
@@ -55,7 +52,7 @@ class JWASignatureTest(unittest.TestCase):
         self.assertIs(JWASignature.from_json('RS256'), RS256)
 
 
-class JWAHSTest(unittest.TestCase):  # pylint: disable=too-few-public-methods
+class JWAHSTest(unittest.TestCase):
 
     def test_it(self):
         from josepy.jwa import HS256

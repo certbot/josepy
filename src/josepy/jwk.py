@@ -36,7 +36,6 @@ logger = logging.getLogger(__name__)
 
 
 class JWK(json_util.TypedJSONObjectWithFields, metaclass=abc.ABCMeta):
-    # pylint: disable=too-few-public-methods
     """JSON Web Key."""
     type_field_name = 'kty'
     TYPES: Dict[str, Type['JWK']] = {}
@@ -213,7 +212,6 @@ class JWKRSA(JWK):
 
     @classmethod
     def fields_from_json(cls, jobj: Mapping[str, Any]) -> 'JWKRSA':
-        # pylint: disable=invalid-name
         n, e = (cls._decode_param(jobj[x]) for x in ('n', 'e'))
         public_numbers = rsa.RSAPublicNumbers(e=e, n=n)
 
@@ -254,7 +252,6 @@ class JWKRSA(JWK):
         return cls(key=key)
 
     def fields_to_partial_json(self) -> Dict[str, Any]:
-        # pylint: disable=protected-access
         if isinstance(self.key._wrapped, rsa.RSAPublicKey):
             numbers = self.key.public_numbers()
             params = {
@@ -378,7 +375,6 @@ class JWKEC(JWK):
 
     @classmethod
     def fields_from_json(cls, jobj: Mapping[str, Any]) -> 'JWKEC':
-        # pylint: disable=invalid-name
         curve = cls._crv_to_curve(jobj['crv'])
         expected_length = cls.expected_length_for_curve(curve)
         x, y = (cls._decode_param(jobj[n], n, expected_length) for n in ('x', 'y'))

@@ -6,14 +6,10 @@ from typing import Any, Type, TypeVar, Union
 
 from josepy import errors
 
-# pylint: disable=no-self-argument,no-method-argument,no-init,inherit-non-class
-# pylint: disable=too-few-public-methods
-
 GenericJSONDeSerializable = TypeVar("GenericJSONDeSerializable", bound="JSONDeSerializable")
 
 
-class JSONDeSerializable(object, metaclass=abc.ABCMeta):
-    # pylint: disable=too-few-public-methods
+class JSONDeSerializable(metaclass=abc.ABCMeta):
     """Interface for (de)serializable JSON objects.
 
     Please recall, that standard Python library implements
@@ -168,7 +164,7 @@ class JSONDeSerializable(object, metaclass=abc.ABCMeta):
         """
         # TypeError: Can't instantiate abstract class <cls> with
         # abstract methods from_json, to_partial_json
-        return cls()  # pylint: disable=abstract-class-instantiated
+        return cls()
 
     @classmethod
     def json_loads(cls: Type[GenericJSONDeSerializable],

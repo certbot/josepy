@@ -468,10 +468,14 @@ class JWKOKP(JWK):
                 format=serialization.PrivateFormat.Raw,
                 encryption_algorithm=serialization.NoEncryption()
             ))
-            params['x'] = self.key._wrapped.public_key().public_bytes(
+            params['x'] = json_util.encode_b64jose(self.key._wrapped.public_key().public_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PublicFormat.Raw,
-            )
+            ))
+            print(json_util.encode_b64jose(self.key._wrapped.public_key().public_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PublicFormat.Raw,
+            )))
         else:
             params['x'] = json_util.encode_b64jose(self.key._wrapped.public_bytes(
                 encoding=serialization.Encoding.Raw,
@@ -488,6 +492,7 @@ class JWKOKP(JWK):
         if "x" not in jobj:
             raise errors.DeserializationError('OKP should have "x" parameter')
         x = json_util.decode_b64jose(jobj["x"])
+        print(x)
 
         try:
             if "d" not in jobj:  # public key

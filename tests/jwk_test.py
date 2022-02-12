@@ -366,16 +366,17 @@ class JWKOKPTest(unittest.TestCase):
         }
         # Test vectors taken from
         # https://datatracker.ietf.org/doc/html/rfc7748#section-6.1
-        # self.jwkx25519json = {
-        #     'kty': 'OKP',
-        #     'crv': 'X25519',
-        #     'x': '8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a',
-        # }
-        # self.jwkx448json = {
-        #     'kty': 'OKP',
-        #     'crv': 'X448',
-        #     'x': 'jjQtV-fA7J_tK8dPzYq7jRPNjF8r5p6LW2R25S2Gw5U',
-        # }
+        self.jwkx25519json = {
+            'kty': 'OKP',
+            'crv': 'X25519',
+            'x': '8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a',
+        }
+        # not 56 bytes lolng
+        self.jwkx448json = {
+            "kty": "OKP",
+            "crv": "X448",
+            "x": "jjQtV-fA7J_tK8dPzYq7jRPNjF8r5p6LW2R25S2Gw5U",
+        }
 
     def test_encode_ed448(self):
         from josepy.jwk import JWKOKP
@@ -416,8 +417,8 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
 -----END PRIVATE KEY-----"""
         key = JWK.load(data)
         data = key.fields_to_partial_json()
-        self.assertEqual(data['crv'], "Ed25519")
-        self.assertIsInstance(data['x'], bytes)
+        self.assertEqual(data["crv"], "Ed25519")
+        self.assertEqual(data["d"], "8gCFr1WrIceljUa0RbwldaotTmas9GFc_AmoK0vdtZk")
 
     # def test_init_auto_comparable(self):
     #     self.assertIsInstance(self.x448_key.key, util.ComparableOKPKey)
@@ -438,8 +439,8 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
         with self.assertRaises(errors.DeserializationError) as warn:
             JWK.from_json(
                 {
-                    'kty': 'OKP',
-                    'crv': 'Ed448',
+                    "kty": "OKP",
+                    "crv": "Ed448",
                 }
             )
         self.assertEqual(
@@ -449,13 +450,19 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
 
     def test_from_json_hashable(self):
         from josepy.jwk import JWK
-        hash(JWK.from_json(self.jwked25519json))
+        h = hash(JWK.from_json(self.jwked25519json))
+        self.assertIsInstance(h, int)
 
     def test_deserialize_public_key(self):
         # should target jwk.py:474-484, but those lines are still marked as missing
         # in the coverage report
         from josepy.jwk import JWKOKP
         JWKOKP.fields_from_json(self.jwked25519json)
+
+    def test_x448(self):
+        from josepy.jwk import JWKOKP
+        key = JWKOKP.fields_from_json(self.jwkx448json)
+        print(key)
 
 
 if __name__ == '__main__':

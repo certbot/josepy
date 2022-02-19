@@ -141,9 +141,9 @@ mkdir kgs
 kgs="kgs/$version"
 pip freeze | tee $kgs
 pip install pytest pytest-cov
-echo testing josepy
-pytest --pyargs josepy
 cd ~-
+echo testing josepy
+pytest
 deactivate
 
 git commit --gpg-sign="$RELEASE_GPG_KEY" -m "Release $version"

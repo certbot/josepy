@@ -41,7 +41,6 @@ started. In particular, we recommend you read these sections
 1) Install Poetry: https://python-poetry.org/docs/#installation
 2) Setup a Python virtual environment
 ```bash
-$ cd josepy
 $ poetry install
 ```
 3) Activate the Python virtual environment

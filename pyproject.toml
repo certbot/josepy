@@ -42,6 +42,7 @@ pyopenssl = ">=0.13"
 setuptools = ">=1.0"
 
 [tool.poetry.dev-dependencies]
+# coverage[toml] extra is required to read the coverage config from pyproject.toml
 coverage = {version = ">=4.0", extras = ["toml"]}
 flake8 = "*"
 isort = "*"

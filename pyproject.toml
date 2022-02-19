@@ -8,7 +8,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "josepy"
-version = "1.12.0.dev0"
+version = "1.13.0.dev0"
 description = "JOSE protocol implementation in Python"
 license = "Apache License 2.0"
 classifiers = [

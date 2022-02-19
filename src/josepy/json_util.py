@@ -13,7 +13,6 @@ from typing import Any, Callable, Dict, List, Mapping, Optional, Type, TypeVar
 
 from OpenSSL import crypto
 
-import josepy.util
 from josepy import b64, errors, interfaces, util
 
 logger = logging.getLogger(__name__)
@@ -66,7 +65,6 @@ class Field:
     def __init__(self, json_name: str, default: Any = None, omitempty: bool = False,
                  decoder: Callable[[Any], Any] = None,
                  encoder: Callable[[Any], Any] = None) -> None:
-        # pylint: disable=too-many-arguments
         self.json_name = json_name
         self.default = default
         self.omitempty = omitempty
@@ -97,7 +95,7 @@ class Field:
             "encoder": self.fenc,
             **kwargs,
         }
-        return type(self)(**current)  # type: ignore[arg-type]  # pylint: disable=star-args
+        return type(self)(**current)  # type: ignore[arg-type]
 
     def decoder(self, fdec: Callable[[Any], Any]) -> 'Field':
         """Descriptor to change the decoder on JSON object field."""
@@ -225,7 +223,6 @@ GenericJSONObjectWithFields = TypeVar('GenericJSONObjectWithFields', bound='JSON
 class JSONObjectWithFields(util.ImmutableMap,
                            interfaces.JSONDeSerializable,
                            metaclass=JSONObjectWithFieldsMeta):
-    # pylint: disable=too-few-public-methods
     """JSON object with fields.
 
     Example::
@@ -259,9 +256,7 @@ class JSONObjectWithFields(util.ImmutableMap,
         }
 
     def __init__(self, **kwargs: Any) -> None:
-        # pylint: disable=star-args
-        super().__init__(
-            **{**self._defaults(), **kwargs})
+        super().__init__(**{**self._defaults(), **kwargs})
 
     def encode(self, name: str) -> Any:
         """Encode a single field.
@@ -402,7 +397,7 @@ def decode_hex16(value: str, size: Optional[int] = None, minimum: bool = False) 
         raise errors.DeserializationError(error)
 
 
-def encode_cert(cert: josepy.util.ComparableX509) -> str:
+def encode_cert(cert: util.ComparableX509) -> str:
     """Encode certificate as JOSE Base-64 DER.
 
     :type cert: `OpenSSL.crypto.X509` wrapped in `.ComparableX509`
@@ -416,7 +411,7 @@ def encode_cert(cert: josepy.util.ComparableX509) -> str:
         crypto.FILETYPE_ASN1, cert.wrapped))
 
 
-def decode_cert(b64der: str) -> josepy.util.ComparableX509:
+def decode_cert(b64der: str) -> util.ComparableX509:
     """Decode JOSE Base-64 DER-encoded certificate.
 
     :param unicode b64der:
@@ -430,7 +425,7 @@ def decode_cert(b64der: str) -> josepy.util.ComparableX509:
         raise errors.DeserializationError(error)
 
 
-def encode_csr(csr: josepy.util.ComparableX509) -> str:
+def encode_csr(csr: util.ComparableX509) -> str:
     """Encode CSR as JOSE Base-64 DER.
 
     :type csr: `OpenSSL.crypto.X509Req` wrapped in `.ComparableX509`
@@ -444,7 +439,7 @@ def encode_csr(csr: josepy.util.ComparableX509) -> str:
         crypto.FILETYPE_ASN1, csr.wrapped))
 
 
-def decode_csr(b64der: str) -> josepy.util.ComparableX509:
+def decode_csr(b64der: str) -> util.ComparableX509:
     """Decode JOSE Base-64 DER-encoded CSR.
 
     :param unicode b64der:

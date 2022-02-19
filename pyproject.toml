@@ -78,7 +78,11 @@ disallow_untyped_defs = true
 
 [tool.pytest.ini_options]
 addopts = "-v --cov-report xml --cov-report=term-missing --cov=josepy --cov-config .coveragerc"
-filterwarnings = ["error"]
+filterwarnings = [
+    "error",
+    # We ignore our own deprecation warning about dropping Python 3.6 support.
+    "ignore:Python 3.6 support will be dropped:DeprecationWarning",
+]
 norecursedirs = "*.egg .eggs dist build docs .tox"
 
 # Isort tooling configuration

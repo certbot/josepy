@@ -12,10 +12,10 @@ RSA512_KEY = test_util.load_rsa_private_key('rsa512_key.pem')
 EC_P256_KEY = test_util.load_ec_private_key('ec_p256_key.pem')
 EC_P384_KEY = test_util.load_ec_private_key('ec_p384_key.pem')
 EC_P521_KEY = test_util.load_ec_private_key('ec_p521_key.pem')
-Ed25519_KEY = test_util.load_ec_private_key('ed25519_key.pem')
-Ed448_KEY = test_util.load_ec_private_key('ed448_key.pem')
-# X25519_KEY = test_util.load_ec_private_key('x25519_key.pem')
-# X448_KEY = test_util.load_ec_private_key('x448_key.pem')
+Ed25519_KEY = test_util.load_okp_private_key('ed25519_key.pem')
+Ed448_KEY = test_util.load_okp_private_key('ed448_key.pem')
+X25519_KEY = test_util.load_okp_private_key('x25519_key.pem')
+X448_KEY = test_util.load_okp_private_key('x448_key.pem')
 
 
 class JWKTest(unittest.TestCase):
@@ -331,7 +331,11 @@ AwEHoUQDQgAEGS5RvStca15z2FEanCM3juoX7tE/LB7iD44GWawGE40APAl/iZuH
         JWK.from_json(data)
 
 
-class JWKOKPTest(unittest.TestCase):
+class JWKOKPTestBase(unittest.TestCase):
+    pass
+
+
+class JWKOKPTest(JWKOKPTestBase):
     """Tests for josepy.jwk.JWKOKP."""
 
     thumbprint = (
@@ -405,7 +409,6 @@ MC4CAQAwBQYDK2VwBCIEIPIAha9VqyHHpY1GtEW8JXWqLU5mrPRhXPwJqCtL3bWZ
         ]):
             self.assertIsInstance(key.key, util.ComparableOKPKey)
 
-    @unittest.skip("Not passing")
     def test_load(self):
         from josepy.jwk import JWKOKP
         self.assertEqual(

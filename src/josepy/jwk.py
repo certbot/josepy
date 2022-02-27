@@ -20,6 +20,7 @@ import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 # TODO import with try/except as some curves may not be available
+# They do this in latchset/jwcrypto
 from cryptography.hazmat.primitives.asymmetric import (
     ec,
     ed448,
@@ -417,16 +418,16 @@ class JWKOKP(JWK):
 
     This class requires ``cryptography>=2.6`` to be installed.
     """
-    typ = 'OKP'
-    __slots__ = ('key',)
+    typ = "OKP"
+    __slots__ = ("key",)
     cryptography_key_types = (
         ed25519.Ed25519PrivateKey, ed25519.Ed25519PrivateKey,
         ed448.Ed448PublicKey, ed448.Ed448PrivateKey,
         x25519.X25519PrivateKey, x25519.X25519PublicKey,
         x448.X448PrivateKey, x448.X448PublicKey,
     )
-    required = ('crv', JWK.type_field_name, 'x')
-    okp_curve = collections.namedtuple('okp_curve', 'pubkey privkey')
+    required = ("crv", JWK.type_field_name, "x")
+    okp_curve = collections.namedtuple("okp_curve", "pubkey privkey")
     crv_to_pub_priv = {
         "Ed25519": okp_curve(pubkey=ed25519.Ed25519PublicKey, privkey=ed25519.Ed25519PrivateKey),
         "Ed448": okp_curve(pubkey=ed448.Ed448PublicKey, privkey=ed448.Ed448PrivateKey),
@@ -440,7 +441,7 @@ class JWKOKP(JWK):
         super().__init__(*args, **kwargs)
 
     def public_key(self) -> "JWKOKP":
-        return self.key._wrapped.__class__.public_key()
+        return self.key.__class__.public_key()
 
     def _key_to_crv(self) -> str:
         if isinstance(self.key._wrapped, (ed25519.Ed25519PublicKey, ed25519.Ed25519PrivateKey)):
@@ -459,21 +460,17 @@ class JWKOKP(JWK):
             "kty": "OKP",
         }
         if hasattr(self.key._wrapped, "private_bytes"):
-            params['d'] = json_util.encode_b64jose(self.key._wrapped.private_bytes(
+            params['d'] = json_util.encode_b64jose(self.key.private_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PrivateFormat.Raw,
-                encryption_algorithm=serialization.NoEncryption()
+                encryption_algorithm=serialization.NoEncryption(),
             ))
-            params['x'] = json_util.encode_b64jose(self.key._wrapped.public_key().public_bytes(
+            params['x'] = json_util.encode_b64jose(self.key.public_key().public_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PublicFormat.Raw,
             ))
-            print(json_util.encode_b64jose(self.key._wrapped.public_key().public_bytes(
-                encoding=serialization.Encoding.Raw,
-                format=serialization.PublicFormat.Raw,
-            )))
         else:
-            params['x'] = json_util.encode_b64jose(self.key._wrapped.public_bytes(
+            params['x'] = json_util.encode_b64jose(self.key.public_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PublicFormat.Raw,
             ))
@@ -488,7 +485,6 @@ class JWKOKP(JWK):
         if "x" not in jobj:
             raise errors.DeserializationError('OKP should have "x" parameter')
         x = json_util.decode_b64jose(jobj["x"])
-        print(x)
 
         try:
             if "d" not in jobj:  # public key

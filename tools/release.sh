@@ -135,6 +135,7 @@ pip install -U pip
 pip install \
   --no-cache-dir \
   --extra-index-url http://localhost:$PORT \
+  --constraint ../constraints.txt \
   josepy[tests]
 # stop local PyPI
 kill $!
@@ -150,10 +151,9 @@ fi
 mkdir kgs
 kgs="kgs/$version"
 pip freeze | tee $kgs
-pip install pytest
-echo testing josepy
-pytest --pyargs josepy
 cd ~-
+echo testing josepy
+pytest
 deactivate
 
 git commit --gpg-sign="$RELEASE_GPG_KEY" -m "Release $version"

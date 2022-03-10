@@ -4,6 +4,8 @@ Changelog
 1.14.0 (master)
 ---------------
 
+* Dropped support for Python 3.6.
+
 1.13.0 (2022-03-10)
 -------------------
 

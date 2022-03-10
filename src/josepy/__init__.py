@@ -25,9 +25,6 @@ Originally developed as part of the ACME_ protocol implementation.
 .. _ACME: https://pypi.python.org/pypi/acme
 
 """
-import sys
-import warnings
-
 # flake8: noqa
 from josepy.b64 import b64decode, b64encode
 from josepy.errors import (
@@ -75,10 +72,3 @@ from josepy.util import (
     ComparableX509,
     ImmutableMap,
 )
-
-if sys.version_info[:2] == (3, 6):
-    warnings.warn(
-            "Python 3.6 support will be dropped in the next release of "
-            "josepy. Please upgrade your Python version.",
-            DeprecationWarning,
-    )

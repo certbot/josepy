@@ -28,6 +28,12 @@ classifiers = [
 homepage = "https://github.com/certbot/josepy"
 authors = ["Certbot Project <certbot-dev@eff.org>"]
 readme = "README.rst"
+include = [
+    "CHANGELOG.rst",
+    "CONTRIBUTING.md",
+    ".coveragerc", "pytest.ini", "tox.ini",
+    "docs", "tests",
+]
 
 [tool.poetry.dependencies]
 python = "^3.6"

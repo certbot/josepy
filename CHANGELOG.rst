@@ -4,9 +4,6 @@ Changelog
 1.13.0 (master)
 ---------------
 
-* Support for Python 3.6 has been deprecated and will be removed in the next
-  scheduled release.
-
 1.12.0 (2022-01-11)
 -------------------
 

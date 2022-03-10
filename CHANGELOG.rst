@@ -1,11 +1,17 @@
 Changelog
 =========
 
-1.13.0 (master)
+1.14.0 (master)
 ---------------
+
+* Dropped support for Python 3.6.
+
+1.13.0 (2022-03-10)
+-------------------
 
 * Support for Python 3.6 has been deprecated and will be removed in the next
   scheduled release.
+* Corrected some type annotations.
 
 1.12.0 (2022-01-11)
 -------------------

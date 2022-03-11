@@ -107,6 +107,7 @@ done
 
 mkdir "dist.$version"
 mv dist "dist.$version/josepy"
+poetry export -f requirements.txt > "dist.$version/constraints.txt"
 
 echo "Testing packages"
 cd "dist.$version"
@@ -125,6 +126,7 @@ pip install -U pip
 pip install \
   --no-cache-dir \
   --extra-index-url http://localhost:$PORT \
+  --constraints constraints.txt \
   josepy
 # stop local PyPI
 kill $!
@@ -140,7 +142,7 @@ fi
 mkdir kgs
 kgs="kgs/$version"
 pip freeze | tee $kgs
-pip install pytest pytest-cov
+pip install pytest
 cd ~-
 echo testing josepy
 pytest

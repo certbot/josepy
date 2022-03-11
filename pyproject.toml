@@ -17,7 +17,6 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -35,7 +34,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 # load_pem_private/public_key (>=0.6)
 # rsa_recover_prime_factors (>=0.8)
 # add sign() and verify() to asymetric keys (RSA >=1.4, ECDSA >=1.5)

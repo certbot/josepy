@@ -81,11 +81,7 @@ disallow_untyped_defs = true
 # Pytest tooling configuration
 
 [tool.pytest.ini_options]
-filterwarnings = [
-    "error",
-    # We ignore our own deprecation warning about dropping Python 3.6 support.
-    "ignore:Python 3.6 support will be dropped:DeprecationWarning",
-]
+filterwarnings = ["error"]
 norecursedirs = "*.egg .eggs dist build docs .tox"
 
 # Isort tooling configuration

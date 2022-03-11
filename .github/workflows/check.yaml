@@ -51,6 +51,18 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true
+  external:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install josepy + pytest
+        run: pip install .[docs] pytest
+      - name: Run tests
+        run: pytest tests
   notify:
     # Only notify about failed builds, do not notify about failed builds for
     # PRs, and only notify about failed pushes to master.

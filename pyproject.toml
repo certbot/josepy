@@ -82,7 +82,6 @@ disallow_untyped_defs = true
 # Pytest tooling configuration
 
 [tool.pytest.ini_options]
-addopts = "-v --cov-report xml --cov-report=term-missing --cov=josepy"
 filterwarnings = [
     "error",
     # We ignore our own deprecation warning about dropping Python 3.6 support.

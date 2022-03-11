@@ -67,7 +67,7 @@ jobs:
     # Only notify about failed builds, do not notify about failed builds for
     # PRs, and only notify about failed pushes to master.
     if: ${{ failure() && github.event_name != 'pull_request' && (github.event_name != 'push' || github.ref == 'refs/heads/master') }}
-    needs: build
+    needs: [build, external]
     runs-on: ubuntu-20.04
     steps:
       - name: Write Mattermost Message

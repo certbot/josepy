@@ -126,7 +126,7 @@ pip install -U pip
 pip install \
   --no-cache-dir \
   --extra-index-url http://localhost:$PORT \
-  --constraints constraints.txt \
+  --constraint constraints.txt \
   josepy
 # stop local PyPI
 kill $!

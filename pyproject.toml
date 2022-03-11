@@ -31,7 +31,6 @@ readme = "README.rst"
 include = [
     "CHANGELOG.rst",
     "CONTRIBUTING.md",
-    ".coveragerc", "pytest.ini", "tox.ini",
     "docs", "tests",
 ]
 

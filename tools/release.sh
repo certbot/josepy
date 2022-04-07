@@ -107,7 +107,7 @@ done
 
 mkdir "dist.$version"
 mv dist "dist.$version/josepy"
-poetry export -f requirements.txt > "dist.$version/constraints.txt"
+poetry export -f requirements.txt > constraints.txt
 
 echo "Testing packages"
 cd "dist.$version"
@@ -126,7 +126,7 @@ pip install -U pip
 pip install \
   --no-cache-dir \
   --extra-index-url http://localhost:$PORT \
-  --constraint constraints.txt \
+  --constraint ../constraints.txt \
   josepy
 # stop local PyPI
 kill $!

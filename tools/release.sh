@@ -107,7 +107,7 @@ done
 
 mkdir "dist.$version"
 mv dist "dist.$version/josepy"
-poetry export -f requirements.txt --dev > constraints.txt
+poetry export -f requirements.txt --dev --without-hashes > constraints.txt
 
 echo "Testing packages"
 cd "dist.$version"

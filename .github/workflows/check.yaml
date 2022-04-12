@@ -51,8 +51,8 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true
-    # This job runs our tests like external parties such as packagers.
-    external:
+  # This job runs our tests like external parties such as packagers.
+  external:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

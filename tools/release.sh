@@ -107,7 +107,7 @@ done
 
 mkdir "dist.$version"
 mv dist "dist.$version/josepy"
-poetry export -f requirements.txt > constraints.txt
+poetry export -f requirements.txt --dev > constraints.txt
 
 echo "Testing packages"
 cd "dist.$version"
@@ -142,7 +142,7 @@ fi
 mkdir kgs
 kgs="kgs/$version"
 pip freeze | tee $kgs
-pip install pytest
+pip install pytest --constraint ../constraints.txt
 cd ~-
 echo testing josepy
 pytest

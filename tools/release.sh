@@ -127,7 +127,7 @@ pip install \
   --no-cache-dir \
   --extra-index-url http://localhost:$PORT \
   --constraint ../constraints.txt \
-  josepy
+  josepy pytest
 # stop local PyPI
 kill $!
 cd ~-
@@ -142,7 +142,6 @@ fi
 mkdir kgs
 kgs="kgs/$version"
 pip freeze | tee $kgs
-pip install pytest --constraint ../constraints.txt
 cd ~-
 echo testing josepy
 pytest

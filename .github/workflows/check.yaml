@@ -27,16 +27,16 @@ jobs:
       - name: Cache Dependencies
         uses: actions/cache@v2
         with:
-          path: ~/.cache/pip
-          # Look to see if there is a cache hit for the corresponding requirements file
-          key: ${{ runner.os }}-pip-${{ hashFiles('constraints.txt') }}
+          path: ~/.cache/pypoetry
+          # Look to see if there is a cache hit for the corresponding lock file
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-poetry-
             ${{ runner.os }}-
-      - name: Install Dependencies
-        run: pip install -r constraints.txt
+      - name: Install Poetry & Tox
+        run: pip install poetry>1.0.0 tox>3.3.0
       # TEST
-      - name: Run Tox
+      - name: Run pytest and coverage
         run: tox -e py
       # STATIC CHECK
       - name: Run mypy
@@ -47,17 +47,28 @@ jobs:
           tox -e flake8
           tox -e isort
       # COVERAGE
-      - name: Convert Coverage
-        run: python -m coverage xml
-      - name: Upload Coverage
+      - name: Upload coverage
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true
+  # This job runs our tests like external parties such as packagers.
+  external:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install josepy + pytest
+        run: pip install .[docs] pytest
+      - name: Run tests
+        run: pytest tests
   notify:
     # Only notify about failed builds, do not notify about failed builds for
     # PRs, and only notify about failed pushes to master.
     if: ${{ failure() && github.event_name != 'pull_request' && (github.event_name != 'push' || github.ref == 'refs/heads/master') }}
-    needs: build
+    needs: [build, external]
     runs-on: ubuntu-20.04
     steps:
       - name: Write Mattermost Message

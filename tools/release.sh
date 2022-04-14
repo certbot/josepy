@@ -12,6 +12,11 @@ if [ "`dirname $0`" != "tools" ] ; then
     exit 1
 fi
 
+if ! poetry --version >> /dev/null 2>&1 ; then
+    echo Please install poetry before running this script
+    exit 1
+fi
+
 if [ "$1" != "--changelog-ok" ]; then
     # turn off set -x for saner output
     set +x
@@ -65,18 +70,6 @@ tag="v$version"
 mv "dist.$version" "dist.$version.$(date +%s).bak" || true
 git tag --delete "$tag" || true
 
-tmpvenv=$(mktemp -d)
-python3 -m venv "$tmpvenv"
-. $tmpvenv/bin/activate
-# update setuptools/pip just like in other places in the repo
-pip install -U setuptools
-pip install -U pip  # latest pip => no --pre for dev releases
-pip install -U wheel  # setup.py bdist_wheel
-
-# newer versions of virtualenv inherit setuptools/pip/wheel versions
-# from current env when creating a child env
-pip install -U virtualenv
-
 root_without_jose="$version.$$"
 root="./releases/jose.$root_without_jose"
 
@@ -94,7 +87,7 @@ SetVersion() {
     short_ver=$(echo "$ver" | cut -d. -f1,2)
     sed -i "s/^release.*/release = u'$ver'/" docs/conf.py
     sed -i "s/^version.*/version = u'$short_ver'/" docs/conf.py
-    sed -i "s/^version.*/version = '$ver'/" setup.py
+    poetry version "$ver"
 
     # interactive user input
     git add -p .
@@ -104,10 +97,7 @@ SetVersion() {
 SetVersion "$version"
 
 echo "Preparing sdists and wheels"
-python setup.py clean
-rm -rf build dist
-python setup.py sdist
-python setup.py bdist_wheel
+poetry build
 
 echo "Signing josepy"
 for x in dist/*.tar.gz dist/*.whl
@@ -117,6 +107,7 @@ done
 
 mkdir "dist.$version"
 mv dist "dist.$version/josepy"
+poetry export -f requirements.txt --dev --without-hashes > constraints.txt
 
 echo "Testing packages"
 cd "dist.$version"
@@ -124,7 +115,7 @@ cd "dist.$version"
 python -m http.server "$PORT" &
 # cd .. is NOT done on purpose: we make sure that all subpackages are
 # installed from local PyPI rather than current directory (repo root)
-virtualenv ../venv
+python -m venv ../venv
 . ../venv/bin/activate
 pip install -U setuptools
 pip install -U pip
@@ -136,7 +127,7 @@ pip install \
   --no-cache-dir \
   --extra-index-url http://localhost:$PORT \
   --constraint ../constraints.txt \
-  josepy[tests]
+  josepy pytest
 # stop local PyPI
 kill $!
 cd ~-

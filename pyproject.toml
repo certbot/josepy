@@ -60,6 +60,7 @@ types-setuptools = "*"
 pytest = ">=2.8.0"
 pytest-cov = "*"
 tox = "*"
+twine = "*"
 
 [tool.poetry.extras]
 docs = [

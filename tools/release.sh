@@ -112,10 +112,10 @@ poetry export -f requirements.txt --dev --without-hashes > constraints.txt
 echo "Testing packages"
 cd "dist.$version"
 # start local PyPI
-python -m http.server "$PORT" &
+python3 -m http.server "$PORT" &
 # cd .. is NOT done on purpose: we make sure that all subpackages are
 # installed from local PyPI rather than current directory (repo root)
-python -m venv ../venv
+python3 -m venv ../venv
 . ../venv/bin/activate
 pip install -U setuptools
 pip install -U pip

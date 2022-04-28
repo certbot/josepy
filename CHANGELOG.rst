@@ -5,7 +5,8 @@ Changelog
 ---------------
 
 * Dropped support for Python 3.6.
-* Add new valid signing key with fingerprint F2871B4152AE13C49519111F447BF683AA3B26C3
+* Added a new valid PGP key for signing our PyPI packages with the fingerprint
+  F2871B4152AE13C49519111F447BF683AA3B26C3
 
 1.13.0 (2022-03-10)
 -------------------

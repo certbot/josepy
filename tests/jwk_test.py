@@ -14,8 +14,9 @@ EC_P384_KEY = test_util.load_ec_private_key('ec_p384_key.pem')
 EC_P521_KEY = test_util.load_ec_private_key('ec_p521_key.pem')
 Ed25519_KEY = test_util.load_okp_private_key('ed25519_key.pem')
 Ed448_KEY = test_util.load_okp_private_key('ed448_key.pem')
-X25519_KEY = test_util.load_okp_private_key('x25519_key.pem')
-X448_KEY = test_util.load_okp_private_key('x448_key.pem')
+# Not implemented on my machine locally, and just cause barf from OpenSSL
+# X25519_KEY = test_util.load_okp_private_key('x25519_key.pem')
+# X448_KEY = test_util.load_okp_private_key('x448_key.pem')
 
 
 class JWKTest(unittest.TestCase):

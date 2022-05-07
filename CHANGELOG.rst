@@ -1,13 +1,24 @@
 Changelog
 =========
 
-1.13.0 (master)
+1.14.0 (master)
 ---------------
 * Added support for Ed25519, Ed448, X25519 and X448 keys (see `RFC 8037 <https://tools.ietf.org/html/rfc8037>`_).
   These are also known as Bernstein curves.
 * Added support for signing with Ed25519, Ed448, X25519 and X448 keys
   (see `RFC 8032 <https://datatracker.ietf.org/doc/html/rfc8032>`_). See JWA.
 * Minimum requirement of ``cryptography`` is now 2.6+.
+
+* Dropped support for Python 3.6.
+* Added a new valid PGP key for signing our PyPI packages with the fingerprint
+  F2871B4152AE13C49519111F447BF683AA3B26C3
+
+1.13.0 (2022-03-10)
+-------------------
+
+* Support for Python 3.6 has been deprecated and will be removed in the next
+  scheduled release.
+* Corrected some type annotations.
 
 1.12.0 (2022-01-11)
 -------------------

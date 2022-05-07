@@ -12,6 +12,11 @@ if [ "`dirname $0`" != "tools" ] ; then
     exit 1
 fi
 
+if ! poetry --version >> /dev/null 2>&1 ; then
+    echo Please install poetry before running this script
+    exit 1
+fi
+
 if [ "$1" != "--changelog-ok" ]; then
     # turn off set -x for saner output
     set +x
@@ -42,6 +47,7 @@ if [ "$RELEASE_GPG_KEY" = "" ]; then
         BF6BCFC89E90747B9A680FD7B6029E8500F7DB16
         86379B4F0AF371B50CD9E5FF3402831161D1D280
         20F201346BF8F3F455A73F9A780CC99432A28621
+        F2871B4152AE13C49519111F447BF683AA3B26C3
     "
     for key in $TRUSTED_KEYS; do
         if gpg2 --with-colons --card-status | grep -q "$key"; then
@@ -65,18 +71,6 @@ tag="v$version"
 mv "dist.$version" "dist.$version.$(date +%s).bak" || true
 git tag --delete "$tag" || true
 
-tmpvenv=$(mktemp -d)
-python3 -m venv "$tmpvenv"
-. $tmpvenv/bin/activate
-# update setuptools/pip just like in other places in the repo
-pip install -U setuptools
-pip install -U pip  # latest pip => no --pre for dev releases
-pip install -U wheel  # setup.py bdist_wheel
-
-# newer versions of virtualenv inherit setuptools/pip/wheel versions
-# from current env when creating a child env
-pip install -U virtualenv
-
 root_without_jose="$version.$$"
 root="./releases/jose.$root_without_jose"
 
@@ -94,7 +88,7 @@ SetVersion() {
     short_ver=$(echo "$ver" | cut -d. -f1,2)
     sed -i "s/^release.*/release = u'$ver'/" docs/conf.py
     sed -i "s/^version.*/version = u'$short_ver'/" docs/conf.py
-    sed -i "s/^version.*/version = '$ver'/" setup.py
+    poetry version "$ver"
 
     # interactive user input
     git add -p .
@@ -104,10 +98,7 @@ SetVersion() {
 SetVersion "$version"
 
 echo "Preparing sdists and wheels"
-python setup.py clean
-rm -rf build dist
-python setup.py sdist
-python setup.py bdist_wheel
+poetry build
 
 echo "Signing josepy"
 for x in dist/*.tar.gz dist/*.whl
@@ -117,14 +108,15 @@ done
 
 mkdir "dist.$version"
 mv dist "dist.$version/josepy"
+poetry export -f requirements.txt --dev --without-hashes > constraints.txt
 
 echo "Testing packages"
 cd "dist.$version"
 # start local PyPI
-python -m http.server "$PORT" &
+python3 -m http.server "$PORT" &
 # cd .. is NOT done on purpose: we make sure that all subpackages are
 # installed from local PyPI rather than current directory (repo root)
-virtualenv ../venv
+python3 -m venv ../venv
 . ../venv/bin/activate
 pip install -U setuptools
 pip install -U pip
@@ -135,7 +127,8 @@ pip install -U pip
 pip install \
   --no-cache-dir \
   --extra-index-url http://localhost:$PORT \
-  josepy[tests]
+  --constraint ../constraints.txt \
+  josepy pytest
 # stop local PyPI
 kill $!
 cd ~-
@@ -150,10 +143,9 @@ fi
 mkdir kgs
 kgs="kgs/$version"
 pip freeze | tee $kgs
-pip install pytest
-echo testing josepy
-pytest --pyargs josepy
 cd ~-
+echo testing josepy
+pytest
 deactivate
 
 git commit --gpg-sign="$RELEASE_GPG_KEY" -m "Release $version"

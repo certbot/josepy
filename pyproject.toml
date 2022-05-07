@@ -1,0 +1,111 @@
+# PEP-517 build
+
+[build-system]
+requires = ["poetry_core>=1.0.8"]
+build-backend = "poetry.core.masonry.api"
+
+# Poetry tooling configuration
+
+[tool.poetry]
+name = "josepy"
+version = "1.14.0.dev0"
+description = "JOSE protocol implementation in Python"
+license = "Apache License 2.0"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Internet :: WWW/HTTP", 
+    "Topic :: Security",
+]
+homepage = "https://github.com/certbot/josepy"
+authors = ["Certbot Project <certbot-dev@eff.org>"]
+readme = "README.rst"
+include = [
+    "CHANGELOG.rst",
+    "CONTRIBUTING.md",
+    "docs", "tests",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+# load_pem_private/public_key (>=0.6)
+# rsa_recover_prime_factors (>=0.8)
+# add sign() and verify() to asymetric keys (RSA >=1.4, ECDSA >=1.5)
+cryptography = ">=1.5"
+# Connection.set_tlsext_host_name (>=0.13)
+pyopenssl = ">=0.13"
+# For pkg_resources. >=1.0 so pip resolves it to a version cryptography
+# will tolerate; see #2599:
+setuptools = ">=1.0"
+sphinx = {version = ">=1.0", optional = true}  # autodoc_member_order = 'bysource', autodoc_default_flags
+sphinx-rtd-theme = {version = ">=1.0", optional = true}
+
+[tool.poetry.dev-dependencies]
+# coverage[toml] extra is required to read the coverage config from pyproject.toml
+coverage = {version = ">=4.0", extras = ["toml"]}
+flake8 = "*"
+isort = "*"
+mypy = "*"
+types-pyOpenSSL = "*"
+types-pyRFC3339 = "*"
+types-requests = "*"
+types-setuptools = "*"
+pytest = ">=2.8.0"
+pytest-cov = "*"
+tox = "*"
+twine = "*"
+
+[tool.poetry.extras]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
+]
+
+[tool.poetry.scripts]
+jws = "josepy.jws:CLI.run"
+
+# Mypy tooling configuration
+
+[tool.mypy]
+ignore_missing_imports = true
+warn_unused_ignores = true
+show_error_codes = true
+disallow_untyped_defs = true
+
+# Pytest tooling configuration
+
+[tool.pytest.ini_options]
+filterwarnings = ["error"]
+norecursedirs = "*.egg .eggs dist build docs .tox"
+
+# Isort tooling configuration
+
+[tool.isort]
+combine_as_imports = false
+default_section = "THIRDPARTY"
+include_trailing_comma = true
+known_first_party = "josepy"
+line_length = 79
+multi_line_output = 3
+
+# Coverage tooling configuration
+
+[tool.coverage.run]
+branch = true
+source = ["josepy"]
+
+[tool.coverage.paths]
+source = [
+   ".tox/*/lib/python*/site-packages/josepy",
+   ".tox/pypy*/site-packages/josepy",
+]
+
+[tool.coverage.report]
+show_missing = true

@@ -3,17 +3,17 @@ import unittest
 
 # https://en.wikipedia.org/wiki/Base64#Examples
 B64_PADDING_EXAMPLES = {
-    b'any carnal pleasure.': (b'YW55IGNhcm5hbCBwbGVhc3VyZS4', b'='),
-    b'any carnal pleasure': (b'YW55IGNhcm5hbCBwbGVhc3VyZQ', b'=='),
-    b'any carnal pleasur': (b'YW55IGNhcm5hbCBwbGVhc3Vy', b''),
-    b'any carnal pleasu': (b'YW55IGNhcm5hbCBwbGVhc3U', b'='),
-    b'any carnal pleas': (b'YW55IGNhcm5hbCBwbGVhcw', b'=='),
+    b"any carnal pleasure.": (b"YW55IGNhcm5hbCBwbGVhc3VyZS4", b"="),
+    b"any carnal pleasure": (b"YW55IGNhcm5hbCBwbGVhc3VyZQ", b"=="),
+    b"any carnal pleasur": (b"YW55IGNhcm5hbCBwbGVhc3Vy", b""),
+    b"any carnal pleasu": (b"YW55IGNhcm5hbCBwbGVhc3U", b"="),
+    b"any carnal pleas": (b"YW55IGNhcm5hbCBwbGVhcw", b"=="),
 }
 
 
 B64_URL_UNSAFE_EXAMPLES = {
-    bytes((251, 239)): b'--8',
-    bytes((255,)) * 2: b'__8',
+    bytes((251, 239)): b"--8",
+    bytes((255,)) * 2: b"__8",
 }
 
 
@@ -23,10 +23,11 @@ class B64EncodeTest(unittest.TestCase):
     @classmethod
     def _call(cls, data):
         from josepy.b64 import b64encode
+
         return b64encode(data)
 
     def test_empty(self):
-        self.assertEqual(self._call(b''), b'')
+        self.assertEqual(self._call(b""), b"")
 
     def test_unsafe_url(self):
         for text, b64 in B64_URL_UNSAFE_EXAMPLES.items():
@@ -37,7 +38,7 @@ class B64EncodeTest(unittest.TestCase):
             self.assertEqual(self._call(text), b64)
 
     def test_unicode_fails_with_type_error(self):
-        self.assertRaises(TypeError, self._call, u'some unicode')
+        self.assertRaises(TypeError, self._call, "some unicode")
 
 
 class B64DecodeTest(unittest.TestCase):
@@ -46,6 +47,7 @@ class B64DecodeTest(unittest.TestCase):
     @classmethod
     def _call(cls, data):
         from josepy.b64 import b64decode
+
         return b64decode(data)
 
     def test_unsafe_url(self):
@@ -61,14 +63,14 @@ class B64DecodeTest(unittest.TestCase):
             self.assertEqual(self._call(b64 + pad), text)
 
     def test_unicode_with_ascii(self):
-        self.assertEqual(self._call(u'YQ'), b'a')
+        self.assertEqual(self._call("YQ"), b"a")
 
     def test_non_ascii_unicode_fails(self):
-        self.assertRaises(ValueError, self._call, u'\u0105')
+        self.assertRaises(ValueError, self._call, "\u0105")
 
     def test_type_error_no_unicode_or_bytes(self):
         self.assertRaises(TypeError, self._call, object())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()  # pragma: no cover

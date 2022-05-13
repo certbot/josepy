@@ -24,8 +24,7 @@ class ComparableX509:
     """
 
     def __init__(self, wrapped: Union[crypto.X509, crypto.X509Req]) -> None:
-        assert isinstance(wrapped, crypto.X509) or isinstance(
-            wrapped, crypto.X509Req)
+        assert isinstance(wrapped, crypto.X509) or isinstance(wrapped, crypto.X509Req)
         self.wrapped = wrapped
 
     def __getattr__(self, name: str) -> Any:
@@ -58,7 +57,7 @@ class ComparableX509:
         return hash((self.__class__, self._dump()))
 
     def __repr__(self) -> str:
-        return '<{0}({1!r})>'.format(self.__class__.__name__, self.wrapped)
+        return "<{0}({1!r})>".format(self.__class__.__name__, self.wrapped)
 
 
 class ComparableKey:
@@ -67,37 +66,45 @@ class ComparableKey:
     See https://github.com/pyca/cryptography/issues/2122.
 
     """
+
     __hash__: Callable[[], int] = NotImplemented
 
-    def __init__(self,
-                 wrapped: Union[
-                     rsa.RSAPrivateKeyWithSerialization,
-                     rsa.RSAPublicKeyWithSerialization,
-                     ec.EllipticCurvePrivateKeyWithSerialization,
-                     ec.EllipticCurvePublicKeyWithSerialization]):
+    def __init__(
+        self,
+        wrapped: Union[
+            rsa.RSAPrivateKeyWithSerialization,
+            rsa.RSAPublicKeyWithSerialization,
+            ec.EllipticCurvePrivateKeyWithSerialization,
+            ec.EllipticCurvePublicKeyWithSerialization,
+        ],
+    ):
         self._wrapped = wrapped
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self._wrapped, name)
 
     def __eq__(self, other: Any) -> bool:
-        if (not isinstance(other, self.__class__) or
-                self._wrapped.__class__ is not other._wrapped.__class__):
+        if (
+            not isinstance(other, self.__class__)
+            or self._wrapped.__class__ is not other._wrapped.__class__
+        ):
             return NotImplemented
-        elif hasattr(self._wrapped, 'private_numbers'):
+        elif hasattr(self._wrapped, "private_numbers"):
             return self.private_numbers() == other.private_numbers()
-        elif hasattr(self._wrapped, 'public_numbers'):
+        elif hasattr(self._wrapped, "public_numbers"):
             return self.public_numbers() == other.public_numbers()
         else:
             return NotImplemented
 
     def __repr__(self) -> str:
-        return '<{0}({1!r})>'.format(self.__class__.__name__, self._wrapped)
+        return "<{0}({1!r})>".format(self.__class__.__name__, self._wrapped)
 
-    def public_key(self) -> 'ComparableKey':
+    def public_key(self) -> "ComparableKey":
         """Get wrapped public key."""
-        if isinstance(self._wrapped, (rsa.RSAPublicKeyWithSerialization,
-                                      ec.EllipticCurvePublicKeyWithSerialization)):
+        if isinstance(
+            self._wrapped,
+            (rsa.RSAPublicKeyWithSerialization, ec.EllipticCurvePublicKeyWithSerialization),
+        ):
             return self
 
         return self.__class__(self._wrapped.public_key())
@@ -119,8 +126,9 @@ class ComparableRSAKey(ComparableKey):
         if isinstance(self._wrapped, rsa.RSAPrivateKeyWithSerialization):
             priv = self.private_numbers()
             pub = priv.public_numbers
-            return hash((self.__class__, priv.p, priv.q, priv.dmp1,
-                         priv.dmq1, priv.iqmp, pub.n, pub.e))
+            return hash(
+                (self.__class__, priv.p, priv.q, priv.dmp1, priv.dmq1, priv.iqmp, pub.n, pub.e)
+            )
         elif isinstance(self._wrapped, rsa.RSAPublicKeyWithSerialization):
             pub = self.public_numbers()
             return hash((self.__class__, pub.n, pub.e))
@@ -149,7 +157,7 @@ class ComparableECKey(ComparableKey):
         raise NotImplementedError()
 
 
-GenericImmutableMap = TypeVar('GenericImmutableMap', bound='ImmutableMap')
+GenericImmutableMap = TypeVar("GenericImmutableMap", bound="ImmutableMap")
 
 
 class ImmutableMap(Mapping, Hashable):
@@ -161,9 +169,11 @@ class ImmutableMap(Mapping, Hashable):
     def __init__(self, **kwargs: Any) -> None:
         if set(kwargs) != set(self.__slots__):
             raise TypeError(
-                '__init__() takes exactly the following arguments: {0} '
-                '({1} given)'.format(', '.join(self.__slots__),
-                                     ', '.join(kwargs) if kwargs else 'none'))
+                "__init__() takes exactly the following arguments: {0} "
+                "({1} given)".format(
+                    ", ".join(self.__slots__), ", ".join(kwargs) if kwargs else "none"
+                )
+            )
         for slot in self.__slots__:
             object.__setattr__(self, slot, kwargs.pop(slot))
 
@@ -191,14 +201,16 @@ class ImmutableMap(Mapping, Hashable):
         raise AttributeError("can't set attribute")
 
     def __repr__(self) -> str:
-        return '{0}({1})'.format(self.__class__.__name__, ', '.join(
-            '{0}={1!r}'.format(key, value)
-            for key, value in self.items()))
+        return "{0}({1})".format(
+            self.__class__.__name__,
+            ", ".join("{0}={1!r}".format(key, value) for key, value in self.items()),
+        )
 
 
 class frozendict(Mapping, Hashable):
     """Frozen dictionary."""
-    __slots__ = ('_items', '_keys')
+
+    __slots__ = ("_items", "_keys")
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         items: Mapping
@@ -210,8 +222,8 @@ class frozendict(Mapping, Hashable):
             raise TypeError()
         # TODO: support generators/iterators
 
-        object.__setattr__(self, '_items', items)
-        object.__setattr__(self, '_keys', tuple(sorted(items.keys())))
+        object.__setattr__(self, "_items", items)
+        object.__setattr__(self, "_keys", tuple(sorted(items.keys())))
 
     def __getitem__(self, key: str) -> Any:
         return self._items[key]
@@ -238,8 +250,9 @@ class frozendict(Mapping, Hashable):
         raise AttributeError("can't set attribute")
 
     def __repr__(self) -> str:
-        return 'frozendict({0})'.format(', '.join('{0}={1!r}'.format(
-            key, value) for key, value in self._sorted_items()))
+        return "frozendict({0})".format(
+            ", ".join("{0}={1!r}".format(key, value) for key, value in self._sorted_items())
+        )
 
 
 # This class takes a similar approach to the cryptography project to deprecate attributes
@@ -250,15 +263,19 @@ class _UtilDeprecationModule:
     Internal class delegating to a module, and displaying warnings when attributes
     related to the deprecated "abstractclassmethod" attributes in the josepy.util module.
     """
+
     def __init__(self, module: ModuleType) -> None:
-        self.__dict__['_module'] = module
+        self.__dict__["_module"] = module
 
     def __getattr__(self, attr: str) -> Any:
-        if attr == 'abstractclassmethod':
-            warnings.warn('The abstractclassmethod attribute in josepy.util is deprecated and will '
-                          'be removed soon. Please use the built-in decorators @classmethod and '
-                          '@abc.abstractmethod together instead.',
-                          DeprecationWarning, stacklevel=2)
+        if attr == "abstractclassmethod":
+            warnings.warn(
+                "The abstractclassmethod attribute in josepy.util is deprecated and will "
+                "be removed soon. Please use the built-in decorators @classmethod and "
+                "@abc.abstractmethod together instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
         return getattr(self._module, attr)
 
     def __setattr__(self, attr: str, value: Any) -> None:  # pragma: no cover
@@ -268,7 +285,7 @@ class _UtilDeprecationModule:
         delattr(self._module, attr)
 
     def __dir__(self) -> List[str]:  # pragma: no cover
-        return ['_module'] + dir(self._module)
+        return ["_module"] + dir(self._module)
 
 
 # Patching ourselves to warn about deprecation and planned removal of some elements in the module.

@@ -27,8 +27,8 @@ def b64encode(data: bytes) -> bytes:
 
     """
     if not isinstance(data, bytes):
-        raise TypeError('argument should be bytes')
-    return base64.urlsafe_b64encode(data).rstrip(b'=')
+        raise TypeError("argument should be bytes")
+    return base64.urlsafe_b64encode(data).rstrip(b"=")
 
 
 def b64decode(data: Union[bytes, str]) -> bytes:
@@ -47,11 +47,10 @@ def b64decode(data: Union[bytes, str]) -> bytes:
     """
     if isinstance(data, str):
         try:
-            data = data.encode('ascii')
+            data = data.encode("ascii")
         except UnicodeEncodeError:
-            raise ValueError(
-                'unicode argument should contain only ASCII characters')
+            raise ValueError("unicode argument should contain only ASCII characters")
     elif not isinstance(data, bytes):
-        raise TypeError('argument should be a str or unicode')
+        raise TypeError("argument should be a str or unicode")
 
-    return base64.urlsafe_b64decode(data + b'=' * (4 - (len(data) % 4)))
+    return base64.urlsafe_b64decode(data + b"=" * (4 - (len(data) % 4)))

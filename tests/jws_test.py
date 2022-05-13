@@ -200,7 +200,7 @@ class CLITest(unittest.TestCase):
         with mock.patch('sys.stdin') as sin:
             sin.read.return_value = '{"payload": "foo", "signature": "xxx"}'
             with mock.patch('sys.stdout'):
-                self.assertEqual(False, CLI.run(['verify']))
+                self.assertIs(CLI.run(['verify']), False)
 
     def test_json(self):
         from josepy.jws import CLI

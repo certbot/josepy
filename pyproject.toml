@@ -51,6 +51,7 @@ sphinx-rtd-theme = {version = ">=1.0", optional = true}
 # coverage[toml] extra is required to read the coverage config from pyproject.toml
 coverage = {version = ">=4.0", extras = ["toml"]}
 flake8 = "*"
+flake8-assertive = "*"
 isort = "*"
 mypy = "*"
 types-pyOpenSSL = "*"

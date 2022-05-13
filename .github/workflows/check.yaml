@@ -42,10 +42,9 @@ jobs:
       - name: Run mypy
         run: tox -e mypy
       # LINTING
-      - name: Run flake8 and isort
+      - name: Run flake8, isort and black
         run:
-          tox -e flake8
-          tox -e isort
+          tox -e flake8 isort black
       # COVERAGE
       - name: Upload coverage
         uses: codecov/codecov-action@v2

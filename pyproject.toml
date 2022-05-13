@@ -72,6 +72,12 @@ docs = [
 [tool.poetry.scripts]
 jws = "josepy.jws:CLI.run"
 
+# Black code style configuration
+
+[tool.black]
+line-length = 100
+target-version = ["py38"]
+
 # Mypy tooling configuration
 
 [tool.mypy]

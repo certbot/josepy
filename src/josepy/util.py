@@ -129,7 +129,7 @@ class ComparableRSAKey(ComparableKey):
 
 
 class ComparableECKey(ComparableKey):
-    """Wrapper for ``cryptography`` RSA keys.
+    """Wrapper for ``cryptography`` EC keys.
     Wraps around:
     - :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePrivateKey`
     - :class:`~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurvePublicKey`

@@ -111,7 +111,7 @@ done
 
 mkdir "dist.$version"
 mv dist "dist.$version/josepy"
-poetry export -f constraints.txt --dev --without-hashes > constraints.txt
+poetry export -f constraints.txt --with dev --without-hashes > constraints.txt
 
 echo "Testing packages"
 cd "dist.$version"

@@ -12,8 +12,11 @@ if [ "`dirname $0`" != "tools" ] ; then
     exit 1
 fi
 
-if ! poetry --version >> /dev/null 2>&1 ; then
-    echo Please install poetry before running this script
+if ! poetry export --help 2>&1 | grep -q constraints.txt ; then
+    # turn off set -x for saner output
+    set +x
+    echo 'Please install poetry with poetry-plugin-export>=1.1.0'
+    echo 'before running this script.'
     exit 1
 fi
 
@@ -108,7 +111,7 @@ done
 
 mkdir "dist.$version"
 mv dist "dist.$version/josepy"
-poetry export -f requirements.txt --dev --without-hashes > constraints.txt
+poetry export -f constraints.txt --with dev --without-hashes > constraints.txt
 
 echo "Testing packages"
 cd "dist.$version"

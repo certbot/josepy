@@ -7,7 +7,7 @@ build:
   jobs:
     pre_install:
       - curl -sSL https://install.python-poetry.org | python3 -
-      - ${HOME}/.local/bin/poetry export -f requirements.txt --dev -E docs --without-hashes > constraints.txt
+      - ${HOME}/.local/bin/poetry export -f constraints.txt --with dev -E docs --without-hashes > constraints.txt
 
 python:
   install:

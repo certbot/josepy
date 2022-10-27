@@ -214,7 +214,7 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
             list(namespace['_orig_slots']) + list(fields.keys()))
         namespace['_fields'] = fields
 
-        return abc.ABCMeta.__new__(mcs, name, bases, namespace)  # type: ignore[call-overload]
+        return abc.ABCMeta.__new__(mcs, name, bases, namespace)  # type: ignore[arg-type]
 
 
 GenericJSONObjectWithFields = TypeVar('GenericJSONObjectWithFields', bound='JSONObjectWithFields')

@@ -423,7 +423,7 @@ class CLI:
         return jwk_mod.JWK.TYPES[arg]
 
     @classmethod
-    def run(cls, args: List[str] = None) -> Optional[bool]:
+    def run(cls, args: Optional[List[str]] = None) -> Optional[bool]:
         """Parse arguments and sign/verify."""
         if args is None:
             args = sys.argv[1:]

@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 def field(json_name: str, default: Any = None, omitempty: bool = False,
-          decoder: Callable[[Any], Any] = None, encoder: Callable[[Any], Any] = None) -> Any:
+          decoder: Optional[Callable[[Any], Any]] = None,
+          encoder: Optional[Callable[[Any], Any]] = None) -> Any:
     """Convenient function to declare a :class:`Field` with proper type annotations.
 
     This function allows to write the following code:
@@ -63,8 +64,8 @@ class Field:
     __slots__ = ('json_name', 'default', 'omitempty', 'fdec', 'fenc')
 
     def __init__(self, json_name: str, default: Any = None, omitempty: bool = False,
-                 decoder: Callable[[Any], Any] = None,
-                 encoder: Callable[[Any], Any] = None) -> None:
+                 decoder: Optional[Callable[[Any], Any]] = None,
+                 encoder: Optional[Callable[[Any], Any]] = None) -> None:
         self.json_name = json_name
         self.default = default
         self.omitempty = omitempty
@@ -95,7 +96,7 @@ class Field:
             "encoder": self.fenc,
             **kwargs,
         }
-        return type(self)(**current)  # type: ignore[arg-type]
+        return type(self)(**current)
 
     def decoder(self, fdec: Callable[[Any], Any]) -> 'Field':
         """Descriptor to change the decoder on JSON object field."""

@@ -43,7 +43,7 @@ jobs:
         run: tox -e mypy
       # LINTING
       - name: Run flake8 and isort
-        run:
+        run: |
           tox -e flake8
           tox -e isort
   # This job runs our tests like external parties such as packagers.

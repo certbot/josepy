@@ -16,7 +16,7 @@ class JSONDeSerializableTest(unittest.TestCase):
                 return self.v
 
             @classmethod
-            def from_json(cls, jobj: Any) -> Basic:
+            def from_json(cls, jobj: Any) -> 'Basic':
                 return cls(jobj)
 
         class Sequence(JSONDeSerializable):
@@ -28,7 +28,7 @@ class JSONDeSerializableTest(unittest.TestCase):
                 return [self.x, self.y]
 
             @classmethod
-            def from_json(cls, jobj: List[Any]) -> Sequence:
+            def from_json(cls, jobj: List[Any]) -> 'Sequence':
                 return cls(
                     Basic.from_json(jobj[0]), Basic.from_json(jobj[1]))
 
@@ -41,7 +41,7 @@ class JSONDeSerializableTest(unittest.TestCase):
                 return {self.x: self.y}
 
             @classmethod
-            def from_json(cls, jobj: Any) -> Mapping:
+            def from_json(cls, jobj: Any) -> 'Mapping':
                 return cls('dummy', 'values')  # pragma: no cover
 
         self.basic1 = Basic('foo1')

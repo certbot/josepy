@@ -67,7 +67,7 @@ class FieldTest(unittest.TestCase):
                 return {'foo': 'bar'}  # pragma: no cover
 
             @classmethod
-            def from_json(cls, jobj: Mapping[str, Any]) -> MockField:
+            def from_json(cls, jobj: Mapping[str, Any]) -> 'MockField':
                 return cls()  # pragma: no cover
         mock_field = MockField()
 

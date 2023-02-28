@@ -1,4 +1,5 @@
 """Tests for josepy.jwa."""
+from typing import Any
 import unittest
 from unittest import mock
 
@@ -21,10 +22,10 @@ class JWASignatureTest(unittest.TestCase):
         from josepy.jwa import JWASignature
 
         class MockSig(JWASignature):
-            def sign(self, key, msg):
+            def sign(self, key: Any, msg: bytes) -> bytes:
                 raise NotImplementedError()  # pragma: no cover
 
-            def verify(self, key, msg, sig):
+            def verify(self, key: Any, msg: bytes, sig: bytes) -> bool:
                 raise NotImplementedError()  # pragma: no cover
 
         self.Sig1 = MockSig('Sig1')
@@ -99,13 +100,13 @@ class JWARSTest(unittest.TestCase):
     def test_sign_new_api(self) -> None:
         from josepy.jwa import RS256
         key = mock.MagicMock()
-        RS256.sign(key, "message")
+        RS256.sign(key, b"message")
         self.assertIs(key.sign.called, True)
 
     def test_verify_new_api(self) -> None:
         from josepy.jwa import RS256
         key = mock.MagicMock()
-        RS256.verify(key, "message", "signature")
+        RS256.verify(key, b"message", b"signature")
         self.assertIs(key.verify.called, True)
 
 
@@ -142,7 +143,7 @@ class JWAECTest(unittest.TestCase):
 
         message = b'foo'
         signature = ES256.sign(EC_P256_KEY, message)
-        different_key = ec.generate_private_key(ec.SECP256R1, default_backend())
+        different_key = ec.generate_private_key(ec.SECP256R1(), default_backend())
         self.assertIs(ES256.verify(different_key.public_key(), message, signature), False)
 
     def test_sign_new_api(self) -> None:
@@ -152,7 +153,7 @@ class JWAECTest(unittest.TestCase):
         key = mock.MagicMock(curve=SECP256R1())
         with mock.patch("josepy.jwa.decode_dss_signature") as decode_patch:
             decode_patch.return_value = (0, 0)
-            ES256.sign(key, "message")
+            ES256.sign(key, b"message")
         self.assertIs(key.sign.called, True)
 
     def test_verify_new_api(self) -> None:
@@ -162,7 +163,7 @@ class JWAECTest(unittest.TestCase):
 
         from josepy.jwa import ES256
         key = mock.MagicMock(key_size=256, curve=SECP256R1())
-        ES256.verify(key, "message", b'\x00' * math.ceil(key.key_size / 8) * 2)
+        ES256.verify(key, b"message", b'\x00' * math.ceil(key.key_size / 8) * 2)
         self.assertIs(key.verify.called, True)
 
     def test_signature_size(self) -> None:
@@ -181,6 +182,7 @@ class JWAECTest(unittest.TestCase):
             })
         with mock.patch("josepy.jwa.decode_dss_signature") as decode_patch:
             decode_patch.return_value = (0, 0)
+            assert isinstance(key, JWK)
             sig = ES512.sign(key.key, b"test")
             self.assertEqual(len(sig), 2 * 66)
 

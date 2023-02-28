@@ -1,4 +1,5 @@
 """Tests for josepy.interfaces."""
+from typing import Any, Dict, List
 import unittest
 
 
@@ -8,40 +9,40 @@ class JSONDeSerializableTest(unittest.TestCase):
         from josepy.interfaces import JSONDeSerializable
 
         class Basic(JSONDeSerializable):
-            def __init__(self, v):
+            def __init__(self, v: Any) -> None:
                 self.v = v
 
-            def to_partial_json(self):
+            def to_partial_json(self) -> Any:
                 return self.v
 
             @classmethod
-            def from_json(cls, jobj):
+            def from_json(cls, jobj: Any) -> Basic:
                 return cls(jobj)
 
         class Sequence(JSONDeSerializable):
-            def __init__(self, x, y):
+            def __init__(self, x: Basic, y: Basic) -> None:
                 self.x = x
                 self.y = y
 
-            def to_partial_json(self):
+            def to_partial_json(self) -> List[Basic]:
                 return [self.x, self.y]
 
             @classmethod
-            def from_json(cls, jobj):
+            def from_json(cls, jobj: List[Any]) -> Sequence:
                 return cls(
                     Basic.from_json(jobj[0]), Basic.from_json(jobj[1]))
 
         class Mapping(JSONDeSerializable):
-            def __init__(self, x, y):
+            def __init__(self, x: Any, y: Any) -> None:
                 self.x = x
                 self.y = y
 
-            def to_partial_json(self):
+            def to_partial_json(self) -> Dict[Basic, Basic]:
                 return {self.x: self.y}
 
             @classmethod
-            def from_json(cls, jobj):
-                pass  # pragma: no cover
+            def from_json(cls, jobj: Any) -> Mapping:
+                return cls('dummy', 'values')  # pragma: no cover
 
         self.basic1 = Basic('foo1')
         self.basic2 = Basic('foo2')

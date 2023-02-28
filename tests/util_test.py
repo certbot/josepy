@@ -72,7 +72,7 @@ class ComparableRSAKeyTest(unittest.TestCase):
 
     def test_ne_no_serialization(self) -> None:
         from josepy.util import ComparableRSAKey
-        self.assertNotEqual(ComparableRSAKey(5), ComparableRSAKey(5))
+        self.assertNotEqual(ComparableRSAKey(5), ComparableRSAKey(5))  # type: ignore
 
     def test_hash(self) -> None:
         self.assertIsInstance(hash(self.key), int)
@@ -116,7 +116,7 @@ class ComparableECKeyTest(unittest.TestCase):
 
     def test_ne_no_serialization(self) -> None:
         from josepy.util import ComparableECKey
-        self.assertNotEqual(ComparableECKey(5), ComparableECKey(5))
+        self.assertNotEqual(ComparableECKey(5), ComparableECKey(5))  # type: ignore
 
     def test_hash(self) -> None:
         self.assertIsInstance(hash(self.p256_key), int)
@@ -140,9 +140,13 @@ class ImmutableMapTest(unittest.TestCase):
         from josepy.util import ImmutableMap
 
         class A(ImmutableMap):
+            x: int
+            y: int
             __slots__ = ('x', 'y')
 
         class B(ImmutableMap):
+            x: int
+            y: int
             __slots__ = ('x', 'y')
 
         self.A = A

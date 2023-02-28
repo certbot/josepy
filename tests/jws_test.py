@@ -61,6 +61,7 @@ class HeaderTest(unittest.TestCase):
         from josepy.jws import Header
         header = Header(x5c=(CERT, CERT))
         jobj = header.to_partial_json()
+        assert isinstance(CERT.wrapped, OpenSSL.crypto.X509)
         cert_asn1 = OpenSSL.crypto.dump_certificate(
             OpenSSL.crypto.FILETYPE_ASN1, CERT.wrapped)
         cert_b64 = base64.b64encode(cert_asn1)
@@ -161,8 +162,12 @@ class JWSTest(unittest.TestCase):
             'protected': json_util.encode_b64jose(
                 self.mixed.signature.protected.encode('utf-8')),
         }
+
+        from josepy.jws import Header
         jobj_from = jobj_to.copy()
-        jobj_from['header'] = jobj_from['header'].to_json()
+        header = jobj_from['header']
+        assert isinstance(header, Header)
+        jobj_from['header'] = header.to_json()
 
         self.assertEqual(self.mixed.to_partial_json(flat=True), jobj_to)
         from josepy.jws import JWS
@@ -174,7 +179,10 @@ class JWSTest(unittest.TestCase):
             'payload': json_util.encode_b64jose(b'foo'),
         }
         jobj_from = jobj_to.copy()
-        jobj_from['signatures'] = [jobj_to['signatures'][0].to_json()]
+        signature = jobj_to['signatures'][0]
+        from josepy.jws import Signature
+        assert isinstance(signature, Signature)
+        jobj_from['signatures'] = [signature.to_json()]
 
         self.assertEqual(self.mixed.to_partial_json(flat=False), jobj_to)
         from josepy.jws import JWS

@@ -1,10 +1,18 @@
 """Tests for josepy.jwk."""
 import binascii
+from typing import Any, TYPE_CHECKING
 import unittest
 
 import test_util
 
 from josepy import errors, json_util, util
+
+# The approach used here and below is based on
+# https://github.com/certbot/certbot/pull/8748.
+if TYPE_CHECKING:
+    from typing_extensions import Protocol
+else:
+    Protocol = object
 
 DSA_PEM = test_util.load_vector('dsa512_key.pem')
 RSA256_KEY = test_util.load_rsa_private_key('rsa256_key.pem')
@@ -26,15 +34,27 @@ class JWKTest(unittest.TestCase):
         self.assertRaises(errors.Error, JWKRSA.load, DSA_PEM)
 
 
+class JWKSubclassTest(Protocol):
+    from josepy.jwk import JWK
+    jwk: JWK
+    thumbprint: bytes
+
+    def assertEqual(self, *unused_args: Any) -> None:
+        """
+        See
+        https://docs.python.org/3/library/unittest.html#unittest.TestCase.assertEqual
+        """
+
+
 class JWKTestBaseMixin:
     """Mixin test for JWK subclass tests."""
 
     thumbprint: bytes = NotImplemented
 
-    def test_thumbprint_private(self) -> None:
+    def test_thumbprint_private(self: JWKSubclassTest) -> None:
         self.assertEqual(self.thumbprint, self.jwk.thumbprint())
 
-    def test_thumbprint_public(self) -> None:
+    def test_thumbprint_public(self: JWKSubclassTest) -> None:
         self.assertEqual(self.thumbprint, self.jwk.public_key().thumbprint())
 
 
@@ -320,11 +340,11 @@ AwEHoUQDQgAEGS5RvStca15z2FEanCM3juoX7tE/LB7iD44GWawGE40APAl/iZuH
 31wQfst4glTZpxkpEI/MzNZHjiYnqrGeSw==
 -----END EC PRIVATE KEY-----"""
         key = JWKEC.load(data)
-        data = key.to_partial_json()
-        y = josepy.json_util.decode_b64jose(data['y'])
+        json = key.to_partial_json()
+        y = josepy.json_util.decode_b64jose(json['y'])
         self.assertEqual(y[0], 0)
         self.assertEqual(len(y), 32)
-        JWK.from_json(data)
+        JWK.from_json(json)
 
 
 if __name__ == '__main__':

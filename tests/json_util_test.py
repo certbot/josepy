@@ -1,5 +1,6 @@
 """Tests for josepy.json_util."""
 import itertools
+from typing import Any, Dict, Mapping
 import unittest
 from unittest import mock
 
@@ -44,10 +45,10 @@ class FieldTest(unittest.TestCase):
     def test_descriptors(self) -> None:
         mock_value = mock.MagicMock()
 
-        def decoder(unused_value):
+        def decoder(unused_value: Any) -> str:
             return 'd'
 
-        def encoder(unused_value):
+        def encoder(unused_value: Any) -> str:
             return 'e'
 
         from josepy.json_util import Field
@@ -62,12 +63,12 @@ class FieldTest(unittest.TestCase):
 
     def test_default_encoder_is_partial(self) -> None:
         class MockField(interfaces.JSONDeSerializable):
-            def to_partial_json(self):
-                return 'foo'  # pragma: no cover
+            def to_partial_json(self) -> Dict[str, Any]:
+                return {'foo': 'bar'}  # pragma: no cover
 
             @classmethod
-            def from_json(cls, jobj):
-                pass  # pragma: no cover
+            def from_json(cls, jobj: Mapping[str, Any]) -> MockField:
+                return cls()  # pragma: no cover
         mock_field = MockField()
 
         from josepy.json_util import Field
@@ -147,13 +148,13 @@ class JSONObjectWithFieldsTest(unittest.TestCase):
             y = Field('y')
             z = Field('Z')  # on purpose uppercase
 
-            @y.encoder
+            @y.encoder  # type: ignore
             def y(value):
                 if value == 500:
                     raise errors.SerializationError()
                 return value
 
-            @y.decoder
+            @y.decoder  # type: ignore
             def y(value):
                 if value == 500:
                     raise errors.DeserializationError()
@@ -337,14 +338,15 @@ class TypedJSONObjectWithFieldsTest(unittest.TestCase):
         @MockParentTypedJSONObjectWithFields.register
         class MockTypedJSONObjectWithFields(
                 MockParentTypedJSONObjectWithFields):
+            foo: str
             typ = 'test'
             __slots__ = ('foo',)
 
             @classmethod
-            def fields_from_json(cls, jobj):
+            def fields_from_json(cls, jobj: Mapping[str, Any]) -> Dict[str, Any]:
                 return {'foo': jobj['foo']}
 
-            def fields_to_partial_json(self):
+            def fields_to_partial_json(self) -> Any:
                 return {'foo': self.foo}
 
         self.parent_cls = MockParentTypedJSONObjectWithFields

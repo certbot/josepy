@@ -22,7 +22,7 @@ class B64EncodeTest(unittest.TestCase):
     """Tests for josepy.b64.b64encode."""
 
     @classmethod
-    def _call(cls, data: Union[str, bytes]) -> bytes:
+    def _call(cls, data: bytes) -> bytes:
         from josepy.b64 import b64encode
         return b64encode(data)
 
@@ -45,7 +45,7 @@ class B64DecodeTest(unittest.TestCase):
     """Tests for josepy.b64.b64decode."""
 
     @classmethod
-    def _call(cls, data: Union[bytes, str, object]) -> bytes:
+    def _call(cls, data: Union[bytes, str]) -> bytes:
         from josepy.b64 import b64decode
         return b64decode(data)
 

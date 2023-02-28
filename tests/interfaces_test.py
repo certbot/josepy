@@ -1,6 +1,6 @@
 """Tests for josepy.interfaces."""
-from typing import Any, Dict, List
 import unittest
+from typing import Any, Dict, List
 
 
 class JSONDeSerializableTest(unittest.TestCase):

@@ -1,7 +1,7 @@
 """Tests for josepy.jwk."""
 import binascii
-from typing import Any, TYPE_CHECKING
 import unittest
+from typing import TYPE_CHECKING, Any
 
 import test_util
 

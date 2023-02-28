@@ -1,6 +1,6 @@
 """Tests for josepy.jwa."""
-from typing import Any
 import unittest
+from typing import Any
 from unittest import mock
 
 import test_util

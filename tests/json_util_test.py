@@ -1,7 +1,7 @@
 """Tests for josepy.json_util."""
 import itertools
-from typing import Any, Dict, Mapping
 import unittest
+from typing import Any, Dict, Mapping
 from unittest import mock
 
 import test_util

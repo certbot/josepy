@@ -1,5 +1,6 @@
 """Tests for josepy.b64."""
 import unittest
+from typing import Union
 
 # https://en.wikipedia.org/wiki/Base64#Examples
 B64_PADDING_EXAMPLES = {
@@ -21,22 +22,22 @@ class B64EncodeTest(unittest.TestCase):
     """Tests for josepy.b64.b64encode."""
 
     @classmethod
-    def _call(cls, data):
+    def _call(cls, data: Union[str, bytes]) -> bytes:
         from josepy.b64 import b64encode
         return b64encode(data)
 
-    def test_empty(self):
+    def test_empty(self) -> None:
         self.assertEqual(self._call(b''), b'')
 
-    def test_unsafe_url(self):
+    def test_unsafe_url(self) -> None:
         for text, b64 in B64_URL_UNSAFE_EXAMPLES.items():
             self.assertEqual(self._call(text), b64)
 
-    def test_different_paddings(self):
+    def test_different_paddings(self) -> None:
         for text, (b64, _) in B64_PADDING_EXAMPLES.items():
             self.assertEqual(self._call(text), b64)
 
-    def test_unicode_fails_with_type_error(self):
+    def test_unicode_fails_with_type_error(self) -> None:
         self.assertRaises(TypeError, self._call, u'some unicode')
 
 
@@ -44,29 +45,29 @@ class B64DecodeTest(unittest.TestCase):
     """Tests for josepy.b64.b64decode."""
 
     @classmethod
-    def _call(cls, data):
+    def _call(cls, data: Union[bytes, str, object]) -> bytes:
         from josepy.b64 import b64decode
         return b64decode(data)
 
-    def test_unsafe_url(self):
+    def test_unsafe_url(self) -> None:
         for text, b64 in B64_URL_UNSAFE_EXAMPLES.items():
             self.assertEqual(self._call(b64), text)
 
-    def test_input_without_padding(self):
+    def test_input_without_padding(self) -> None:
         for text, (b64, _) in B64_PADDING_EXAMPLES.items():
             self.assertEqual(self._call(b64), text)
 
-    def test_input_with_padding(self):
+    def test_input_with_padding(self) -> None:
         for text, (b64, pad) in B64_PADDING_EXAMPLES.items():
             self.assertEqual(self._call(b64 + pad), text)
 
-    def test_unicode_with_ascii(self):
+    def test_unicode_with_ascii(self) -> None:
         self.assertEqual(self._call(u'YQ'), b'a')
 
-    def test_non_ascii_unicode_fails(self):
+    def test_non_ascii_unicode_fails(self) -> None:
         self.assertRaises(ValueError, self._call, u'\u0105')
 
-    def test_type_error_no_unicode_or_bytes(self):
+    def test_type_error_no_unicode_or_bytes(self) -> None:
         self.assertRaises(TypeError, self._call, object())
 
 

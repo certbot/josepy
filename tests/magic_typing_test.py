@@ -7,7 +7,7 @@ from unittest import mock
 
 class MagicTypingTest(unittest.TestCase):
     """Tests for josepy.magic_typing."""
-    def test_import_success(self):
+    def test_import_success(self) -> None:
         try:
             import typing as temp_typing
         except ImportError:  # pragma: no cover

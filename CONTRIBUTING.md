@@ -54,15 +54,15 @@ $ .\.venv\Script\activate
 ## Run the tests and quality checks
 
 1) Configure a development environment ([see above](#configure-a-development-environment))
-2) Run the unit tests
+2) Run the tests
+```bash
+$ tox
+```
+3) You can also run specific tests
 ```bash
 $ tox -e py
 ```
-3) Run the linter and import format checker
+You can get a listing of the available tests by running
 ```bash
-$ tox -e flake8 isort
-```
-4) Run the type checker
-```bash
-$ tox -e mypy
+$ tox -l
 ```

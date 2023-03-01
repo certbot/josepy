@@ -1,9 +1,11 @@
 """Tests for josepy.jws."""
 import base64
+import sys
 import unittest
 from unittest import mock
 
 import OpenSSL
+import pytest
 import test_util
 
 from josepy import errors, json_util, jwa, jwk
@@ -227,4 +229,4 @@ class CLITest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()  # pragma: no cover
+    sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

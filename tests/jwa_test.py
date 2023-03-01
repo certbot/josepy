@@ -1,7 +1,9 @@
 """Tests for josepy.jwa."""
+import sys
 import unittest
 from unittest import mock
 
+import pytest
 import test_util
 
 from josepy import errors
@@ -186,4 +188,4 @@ class JWAECTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()  # pragma: no cover
+    sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

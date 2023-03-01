@@ -4,6 +4,8 @@ import unittest
 import warnings
 from unittest import mock
 
+import pytest
+
 
 class MagicTypingTest(unittest.TestCase):
     """Tests for josepy.magic_typing."""
@@ -27,4 +29,4 @@ class MagicTypingTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()  # pragma: no cover
+    sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

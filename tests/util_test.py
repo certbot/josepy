@@ -1,7 +1,9 @@
 """Tests for josepy.util."""
 import functools
+import sys
 import unittest
 
+import pytest
 import test_util
 
 
@@ -237,4 +239,4 @@ class frozendictTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()  # pragma: no cover
+    sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

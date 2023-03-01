@@ -1,8 +1,10 @@
 """Tests for josepy.json_util."""
 import itertools
+import sys
 import unittest
 from unittest import mock
 
+import pytest
 import test_util
 
 from josepy import errors, interfaces, util
@@ -375,4 +377,4 @@ class TypedJSONObjectWithFieldsTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()  # pragma: no cover
+    sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

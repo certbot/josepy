@@ -1,5 +1,8 @@
 """Tests for josepy.b64."""
+import sys
 import unittest
+
+import pytest
 
 # https://en.wikipedia.org/wiki/Base64#Examples
 B64_PADDING_EXAMPLES = {
@@ -71,4 +74,4 @@ class B64DecodeTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()  # pragma: no cover
+    sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

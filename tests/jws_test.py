@@ -43,7 +43,7 @@ class HeaderTest(unittest.TestCase):
     def test_add_non_empty(self):
         from josepy.jws import Header
         assert Header(jwk='foo', crit=('a', 'b')) == \
-                         self.header1 + self.crit
+            self.header1 + self.crit
 
     def test_add_empty(self):
         assert self.header1 == self.header1 + self.empty

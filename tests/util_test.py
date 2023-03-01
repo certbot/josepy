@@ -45,7 +45,7 @@ class ComparableX509Test(unittest.TestCase):
     def test_repr(self):
         for x509 in self.req1, self.cert1:
             assert repr(x509) == \
-                             '<ComparableX509({0!r})>'.format(x509.wrapped)
+                '<ComparableX509({0!r})>'.format(x509.wrapped)
 
 
 class ComparableRSAKeyTest(unittest.TestCase):

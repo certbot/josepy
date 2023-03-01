@@ -50,6 +50,10 @@ $ source .venv/bin/activate
 # (On Windows Powershell)
 $ .\.venv\Script\activate
 ```
+4) You may then want to set up [pre-commit](https://pre-commit.com/) by running:
+```bash
+$ pre-commit install
+```
 
 ## Run the tests and quality checks
 

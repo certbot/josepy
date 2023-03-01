@@ -23,7 +23,7 @@ class MagicTypingTest(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
             from josepy.magic_typing import Text
-        self.assertEqual(Text, text_mock)
+        assert Text == text_mock
         del sys.modules['josepy.magic_typing']
         sys.modules['typing'] = temp_typing
 

@@ -1,7 +1,8 @@
 from __future__ import print_function  # Python2 support
 
-import josepy
 from cryptography.hazmat.primitives import serialization
+
+import josepy
 
 
 def jwk_to_pem(pkey_jwk):
@@ -72,8 +73,8 @@ if __name__ == "__main__":
 
     This example is only concerned with the `/private_key.json` file
     """
-    import sys
     import json
+    import sys
 
     _args = sys.argv
     if len(_args) == 2:

@@ -1,7 +1,9 @@
 """Tests for josepy.util."""
 import functools
+import sys
 import unittest
 
+import pytest
 import test_util
 
 
@@ -19,31 +21,31 @@ class ComparableX509Test(unittest.TestCase):
         self.cert_other = test_util.load_comparable_cert('cert-san.pem')
 
     def test_getattr_proxy(self):
-        self.assertIs(self.cert1.has_expired(), True)
+        assert self.cert1.has_expired() is True
 
     def test_eq(self):
-        self.assertEqual(self.req1, self.req2)
-        self.assertEqual(self.cert1, self.cert2)
+        assert self.req1 == self.req2
+        assert self.cert1 == self.cert2
 
     def test_ne(self):
-        self.assertNotEqual(self.req1, self.req_other)
-        self.assertNotEqual(self.cert1, self.cert_other)
+        assert self.req1 != self.req_other
+        assert self.cert1 != self.cert_other
 
     def test_ne_wrong_types(self):
-        self.assertNotEqual(self.req1, 5)
-        self.assertNotEqual(self.cert1, 5)
+        assert self.req1 != 5
+        assert self.cert1 != 5
 
     def test_hash(self):
-        self.assertEqual(hash(self.req1), hash(self.req2))
-        self.assertNotEqual(hash(self.req1), hash(self.req_other))
+        assert hash(self.req1) == hash(self.req2)
+        assert hash(self.req1) != hash(self.req_other)
 
-        self.assertEqual(hash(self.cert1), hash(self.cert2))
-        self.assertNotEqual(hash(self.cert1), hash(self.cert_other))
+        assert hash(self.cert1) == hash(self.cert2)
+        assert hash(self.cert1) != hash(self.cert_other)
 
     def test_repr(self):
         for x509 in self.req1, self.cert1:
-            self.assertEqual(repr(x509),
-                             '<ComparableX509({0!r})>'.format(x509.wrapped))
+            assert repr(x509) == \
+                '<ComparableX509({0!r})>'.format(x509.wrapped)
 
 
 class ComparableRSAKeyTest(unittest.TestCase):
@@ -56,36 +58,36 @@ class ComparableRSAKeyTest(unittest.TestCase):
         self.key2 = test_util.load_rsa_private_key('rsa512_key.pem')
 
     def test_getattr_proxy(self):
-        self.assertEqual(256, self.key.key_size)
+        assert 256 == self.key.key_size
 
     def test_eq(self):
-        self.assertEqual(self.key, self.key_same)
+        assert self.key == self.key_same
 
     def test_ne(self):
-        self.assertNotEqual(self.key, self.key2)
+        assert self.key != self.key2
 
     def test_ne_different_types(self):
-        self.assertNotEqual(self.key, 5)
+        assert self.key != 5
 
     def test_ne_not_wrapped(self):
-        self.assertNotEqual(self.key, self.key_same._wrapped)
+        assert self.key != self.key_same._wrapped
 
     def test_ne_no_serialization(self):
         from josepy.util import ComparableRSAKey
-        self.assertNotEqual(ComparableRSAKey(5), ComparableRSAKey(5))
+        assert ComparableRSAKey(5) != ComparableRSAKey(5)
 
     def test_hash(self):
-        self.assertIsInstance(hash(self.key), int)
-        self.assertEqual(hash(self.key), hash(self.key_same))
-        self.assertNotEqual(hash(self.key), hash(self.key2))
+        assert isinstance(hash(self.key), int)
+        assert hash(self.key) == hash(self.key_same)
+        assert hash(self.key) != hash(self.key2)
 
     def test_repr(self):
-        self.assertIs(repr(self.key).startswith(
-            '<ComparableRSAKey(<cryptography.hazmat.'), True)
+        assert repr(self.key).startswith(
+            '<ComparableRSAKey(<cryptography.hazmat.') is True
 
     def test_public_key(self):
         from josepy.util import ComparableRSAKey
-        self.assertIsInstance(self.key.public_key(), ComparableRSAKey)
+        assert isinstance(self.key.public_key(), ComparableRSAKey)
 
 
 class ComparableECKeyTest(unittest.TestCase):
@@ -99,38 +101,38 @@ class ComparableECKeyTest(unittest.TestCase):
         self.p521_key = test_util.load_ec_private_key('ec_p521_key.pem')
 
     def test_getattr_proxy(self):
-        self.assertEqual(256, self.p256_key.key_size)
+        assert 256 == self.p256_key.key_size
 
     def test_eq(self):
-        self.assertEqual(self.p256_key, self.p256_key_same)
+        assert self.p256_key == self.p256_key_same
 
     def test_ne(self):
-        self.assertNotEqual(self.p256_key, self.p384_key)
-        self.assertNotEqual(self.p256_key, self.p521_key)
+        assert self.p256_key != self.p384_key
+        assert self.p256_key != self.p521_key
 
     def test_ne_different_types(self):
-        self.assertNotEqual(self.p256_key, 5)
+        assert self.p256_key != 5
 
     def test_ne_not_wrapped(self):
-        self.assertNotEqual(self.p256_key, self.p256_key_same._wrapped)
+        assert self.p256_key != self.p256_key_same._wrapped
 
     def test_ne_no_serialization(self):
         from josepy.util import ComparableECKey
-        self.assertNotEqual(ComparableECKey(5), ComparableECKey(5))
+        assert ComparableECKey(5) != ComparableECKey(5)
 
     def test_hash(self):
-        self.assertIsInstance(hash(self.p256_key), int)
-        self.assertEqual(hash(self.p256_key), hash(self.p256_key_same))
-        self.assertNotEqual(hash(self.p256_key), hash(self.p384_key))
-        self.assertNotEqual(hash(self.p256_key), hash(self.p521_key))
+        assert isinstance(hash(self.p256_key), int)
+        assert hash(self.p256_key) == hash(self.p256_key_same)
+        assert hash(self.p256_key) != hash(self.p384_key)
+        assert hash(self.p256_key) != hash(self.p521_key)
 
     def test_repr(self):
-        self.assertIs(repr(self.p256_key).startswith(
-            '<ComparableECKey(<cryptography.hazmat.'), True)
+        assert repr(self.p256_key).startswith(
+            '<ComparableECKey(<cryptography.hazmat.') is True
 
     def test_public_key(self):
         from josepy.util import ComparableECKey
-        self.assertIsInstance(self.p256_key.public_key(), ComparableECKey)
+        assert isinstance(self.p256_key.public_key(), ComparableECKey)
 
 
 class ImmutableMapTest(unittest.TestCase):
@@ -154,49 +156,55 @@ class ImmutableMapTest(unittest.TestCase):
         self.b = self.B(x=1, y=2)
 
     def test_update(self):
-        self.assertEqual(self.A(x=2, y=2), self.a1.update(x=2))
-        self.assertEqual(self.a2, self.a1.update(x=3, y=4))
+        assert self.A(x=2, y=2) == self.a1.update(x=2)
+        assert self.a2 == self.a1.update(x=3, y=4)
 
     def test_get_missing_item_raises_key_error(self):
-        self.assertRaises(KeyError, self.a1.__getitem__, 'z')
+        with pytest.raises(KeyError):
+            self.a1.__getitem__('z')
 
     def test_order_of_args_does_not_matter(self):
-        self.assertEqual(self.a1, self.a1_swap)
+        assert self.a1 == self.a1_swap
 
     def test_type_error_on_missing(self):
-        self.assertRaises(TypeError, self.A, x=1)
-        self.assertRaises(TypeError, self.A, y=2)
+        with pytest.raises(TypeError):
+            self.A(x=1)
+        with pytest.raises(TypeError):
+            self.A(y=2)
 
     def test_type_error_on_unrecognized(self):
-        self.assertRaises(TypeError, self.A, x=1, z=2)
-        self.assertRaises(TypeError, self.A, x=1, y=2, z=3)
+        with pytest.raises(TypeError):
+            self.A(x=1, z=2)
+        with pytest.raises(TypeError):
+            self.A(x=1, y=2, z=3)
 
     def test_get_attr(self):
-        self.assertEqual(1, self.a1.x)
-        self.assertEqual(2, self.a1.y)
-        self.assertEqual(1, self.a1_swap.x)
-        self.assertEqual(2, self.a1_swap.y)
+        assert 1 == self.a1.x
+        assert 2 == self.a1.y
+        assert 1 == self.a1_swap.x
+        assert 2 == self.a1_swap.y
 
     def test_set_attr_raises_attribute_error(self):
-        self.assertRaises(
-            AttributeError, functools.partial(self.a1.__setattr__, 'x'), 10)
+        with pytest.raises(AttributeError):
+            functools.partial(self.a1.__setattr__, 'x')(10)
 
     def test_equal(self):
-        self.assertEqual(self.a1, self.a1)
-        self.assertEqual(self.a2, self.a2)
-        self.assertNotEqual(self.a1, self.a2)
+        assert self.a1 == self.a1
+        assert self.a2 == self.a2
+        assert self.a1 != self.a2
 
     def test_hash(self):
-        self.assertEqual(hash((1, 2)), hash(self.a1))
+        assert hash((1, 2)) == hash(self.a1)
 
     def test_unhashable(self):
-        self.assertRaises(TypeError, self.A(x=1, y={}).__hash__)
+        with pytest.raises(TypeError):
+            self.A(x=1, y={}).__hash__()
 
     def test_repr(self):
-        self.assertEqual('A(x=1, y=2)', repr(self.a1))
-        self.assertEqual('A(x=1, y=2)', repr(self.a1_swap))
-        self.assertEqual('B(x=1, y=2)', repr(self.b))
-        self.assertEqual("B(x='foo', y='bar')", repr(self.B(x='foo', y='bar')))
+        assert 'A(x=1, y=2)' == repr(self.a1)
+        assert 'A(x=1, y=2)' == repr(self.a1_swap)
+        assert 'B(x=1, y=2)' == repr(self.b)
+        assert "B(x='foo', y='bar')" == repr(self.B(x='foo', y='bar'))
 
 
 class frozendictTest(unittest.TestCase):
@@ -208,33 +216,36 @@ class frozendictTest(unittest.TestCase):
 
     def test_init_dict(self):
         from josepy.util import frozendict
-        self.assertEqual(self.fdict, frozendict({'x': 1, 'y': '2'}))
+        assert self.fdict == frozendict({'x': 1, 'y': '2'})
 
     def test_init_other_raises_type_error(self):
         from josepy.util import frozendict
 
         # specifically fail for generators...
-        self.assertRaises(TypeError, frozendict, {'a': 'b'}.items())
+        with pytest.raises(TypeError):
+            frozendict({'a': 'b'}.items())
 
     def test_len(self):
-        self.assertEqual(2, len(self.fdict))
+        assert 2 == len(self.fdict)
 
     def test_hash(self):
-        self.assertIsInstance(hash(self.fdict), int)
+        assert isinstance(hash(self.fdict), int)
 
     def test_getattr_proxy(self):
-        self.assertEqual(1, self.fdict.x)
-        self.assertEqual('2', self.fdict.y)
+        assert 1 == self.fdict.x
+        assert '2' == self.fdict.y
 
     def test_getattr_raises_attribute_error(self):
-        self.assertRaises(AttributeError, self.fdict.__getattr__, 'z')
+        with pytest.raises(AttributeError):
+            self.fdict.__getattr__('z')
 
     def test_setattr_immutable(self):
-        self.assertRaises(AttributeError, self.fdict.__setattr__, 'z', 3)
+        with pytest.raises(AttributeError):
+            self.fdict.__setattr__('z', 3)
 
     def test_repr(self):
-        self.assertEqual("frozendict(x=1, y='2')", repr(self.fdict))
+        assert "frozendict(x=1, y='2')" == repr(self.fdict)
 
 
 if __name__ == '__main__':
-    unittest.main()  # pragma: no cover
+    sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

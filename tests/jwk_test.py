@@ -2,7 +2,7 @@
 import binascii
 import sys
 import unittest
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pytest
 import test_util
@@ -42,12 +42,6 @@ class JWKSubclassTest(Protocol):
     from josepy.jwk import JWK
     jwk: JWK
     thumbprint: bytes
-
-    def assertEqual(self, *unused_args: Any) -> None:
-        """
-        See
-        https://docs.python.org/3/library/unittest.html#unittest.TestCase.assertEqual
-        """
 
 
 class JWKTestBaseMixin:

@@ -6,11 +6,11 @@ import pytest
 
 
 class UnrecognizedTypeErrorTest(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         from josepy.errors import UnrecognizedTypeError
         self.error = UnrecognizedTypeError('foo', {'type': 'foo'})
 
-    def test_str(self):
+    def test_str(self) -> None:
         assert "foo was not recognized, full message: {'type': 'foo'}" == \
             str(self.error)
 

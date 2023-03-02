@@ -6,11 +6,8 @@ from unittest import mock
 import pytest
 
 
-def test_import_success():
-    try:
-        import typing as temp_typing
-    except ImportError:  # pragma: no cover
-        temp_typing = None  # pragma: no cover
+def test_import_success() -> None:
+    import typing as temp_typing
     typing_class_mock = mock.MagicMock()
     text_mock = mock.MagicMock()
     typing_class_mock.Text = text_mock

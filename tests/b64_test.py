@@ -1,5 +1,4 @@
 """Tests for josepy.b64."""
-import unittest
 from typing import Union
 import pytest
 

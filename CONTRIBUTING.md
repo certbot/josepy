@@ -50,7 +50,8 @@ $ source .venv/bin/activate
 # (On Windows Powershell)
 $ .\.venv\Script\activate
 ```
-4) Optionally set up [pre-commit](https://pre-commit.com/)
+4) Optionally set up [pre-commit](https://pre-commit.com/) which will cause
+simple tests to be automatically run on your changes when you commit them
 ```bash
 $ pre-commit install
 ```

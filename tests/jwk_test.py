@@ -56,10 +56,10 @@ class JWKTestBaseMixin:
     thumbprint: bytes = NotImplemented
 
     def test_thumbprint_private(self: JWKSubclassTest) -> None:
-        self.assertEqual(self.thumbprint, self.jwk.thumbprint())
+        assert self.thumbprint == self.jwk.thumbprint()
 
     def test_thumbprint_public(self: JWKSubclassTest) -> None:
-        self.assertEqual(self.thumbprint, self.jwk.public_key().thumbprint())
+        assert self.thumbprint == self.jwk.public_key().thumbprint()
 
 
 class JWKOctTest(unittest.TestCase, JWKTestBaseMixin):
@@ -75,7 +75,7 @@ class JWKOctTest(unittest.TestCase, JWKTestBaseMixin):
         self.jobj = {'kty': 'oct', 'k': json_util.encode_b64jose(b'foo')}
 
     def test_to_partial_json(self) -> None:
-        self.assertEqual(self.jwk.to_partial_json(), self.jobj)
+        assert self.jwk.to_partial_json() == self.jobj
 
     def test_from_json(self) -> None:
         from josepy.jwk import JWKOct
@@ -90,7 +90,7 @@ class JWKOctTest(unittest.TestCase, JWKTestBaseMixin):
         assert self.jwk == JWKOct.load(b'foo')
 
     def test_public_key(self) -> None:
-        self.assertIs(self.jwk.public_key(), self.jwk)
+        assert self.jwk.public_key() is self.jwk
 
 
 class JWKRSATest(unittest.TestCase, JWKTestBaseMixin):
@@ -131,8 +131,8 @@ class JWKRSATest(unittest.TestCase, JWKTestBaseMixin):
         self.jwk = self.private
 
     def test_init_auto_comparable(self) -> None:
-        self.assertIsInstance(self.jwk256_not_comparable.key, util.ComparableRSAKey)
-        self.assertEqual(self.jwk256, self.jwk256_not_comparable)
+        assert isinstance(self.jwk256_not_comparable.key, util.ComparableRSAKey)
+        assert self.jwk256 == self.jwk256_not_comparable
 
     def test_encode_param_zero(self) -> None:
         from josepy.jwk import JWKRSA
@@ -141,12 +141,12 @@ class JWKRSATest(unittest.TestCase, JWKTestBaseMixin):
         assert 'AA' == JWKRSA._encode_param(0)
 
     def test_equals(self) -> None:
-        self.assertEqual(self.jwk256, self.jwk256)
-        self.assertEqual(self.jwk512, self.jwk512)
+        assert self.jwk256 == self.jwk256
+        assert self.jwk512 == self.jwk512
 
     def test_not_equals(self) -> None:
-        self.assertNotEqual(self.jwk256, self.jwk512)
-        self.assertNotEqual(self.jwk512, self.jwk256)
+        assert self.jwk256 != self.jwk512
+        assert self.jwk512 != self.jwk256
 
     def test_load(self) -> None:
         from josepy.jwk import JWKRSA
@@ -154,12 +154,12 @@ class JWKRSATest(unittest.TestCase, JWKTestBaseMixin):
             test_util.load_vector('rsa256_key.pem'))
 
     def test_public_key(self) -> None:
-        self.assertEqual(self.jwk256, self.private.public_key())
+        assert self.jwk256 == self.private.public_key()
 
     def test_to_partial_json(self) -> None:
-        self.assertEqual(self.jwk256.to_partial_json(), self.jwk256json)
-        self.assertEqual(self.jwk512.to_partial_json(), self.jwk512json)
-        self.assertEqual(self.private.to_partial_json(), self.private_json)
+        assert self.jwk256.to_partial_json() == self.jwk256json
+        assert self.jwk512.to_partial_json() == self.jwk512json
+        assert self.private.to_partial_json() == self.private_json
 
     def test_from_json(self) -> None:
         from josepy.jwk import JWK
@@ -246,9 +246,8 @@ class JWKECTest(unittest.TestCase, JWKTestBaseMixin):
         self.jwk = self.private
 
     def test_init_auto_comparable(self) -> None:
-        self.assertIsInstance(
-            self.jwk256_not_comparable.key, util.ComparableECKey)
-        self.assertEqual(self.jwk256, self.jwk256_not_comparable)
+        assert isinstance(self.jwk256_not_comparable.key, util.ComparableECKey)
+        assert self.jwk256 == self.jwk256_not_comparable
 
     def test_encode_param_zero(self) -> None:
         from josepy.jwk import JWKEC
@@ -258,17 +257,17 @@ class JWKECTest(unittest.TestCase, JWKTestBaseMixin):
         assert 'AA' == JWKEC._encode_param(0, 1)
 
     def test_equals(self) -> None:
-        self.assertEqual(self.jwk256, self.jwk256)
-        self.assertEqual(self.jwk384, self.jwk384)
-        self.assertEqual(self.jwk521, self.jwk521)
+        assert self.jwk256 == self.jwk256
+        assert self.jwk384 == self.jwk384
+        assert self.jwk521 == self.jwk521
 
     def test_not_equals(self) -> None:
-        self.assertNotEqual(self.jwk256, self.jwk384)
-        self.assertNotEqual(self.jwk256, self.jwk521)
-        self.assertNotEqual(self.jwk384, self.jwk256)
-        self.assertNotEqual(self.jwk384, self.jwk521)
-        self.assertNotEqual(self.jwk521, self.jwk256)
-        self.assertNotEqual(self.jwk521, self.jwk384)
+        assert self.jwk256 != self.jwk384
+        assert self.jwk256 != self.jwk521
+        assert self.jwk384 != self.jwk256
+        assert self.jwk384 != self.jwk521
+        assert self.jwk521 != self.jwk256
+        assert self.jwk521 != self.jwk384
 
     def test_load(self) -> None:
         from josepy.jwk import JWKEC
@@ -276,13 +275,13 @@ class JWKECTest(unittest.TestCase, JWKTestBaseMixin):
             test_util.load_vector('ec_p256_key.pem'))
 
     def test_public_key(self) -> None:
-        self.assertEqual(self.jwk256, self.private.public_key())
+        assert self.jwk256 == self.private.public_key()
 
     def test_to_partial_json(self) -> None:
-        self.assertEqual(self.jwk256.to_partial_json(), self.jwk256json)
-        self.assertEqual(self.jwk384.to_partial_json(), self.jwk384json)
-        self.assertEqual(self.jwk521.to_partial_json(), self.jwk521json)
-        self.assertEqual(self.private.to_partial_json(), self.private_json)
+        assert self.jwk256.to_partial_json() == self.jwk256json
+        assert self.jwk384.to_partial_json() == self.jwk384json
+        assert self.jwk521.to_partial_json() == self.jwk521json
+        assert self.private.to_partial_json() == self.private_json
 
     def test_from_json(self) -> None:
         from josepy.jwk import JWK
@@ -340,8 +339,8 @@ AwEHoUQDQgAEGS5RvStca15z2FEanCM3juoX7tE/LB7iD44GWawGE40APAl/iZuH
         key = JWKEC.load(data)
         json = key.to_partial_json()
         y = josepy.json_util.decode_b64jose(json['y'])
-        self.assertEqual(y[0], 0)
-        self.assertEqual(len(y), 32)
+        assert y[0] == 0
+        assert len(y) == 32
         JWK.from_json(json)
 
 

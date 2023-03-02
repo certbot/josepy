@@ -11,9 +11,8 @@ class UnrecognizedTypeErrorTest(unittest.TestCase):
         self.error = UnrecognizedTypeError('foo', {'type': 'foo'})
 
     def test_str(self) -> None:
-        self.assertEqual(
-            "foo was not recognized, full message: {'type': 'foo'}",
-            str(self.error))
+        assert "foo was not recognized, full message: {'type': 'foo'}" == \
+            str(self.error)
 
 
 if __name__ == '__main__':

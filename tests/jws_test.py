@@ -46,14 +46,16 @@ class HeaderTest(unittest.TestCase):
             self.header1 + self.crit
 
     def test_add_empty(self) -> None:
-        self.assertEqual(self.header1, self.header1 + self.empty)
-        self.assertEqual(self.header1, self.empty + self.header1)
+        assert self.header1 == self.header1 + self.empty
+        assert self.header1 == self.empty + self.header1
 
     def test_add_overlapping_error(self) -> None:
-        self.assertRaises(TypeError, self.header1.__add__, self.header2)
+        with pytest.raises(TypeError):
+            self.header1.__add__(self.header2)
 
     def test_add_wrong_type_error(self) -> None:
-        self.assertRaises(TypeError, self.header1.__add__, 'xxx')
+        with pytest.raises(TypeError):
+            self.header1.__add__('xxx')
 
     def test_crit_decode_always_errors(self) -> None:
         from josepy.jws import Header
@@ -75,9 +77,10 @@ class HeaderTest(unittest.TestCase):
             Header.from_json(jobj)
 
     def test_find_key(self) -> None:
-        self.assertEqual('foo', self.header1.find_key())
-        self.assertEqual('bar', self.header2.find_key())
-        self.assertRaises(errors.Error, self.crit.find_key)
+        assert 'foo' == self.header1.find_key()
+        assert 'bar' == self.header2.find_key()
+        with pytest.raises(errors.Error):
+            self.crit.find_key()
 
 
 class SignatureTest(unittest.TestCase):
@@ -113,18 +116,18 @@ class JWSTest(unittest.TestCase):
             protect=frozenset(['alg']))
 
     def test_pubkey_jwk(self) -> None:
-        self.assertEqual(self.unprotected.signature.combined.jwk, self.pubkey)
-        self.assertEqual(self.protected.signature.combined.jwk, self.pubkey)
-        self.assertEqual(self.mixed.signature.combined.jwk, self.pubkey)
+        assert self.unprotected.signature.combined.jwk == self.pubkey
+        assert self.protected.signature.combined.jwk == self.pubkey
+        assert self.mixed.signature.combined.jwk == self.pubkey
 
     def test_sign_unprotected(self) -> None:
-        self.assertIs(self.unprotected.verify(), True)
+        assert self.unprotected.verify() is True
 
     def test_sign_protected(self) -> None:
-        self.assertIs(self.protected.verify(), True)
+        assert self.protected.verify() is True
 
     def test_sign_mixed(self) -> None:
-        self.assertIs(self.mixed.verify(), True)
+        assert self.mixed.verify() is True
 
     def test_compact_lost_unprotected(self) -> None:
         compact = self.mixed.to_compact()

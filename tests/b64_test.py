@@ -1,6 +1,7 @@
 """Tests for josepy.b64."""
 import unittest
 from typing import Union
+import pytest
 
 # https://en.wikipedia.org/wiki/Base64#Examples
 B64_PADDING_EXAMPLES = {
@@ -27,7 +28,7 @@ class B64EncodeTest:
         return b64encode(data)
 
     def test_empty(self) -> None:
-        self.assertEqual(self._call(b''), b'')
+        assert self._call(b'') == b''
 
     def test_unsafe_url(self) -> None:
         for text, b64 in B64_URL_UNSAFE_EXAMPLES.items():
@@ -38,7 +39,8 @@ class B64EncodeTest:
             assert self._call(text) == b64
 
     def test_unicode_fails_with_type_error(self) -> None:
-        self.assertRaises(TypeError, self._call, u'some unicode')
+        with pytest.raises(TypeError):
+            self._call(u'some unicode')
 
 
 class B64DecodeTest:
@@ -62,13 +64,15 @@ class B64DecodeTest:
             assert self._call(b64 + pad) == text
 
     def test_unicode_with_ascii(self) -> None:
-        self.assertEqual(self._call(u'YQ'), b'a')
+        assert self._call(u'YQ') == b'a'
 
     def test_non_ascii_unicode_fails(self) -> None:
-        self.assertRaises(ValueError, self._call, u'\u0105')
+        with pytest.raises(ValueError):
+            self._call(u'\u0105')
 
     def test_type_error_no_unicode_or_bytes(self) -> None:
-        self.assertRaises(TypeError, self._call, object())
+        with pytest.raises(TypeError):
+            self._call(object())
 
 
 if __name__ == '__main__':

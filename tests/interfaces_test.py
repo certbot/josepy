@@ -59,20 +59,20 @@ class JSONDeSerializableTest(unittest.TestCase):
         self.Mapping = Mapping
 
     def test_to_json_sequence(self) -> None:
-        self.assertEqual(self.seq.to_json(), ['foo1', 'foo2'])
+        assert self.seq.to_json() == ['foo1', 'foo2']
 
     def test_to_json_mapping(self) -> None:
-        self.assertEqual(self.mapping.to_json(), {'foo1': 'foo2'})
+        assert self.mapping.to_json() == {'foo1': 'foo2'}
 
     def test_to_json_other(self) -> None:
         mock_value = object()
         assert self.Basic(mock_value).to_json() is mock_value
 
     def test_to_json_nested(self) -> None:
-        self.assertEqual(self.nested.to_json(), [['foo1']])
+        assert self.nested.to_json() == [['foo1']]
 
     def test_to_json(self) -> None:
-        self.assertEqual(self.tuple.to_json(), (('foo', )))
+        assert self.tuple.to_json() == (('foo', ))
 
     def test_from_json_not_implemented(self) -> None:
         from josepy.interfaces import JSONDeSerializable
@@ -88,11 +88,11 @@ class JSONDeSerializableTest(unittest.TestCase):
         assert seq.y.v == 'foo2'
 
     def test_json_dumps(self) -> None:
-        self.assertEqual('["foo1", "foo2"]', self.seq.json_dumps())
+        assert '["foo1", "foo2"]' == self.seq.json_dumps()
 
     def test_json_dumps_pretty(self) -> None:
-        self.assertEqual(self.seq.json_dumps_pretty(),
-                         '[\n    "foo1",\n    "foo2"\n]')
+        assert self.seq.json_dumps_pretty() == \
+                         '[\n    "foo1",\n    "foo2"\n]'
 
     def test_json_dump_default(self) -> None:
         from josepy.interfaces import JSONDeSerializable

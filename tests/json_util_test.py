@@ -210,7 +210,7 @@ class JSONObjectWithFieldsTest(unittest.TestCase):
         self.assertEqual(
             {'x': 2, 'y': 2, 'z': 3},
             self.MockJSONObjectWithFields.fields_from_json(
-                {'x': 4, 'y': 2, 'Z': 3})
+                {'x': 4, 'y': 2, 'Z': 3}))
 
     def test_fields_to_partial_json_error_passthrough(self) -> None:
         self.assertRaises(
@@ -361,7 +361,7 @@ class TypedJSONObjectWithFieldsTest(unittest.TestCase):
         self.assertEqual(self.msg.to_partial_json(), {
             'type': 'test',
             'foo': 'bar',
-        }
+        })
 
     def test_from_json_non_dict_fails(self) -> None:
         for value in [[], (), 5, "asd"]:  # all possible input types

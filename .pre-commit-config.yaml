@@ -1,0 +1,14 @@
+files: |
+    (?x)^(
+      src|
+      tests
+    )/
+repos:
+  - repo: https://github.com/pycqa/flake8
+    rev: 5.0.4
+    hooks:
+      - id: flake8
+  - repo: https://github.com/pycqa/isort
+    rev: 5.11.5
+    hooks:
+      - id: isort

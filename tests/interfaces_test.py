@@ -92,7 +92,7 @@ class JSONDeSerializableTest(unittest.TestCase):
 
     def test_json_dumps_pretty(self) -> None:
         assert self.seq.json_dumps_pretty() == \
-                         '[\n    "foo1",\n    "foo2"\n]'
+            '[\n    "foo1",\n    "foo2"\n]'
 
     def test_json_dump_default(self) -> None:
         from josepy.interfaces import JSONDeSerializable

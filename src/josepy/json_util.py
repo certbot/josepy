@@ -9,7 +9,17 @@ The framework presented here is somewhat based on `Go's "json" package`_
 import abc
 import binascii
 import logging
-from typing import Any, Callable, Dict, List, Mapping, Optional, Type, TypeVar
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Type,
+    TypeVar,
+)
 
 from OpenSSL import crypto
 
@@ -191,6 +201,7 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
     """
 
     _fields: Dict[str, Field] = {}
+    _orig_slots: Iterable[str]
 
     def __new__(mcs, name: str, bases: List[str],
                 namespace: Dict[str, Any]) -> 'JSONObjectWithFieldsMeta':

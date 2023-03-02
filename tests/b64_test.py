@@ -18,7 +18,7 @@ B64_URL_UNSAFE_EXAMPLES = {
 }
 
 
-class B64EncodeTest(unittest.TestCase):
+class B64EncodeTest:
     """Tests for josepy.b64.b64encode."""
 
     @classmethod
@@ -31,17 +31,17 @@ class B64EncodeTest(unittest.TestCase):
 
     def test_unsafe_url(self) -> None:
         for text, b64 in B64_URL_UNSAFE_EXAMPLES.items():
-            self.assertEqual(self._call(text), b64)
+            assert self._call(text) == b64
 
     def test_different_paddings(self) -> None:
         for text, (b64, _) in B64_PADDING_EXAMPLES.items():
-            self.assertEqual(self._call(text), b64)
+            assert self._call(text) == b64
 
     def test_unicode_fails_with_type_error(self) -> None:
         self.assertRaises(TypeError, self._call, u'some unicode')
 
 
-class B64DecodeTest(unittest.TestCase):
+class B64DecodeTest:
     """Tests for josepy.b64.b64decode."""
 
     @classmethod
@@ -51,15 +51,15 @@ class B64DecodeTest(unittest.TestCase):
 
     def test_unsafe_url(self) -> None:
         for text, b64 in B64_URL_UNSAFE_EXAMPLES.items():
-            self.assertEqual(self._call(b64), text)
+            assert self._call(b64) == text
 
     def test_input_without_padding(self) -> None:
         for text, (b64, _) in B64_PADDING_EXAMPLES.items():
-            self.assertEqual(self._call(b64), text)
+            assert self._call(b64) == text
 
     def test_input_with_padding(self) -> None:
         for text, (b64, pad) in B64_PADDING_EXAMPLES.items():
-            self.assertEqual(self._call(b64 + pad), text)
+            assert self._call(b64 + pad) == text
 
     def test_unicode_with_ascii(self) -> None:
         self.assertEqual(self._call(u'YQ'), b'a')
@@ -72,4 +72,4 @@ class B64DecodeTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()  # pragma: no cover
+    sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

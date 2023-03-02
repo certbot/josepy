@@ -1,9 +1,11 @@
 """Tests for josepy.json_util."""
 import itertools
+import sys
 import unittest
 from typing import Any, Dict, Mapping
 from unittest import mock
 
+import pytest
 import test_util
 
 from josepy import errors, interfaces, util
@@ -19,9 +21,9 @@ class FieldTest(unittest.TestCase):
         from josepy.json_util import Field, field
 
         test = field("foo", default="bar")
-        self.assertIsInstance(test, Field)
-        self.assertEqual(test.json_name, "foo")
-        self.assertEqual(test.default, "bar")
+        assert isinstance(test, Field)
+        assert test.json_name == "foo"
+        assert test.default == "bar"
 
     def test_type_field_control(self) -> None:
         from josepy.json_util import JSONObjectWithFields, field
@@ -30,7 +32,7 @@ class FieldTest(unittest.TestCase):
             type: str = field('type')
             index: int = field('index')
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             class DummyImproperlyTyped(JSONObjectWithFields):
                 type = field('type')
                 index: int = field('index')
@@ -39,8 +41,7 @@ class FieldTest(unittest.TestCase):
         from josepy.json_util import Field
         for default, omitempty, value in itertools.product(
                 [True, False], [True, False], [True, False]):
-            self.assertIs(
-                Field("foo", default=default, omitempty=omitempty).omit(value), False)
+            assert Field("foo", default=default, omitempty=omitempty).omit(value) is False
 
     def test_descriptors(self) -> None:
         mock_value = mock.MagicMock()
@@ -55,11 +56,11 @@ class FieldTest(unittest.TestCase):
         field = Field('foo')
 
         field = field.encoder(encoder)
-        self.assertEqual('e', field.encode(mock_value))
+        assert 'e' == field.encode(mock_value)
 
         field = field.decoder(decoder)
-        self.assertEqual('e', field.encode(mock_value))
-        self.assertEqual('d', field.decode(mock_value))
+        assert 'e' == field.encode(mock_value)
+        assert 'd' == field.decode(mock_value)
 
     def test_default_encoder_is_partial(self) -> None:
         class MockField(interfaces.JSONDeSerializable):
@@ -72,29 +73,29 @@ class FieldTest(unittest.TestCase):
         mock_field = MockField()
 
         from josepy.json_util import Field
-        self.assertIs(Field.default_encoder(mock_field), mock_field)
+        assert Field.default_encoder(mock_field) is mock_field
         # in particular...
-        self.assertNotEqual('foo', Field.default_encoder(mock_field))
+        assert 'foo' != Field.default_encoder(mock_field)
 
     def test_default_encoder_passthrough(self) -> None:
         mock_value = mock.MagicMock()
         from josepy.json_util import Field
-        self.assertIs(Field.default_encoder(mock_value), mock_value)
+        assert Field.default_encoder(mock_value) is mock_value
 
     def test_default_decoder_list_to_tuple(self) -> None:
         from josepy.json_util import Field
-        self.assertEqual((1, 2, 3), Field.default_decoder([1, 2, 3]))
+        assert (1, 2, 3) == Field.default_decoder([1, 2, 3])
 
     def test_default_decoder_dict_to_frozendict(self) -> None:
         from josepy.json_util import Field
         obj = Field.default_decoder({'x': 2})
-        self.assertIsInstance(obj, util.frozendict)
-        self.assertEqual(obj, util.frozendict(x=2))
+        assert isinstance(obj, util.frozendict)
+        assert obj == util.frozendict(x=2)
 
     def test_default_decoder_passthrough(self) -> None:
         mock_value = mock.MagicMock()
         from josepy.json_util import Field
-        self.assertIs(Field.default_decoder(mock_value), mock_value)
+        assert Field.default_decoder(mock_value) is mock_value
 
 
 class JSONObjectWithFieldsMetaTest(unittest.TestCase):
@@ -209,7 +210,7 @@ class JSONObjectWithFieldsTest(unittest.TestCase):
         self.assertEqual(
             {'x': 2, 'y': 2, 'z': 3},
             self.MockJSONObjectWithFields.fields_from_json(
-                {'x': 4, 'y': 2, 'Z': 3}))
+                {'x': 4, 'y': 2, 'Z': 3})
 
     def test_fields_to_partial_json_error_passthrough(self) -> None:
         self.assertRaises(
@@ -252,78 +253,82 @@ class DeEncodersTest(unittest.TestCase):
     def test_encode_b64jose(self) -> None:
         from josepy.json_util import encode_b64jose
         encoded = encode_b64jose(b'x')
-        self.assertIsInstance(encoded, str)
-        self.assertEqual(u'eA', encoded)
+        assert isinstance(encoded, str)
+        assert u'eA' == encoded
 
     def test_decode_b64jose(self) -> None:
         from josepy.json_util import decode_b64jose
         decoded = decode_b64jose(u'eA')
-        self.assertIsInstance(decoded, bytes)
-        self.assertEqual(b'x', decoded)
+        assert isinstance(decoded, bytes)
+        assert b'x' == decoded
 
     def test_decode_b64jose_padding_error(self) -> None:
         from josepy.json_util import decode_b64jose
-        self.assertRaises(errors.DeserializationError, decode_b64jose, u'x')
+        with pytest.raises(errors.DeserializationError):
+            decode_b64jose(u'x')
 
     def test_decode_b64jose_size(self) -> None:
         from josepy.json_util import decode_b64jose
-        self.assertEqual(b'foo', decode_b64jose(u'Zm9v', size=3))
-        self.assertRaises(
-            errors.DeserializationError, decode_b64jose, u'Zm9v', size=2)
-        self.assertRaises(
-            errors.DeserializationError, decode_b64jose, u'Zm9v', size=4)
+        assert b'foo' == decode_b64jose(u'Zm9v', size=3)
+        with pytest.raises(errors.DeserializationError):
+            decode_b64jose(u'Zm9v', size=2)
+        with pytest.raises(errors.DeserializationError):
+            decode_b64jose(u'Zm9v', size=4)
 
     def test_decode_b64jose_minimum_size(self) -> None:
         from josepy.json_util import decode_b64jose
-        self.assertEqual(b'foo', decode_b64jose(u'Zm9v', size=3, minimum=True))
-        self.assertEqual(b'foo', decode_b64jose(u'Zm9v', size=2, minimum=True))
-        self.assertRaises(errors.DeserializationError, decode_b64jose,
-                          u'Zm9v', size=4, minimum=True)
+        assert b'foo' == decode_b64jose(u'Zm9v', size=3, minimum=True)
+        assert b'foo' == decode_b64jose(u'Zm9v', size=2, minimum=True)
+        with pytest.raises(errors.DeserializationError):
+            decode_b64jose(u'Zm9v', size=4, minimum=True)
 
     def test_encode_hex16(self) -> None:
         from josepy.json_util import encode_hex16
         encoded = encode_hex16(b'foo')
-        self.assertEqual(u'666f6f', encoded)
-        self.assertIsInstance(encoded, str)
+        assert u'666f6f' == encoded
+        assert isinstance(encoded, str)
 
     def test_decode_hex16(self) -> None:
         from josepy.json_util import decode_hex16
         decoded = decode_hex16(u'666f6f')
-        self.assertEqual(b'foo', decoded)
-        self.assertIsInstance(decoded, bytes)
+        assert b'foo' == decoded
+        assert isinstance(decoded, bytes)
 
     def test_decode_hex16_minimum_size(self) -> None:
         from josepy.json_util import decode_hex16
-        self.assertEqual(b'foo', decode_hex16(u'666f6f', size=3, minimum=True))
-        self.assertEqual(b'foo', decode_hex16(u'666f6f', size=2, minimum=True))
-        self.assertRaises(errors.DeserializationError, decode_hex16,
-                          u'666f6f', size=4, minimum=True)
+        assert b'foo' == decode_hex16(u'666f6f', size=3, minimum=True)
+        assert b'foo' == decode_hex16(u'666f6f', size=2, minimum=True)
+        with pytest.raises(errors.DeserializationError):
+            decode_hex16(u'666f6f', size=4, minimum=True)
 
     def test_decode_hex16_odd_length(self) -> None:
         from josepy.json_util import decode_hex16
-        self.assertRaises(errors.DeserializationError, decode_hex16, u'x')
+        with pytest.raises(errors.DeserializationError):
+            decode_hex16(u'x')
 
     def test_encode_cert(self) -> None:
         from josepy.json_util import encode_cert
-        self.assertEqual(self.b64_cert, encode_cert(CERT))
+        assert self.b64_cert == encode_cert(CERT)
 
     def test_decode_cert(self) -> None:
         from josepy.json_util import decode_cert
         cert = decode_cert(self.b64_cert)
-        self.assertIsInstance(cert, util.ComparableX509)
-        self.assertEqual(cert, CERT)
-        self.assertRaises(errors.DeserializationError, decode_cert, u'')
+        assert isinstance(cert, util.ComparableX509)
+        assert cert == CERT
+        with pytest.raises(errors.DeserializationError):
+            decode_cert(u'')
 
     def test_encode_csr(self) -> None:
         from josepy.json_util import encode_csr
-        self.assertEqual(self.b64_csr, encode_csr(CSR))
+        assert self.b64_csr == encode_csr(CSR)
 
     def test_decode_csr(self) -> None:
         from josepy.json_util import decode_csr
         csr = decode_csr(self.b64_csr)
-        self.assertIsInstance(csr, util.ComparableX509)
-        self.assertEqual(csr, CSR)
-        self.assertRaises(errors.DeserializationError, decode_csr, u'')
+        assert isinstance(csr, util.ComparableX509)
+        assert csr == CSR
+        with pytest.raises(errors.DeserializationError):
+            decode_csr(u'')
 
 
 class TypedJSONObjectWithFieldsTest(unittest.TestCase):
@@ -356,12 +361,12 @@ class TypedJSONObjectWithFieldsTest(unittest.TestCase):
         self.assertEqual(self.msg.to_partial_json(), {
             'type': 'test',
             'foo': 'bar',
-        })
+        }
 
     def test_from_json_non_dict_fails(self) -> None:
         for value in [[], (), 5, "asd"]:  # all possible input types
-            self.assertRaises(
-                errors.DeserializationError, self.parent_cls.from_json, value)
+            with pytest.raises(errors.DeserializationError):
+                self.parent_cls.from_json(value)
 
     def test_from_json_dict_no_type_fails(self) -> None:
         self.assertRaises(
@@ -377,4 +382,4 @@ class TypedJSONObjectWithFieldsTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()  # pragma: no cover
+    sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

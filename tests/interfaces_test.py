@@ -1,6 +1,9 @@
 """Tests for josepy.interfaces."""
+import sys
 import unittest
 from typing import Any, Dict, List
+
+import pytest
 
 
 class JSONDeSerializableTest(unittest.TestCase):
@@ -63,7 +66,7 @@ class JSONDeSerializableTest(unittest.TestCase):
 
     def test_to_json_other(self) -> None:
         mock_value = object()
-        self.assertIs(self.Basic(mock_value).to_json(), mock_value)
+        assert self.Basic(mock_value).to_json() is mock_value
 
     def test_to_json_nested(self) -> None:
         self.assertEqual(self.nested.to_json(), [['foo1']])
@@ -73,15 +76,16 @@ class JSONDeSerializableTest(unittest.TestCase):
 
     def test_from_json_not_implemented(self) -> None:
         from josepy.interfaces import JSONDeSerializable
-        self.assertRaises(TypeError, JSONDeSerializable.from_json, 'xxx')
+        with pytest.raises(TypeError):
+            JSONDeSerializable.from_json('xxx')
 
     def test_json_loads(self) -> None:
         seq = self.Sequence.json_loads('["foo1", "foo2"]')
-        self.assertIsInstance(seq, self.Sequence)
-        self.assertIsInstance(seq.x, self.Basic)
-        self.assertIsInstance(seq.y, self.Basic)
-        self.assertEqual(seq.x.v, 'foo1')
-        self.assertEqual(seq.y.v, 'foo2')
+        assert isinstance(seq, self.Sequence)
+        assert isinstance(seq.x, self.Basic)
+        assert isinstance(seq.y, self.Basic)
+        assert seq.x.v == 'foo1'
+        assert seq.y.v == 'foo2'
 
     def test_json_dumps(self) -> None:
         self.assertEqual('["foo1", "foo2"]', self.seq.json_dumps())
@@ -93,19 +97,18 @@ class JSONDeSerializableTest(unittest.TestCase):
     def test_json_dump_default(self) -> None:
         from josepy.interfaces import JSONDeSerializable
 
-        self.assertEqual(
-            'foo1', JSONDeSerializable.json_dump_default(self.basic1))
+        assert 'foo1' == JSONDeSerializable.json_dump_default(self.basic1)
 
         jobj = JSONDeSerializable.json_dump_default(self.seq)
-        self.assertEqual(len(jobj), 2)
-        self.assertIs(jobj[0], self.basic1)
-        self.assertIs(jobj[1], self.basic2)
+        assert len(jobj) == 2
+        assert jobj[0] is self.basic1
+        assert jobj[1] is self.basic2
 
     def test_json_dump_default_type_error(self) -> None:
         from josepy.interfaces import JSONDeSerializable
-        self.assertRaises(
-            TypeError, JSONDeSerializable.json_dump_default, object())
+        with pytest.raises(TypeError):
+            JSONDeSerializable.json_dump_default(object())
 
 
 if __name__ == '__main__':
-    unittest.main()  # pragma: no cover
+    sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

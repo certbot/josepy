@@ -1,7 +1,9 @@
 """Tests for josepy.util."""
 import functools
+import sys
 import unittest
 
+import pytest
 import test_util
 
 
@@ -37,13 +39,13 @@ class ComparableX509Test(unittest.TestCase):
         self.assertEqual(hash(self.req1), hash(self.req2))
         self.assertNotEqual(hash(self.req1), hash(self.req_other))
 
-        self.assertEqual(hash(self.cert1), hash(self.cert2))
-        self.assertNotEqual(hash(self.cert1), hash(self.cert_other))
+        assert hash(self.cert1) == hash(self.cert2)
+        assert hash(self.cert1) != hash(self.cert_other)
 
     def test_repr(self) -> None:
         for x509 in self.req1, self.cert1:
-            self.assertEqual(repr(x509),
-                             '<ComparableX509({0!r})>'.format(x509.wrapped))
+            assert repr(x509) == \
+                '<ComparableX509({0!r})>'.format(x509.wrapped)
 
 
 class ComparableRSAKeyTest(unittest.TestCase):
@@ -85,7 +87,7 @@ class ComparableRSAKeyTest(unittest.TestCase):
 
     def test_public_key(self) -> None:
         from josepy.util import ComparableRSAKey
-        self.assertIsInstance(self.key.public_key(), ComparableRSAKey)
+        assert isinstance(self.key.public_key(), ComparableRSAKey)
 
 
 class ComparableECKeyTest(unittest.TestCase):
@@ -130,7 +132,7 @@ class ComparableECKeyTest(unittest.TestCase):
 
     def test_public_key(self) -> None:
         from josepy.util import ComparableECKey
-        self.assertIsInstance(self.p256_key.public_key(), ComparableECKey)
+        assert isinstance(self.p256_key.public_key(), ComparableECKey)
 
 
 class ImmutableMapTest(unittest.TestCase):
@@ -212,13 +214,14 @@ class frozendictTest(unittest.TestCase):
 
     def test_init_dict(self) -> None:
         from josepy.util import frozendict
-        self.assertEqual(self.fdict, frozendict({'x': 1, 'y': '2'}))
+        assert self.fdict == frozendict({'x': 1, 'y': '2'})
 
     def test_init_other_raises_type_error(self) -> None:
         from josepy.util import frozendict
 
         # specifically fail for generators...
-        self.assertRaises(TypeError, frozendict, {'a': 'b'}.items())
+        with pytest.raises(TypeError):
+            frozendict({'a': 'b'}.items())
 
     def test_len(self) -> None:
         self.assertEqual(2, len(self.fdict))
@@ -241,4 +244,4 @@ class frozendictTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()  # pragma: no cover
+    sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

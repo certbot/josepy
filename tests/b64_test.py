@@ -1,5 +1,7 @@
 """Tests for josepy.b64."""
+import sys
 from typing import Union
+
 import pytest
 
 # https://en.wikipedia.org/wiki/Base64#Examples
@@ -39,7 +41,8 @@ class B64EncodeTest:
 
     def test_unicode_fails_with_type_error(self) -> None:
         with pytest.raises(TypeError):
-            self._call(u'some unicode')
+            # We're purposefully testing with the incorrect type here.
+            self._call(u'some unicode')  # type: ignore
 
 
 class B64DecodeTest:
@@ -71,7 +74,8 @@ class B64DecodeTest:
 
     def test_type_error_no_unicode_or_bytes(self) -> None:
         with pytest.raises(TypeError):
-            self._call(object())
+            # We're purposefully testing with the incorrect type here.
+            self._call(object())  # type: ignore
 
 
 if __name__ == '__main__':

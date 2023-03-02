@@ -107,7 +107,8 @@ class JSONDeSerializableTest(unittest.TestCase):
     def test_json_dump_default_type_error(self) -> None:
         from josepy.interfaces import JSONDeSerializable
         with pytest.raises(TypeError):
-            JSONDeSerializable.json_dump_default(object())
+            # We're purposefully testing with the incorrect type here.
+            JSONDeSerializable.json_dump_default(object())  # type: ignore
 
 
 if __name__ == '__main__':

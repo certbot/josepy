@@ -357,7 +357,8 @@ class TypedJSONObjectWithFieldsTest(unittest.TestCase):
     def test_from_json_non_dict_fails(self) -> None:
         for value in [[], (), 5, "asd"]:  # all possible input types
             with pytest.raises(errors.DeserializationError):
-                self.parent_cls.from_json(value)
+                # We're purposefully testing with the incorrect type here.
+                self.parent_cls.from_json(value)  # type: ignore
 
     def test_from_json_dict_no_type_fails(self) -> None:
         with pytest.raises(errors.DeserializationError):

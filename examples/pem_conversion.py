@@ -93,15 +93,11 @@ if __name__ == "__main__":
         print("Error.")
         print("Invoke this script with a single argument: the path to a certbot key.")
         print(
-            "   python pem_conversion.py "
-            "/etc/letsencrypt/accounts/acme-v02.api.letsencrypt.org/"
-            "directory/##ACCOUNT##/private_key.json"
+            "   python pem_conversion.py /etc/letsencrypt/accounts/acme-v02.api.letsencrypt.org/directory/##ACCOUNT##/private_key.json"
         )
         print(
             "Optional: add the string 'roundtrip' after the key to perform a roundtrip"
         )
         print(
-            "   python pem_conversion.py "
-            "/etc/letsencrypt/accounts/acme-v02.api.letsencrypt.org/"
-            "directory/##ACCOUNT##/private_key.json roundtrip"
+            "   python pem_conversion.py /etc/letsencrypt/accounts/acme-v02.api.letsencrypt.org/directory/##ACCOUNT##/private_key.json roundtrip"
         )

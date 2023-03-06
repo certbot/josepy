@@ -2,6 +2,7 @@
 import atexit
 import contextlib
 import os
+import sys
 from typing import Any
 
 from cryptography.hazmat.backends import default_backend
@@ -12,10 +13,12 @@ import josepy.util
 from josepy import ComparableRSAKey, ComparableX509
 from josepy.util import ComparableECKey
 
-try:
-    import importlib_resources
-except ImportError:
+# This approach is based on the recommendation at
+# https://github.com/python/mypy/issues/1153#issuecomment-1207333806.
+if sys.version_info >= (3, 9):
     import importlib.resources as importlib_resources
+else:
+    import importlib_resources
 
 TESTDATA = importlib_resources.files('testdata')
 

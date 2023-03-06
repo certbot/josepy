@@ -28,6 +28,8 @@ def vector_path(*names: str) -> str:
     file_manager = contextlib.ExitStack()
     atexit.register(file_manager.close)
     ref = TESTDATA.joinpath(*names)
+    # We convert the value to str here because some of the calling code doesn't
+    # work with pathlib objects.
     return str(file_manager.enter_context(importlib_resources.as_file(ref)))
 
 

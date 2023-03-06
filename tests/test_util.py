@@ -1,8 +1,9 @@
 """Test utilities."""
+import atexit
+import contextlib
 import os
 from typing import Any
 
-import pkg_resources
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from OpenSSL import crypto
@@ -11,17 +12,25 @@ import josepy.util
 from josepy import ComparableRSAKey, ComparableX509
 from josepy.util import ComparableECKey
 
+try:
+    import importlib_resources
+except ImportError:
+    import importlib.resources as importlib_resources
+
+TESTDATA = importlib_resources.files('testdata')
+
 
 def vector_path(*names: str) -> str:
     """Path to a test vector."""
-    return pkg_resources.resource_filename(
-        __name__, os.path.join('testdata', *names))
+    file_manager = contextlib.ExitStack()
+    atexit.register(file_manager.close)
+    ref = TESTDATA.joinpath(*names)
+    return str(file_manager.enter_context(importlib_resources.as_file(ref)))
 
 
 def load_vector(*names: str) -> bytes:
     """Load contents of a test vector."""
-    # luckily, resource_string opens file in binary mode
-    return pkg_resources.resource_string(__name__, os.path.join('testdata', *names))
+    return TESTDATA.joinpath(*names).read_bytes()
 
 
 def _guess_loader(filename: str, loader_pem: Any, loader_der: Any) -> Any:

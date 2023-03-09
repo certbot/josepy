@@ -25,6 +25,8 @@ TESTDATA = importlib_resources.files('testdata')
 
 def vector_path(*names: str) -> str:
     """Path to a test vector."""
+    # This code is based on the recommendation at
+    # https://web.archive.org/web/20230131043552/https://importlib-resources.readthedocs.io/en/latest/migration.html#pkg-resources-resource-filename.
     file_manager = contextlib.ExitStack()
     atexit.register(file_manager.close)
     ref = TESTDATA.joinpath(*names)

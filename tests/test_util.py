@@ -20,7 +20,7 @@ if sys.version_info >= (3, 9):
 else:
     import importlib_resources
 
-TESTDATA = importlib_resources.files('testdata')
+TESTDATA = importlib_resources.files("testdata")
 
 
 def vector_path(*names: str) -> str:
@@ -42,9 +42,9 @@ def load_vector(*names: str) -> bytes:
 
 def _guess_loader(filename: str, loader_pem: Any, loader_der: Any) -> Any:
     _, ext = os.path.splitext(filename)
-    if ext.lower() == '.pem':
+    if ext.lower() == ".pem":
         return loader_pem
-    elif ext.lower() == '.der':
+    elif ext.lower() == ".der":
         return loader_der
     else:  # pragma: no cover
         raise ValueError("Loader could not be recognized based on extension")
@@ -52,8 +52,7 @@ def _guess_loader(filename: str, loader_pem: Any, loader_der: Any) -> Any:
 
 def load_cert(*names: str) -> crypto.X509:
     """Load certificate."""
-    loader = _guess_loader(
-        names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
+    loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
     return crypto.load_certificate(loader, load_vector(*names))
 
 
@@ -64,8 +63,7 @@ def load_comparable_cert(*names: str) -> josepy.util.ComparableX509:
 
 def load_csr(*names: str) -> crypto.X509Req:
     """Load certificate request."""
-    loader = _guess_loader(
-        names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
+    loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
     return crypto.load_certificate_request(loader, load_vector(*names))
 
 
@@ -76,22 +74,21 @@ def load_comparable_csr(*names: str) -> josepy.util.ComparableX509:
 
 def load_rsa_private_key(*names: str) -> josepy.util.ComparableRSAKey:
     """Load RSA private key."""
-    loader = _guess_loader(names[-1], serialization.load_pem_private_key,
-                           serialization.load_der_private_key)
-    return ComparableRSAKey(loader(
-        load_vector(*names), password=None, backend=default_backend()))
+    loader = _guess_loader(
+        names[-1], serialization.load_pem_private_key, serialization.load_der_private_key
+    )
+    return ComparableRSAKey(loader(load_vector(*names), password=None, backend=default_backend()))
 
 
 def load_ec_private_key(*names: str) -> josepy.util.ComparableECKey:
     """Load EC private key."""
-    loader = _guess_loader(names[-1], serialization.load_pem_private_key,
-                           serialization.load_der_private_key)
-    return ComparableECKey(loader(
-        load_vector(*names), password=None, backend=default_backend()))
+    loader = _guess_loader(
+        names[-1], serialization.load_pem_private_key, serialization.load_der_private_key
+    )
+    return ComparableECKey(loader(load_vector(*names), password=None, backend=default_backend()))
 
 
 def load_pyopenssl_private_key(*names: str) -> crypto.PKey:
     """Load pyOpenSSL private key."""
-    loader = _guess_loader(
-        names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
+    loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
     return crypto.load_privatekey(loader, load_vector(*names))

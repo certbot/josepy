@@ -35,6 +35,8 @@ include = [
 ]
 
 [tool.poetry.dependencies]
+# This should be kept in sync with the value of target-version in our
+# configuration for black below.
 python = "^3.7"
 # load_pem_private/public_key (>=0.6)
 # rsa_recover_prime_factors (>=0.8)
@@ -47,6 +49,7 @@ sphinx = {version = ">=4.3.0", optional = true}
 sphinx-rtd-theme = {version = ">=1.0", optional = true}
 
 [tool.poetry.dev-dependencies]
+black = "*"
 # coverage[toml] extra is required to read the coverage config from pyproject.toml
 coverage = {version = ">=4.0", extras = ["toml"]}
 # flake8 3.x doesn't work on Python 3.7. See
@@ -79,6 +82,13 @@ docs = [
 [tool.poetry.scripts]
 jws = "josepy.jws:CLI.run"
 
+# Black tooling configuration
+[tool.black]
+line-length = 100
+# This should be kept in sync with the version of Python specified in poetry's
+# dependencies above.
+target-version = ['py37', 'py38', 'py39', 'py310', 'py311']
+
 # Mypy tooling configuration
 
 [tool.mypy]
@@ -98,10 +108,9 @@ norecursedirs = "*.egg .eggs dist build docs .tox"
 [tool.isort]
 combine_as_imports = false
 default_section = "THIRDPARTY"
-include_trailing_comma = true
 known_first_party = "josepy"
 line_length = 79
-multi_line_output = 3
+profile = "black"
 
 # Coverage tooling configuration
 

@@ -62,9 +62,9 @@ class JWK(json_util.TypedJSONObjectWithFields, metaclass=abc.ABCMeta):
         digest.update(
             json.dumps(
                 {k: v for k, v in self.to_json().items() if k in self.required},
-                **self._thumbprint_json_dumps_params,
+                **self._thumbprint_json_dumps_params,  # type: ignore[arg-type]
             ).encode()
-        )  # type: ignore[arg-type]
+        )
         return digest.finalize()
 
     @abc.abstractmethod

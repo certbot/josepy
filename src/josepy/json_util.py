@@ -497,7 +497,7 @@ class TypedJSONObjectWithFields(JSONObjectWithFields):
     def get_type_cls(cls, jobj: Mapping[str, Any]) -> Type["TypedJSONObjectWithFields"]:
         """Get the registered class for ``jobj``."""
         if cls in cls.TYPES.values():
-            if cls.type_field_name not in jobj:
+            if cls.type_field_name not in jobj:  # noqa
                 raise errors.DeserializationError(
                     "Missing type field ({0})".format(cls.type_field_name))
             # cls is already registered type_cls, force to use it

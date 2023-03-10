@@ -135,6 +135,31 @@ class ComparableECKeyTest(unittest.TestCase):
         assert isinstance(self.p256_key.public_key(), ComparableECKey)
 
 
+class ComparableOKPKeyTests(unittest.TestCase):
+    def setUp(self):
+        # test_utl.load_ec_private_key return ComparableECKey
+        self.ed25519_key = test_util.load_okp_private_key('ed25519_key.pem')
+        self.ed25519_key_same = test_util.load_okp_private_key('ed25519_key.pem')
+        self.ed448_key = test_util.load_okp_private_key('ed448_key.pem')
+        # self.x25519_key = test_util.load_okp_private_key('x25519_key.pem')
+        # self.x448_key = test_util.load_okp_private_key('x448_key.pem')
+
+    def test_repr(self):
+        self.assertIs(repr(self.ed25519_key).startswith(
+            '<ComparableOKPKey(<cryptography.hazmat.'), True)
+
+    def test_public_key(self):
+        from josepy.util import ComparableOKPKey
+        self.assertIsInstance(self.ed25519_key.public_key(), ComparableOKPKey)
+
+    def test_hash(self):
+        self.assertIsInstance(hash(self.ed25519_key), int)
+        self.assertEqual(hash(self.ed25519_key), hash(self.ed25519_key_same))
+        self.assertNotEqual(hash(self.ed25519_key), hash(self.ed448_key))
+        # self.assertNotEqual(hash(self.ed25519_key), hash(self.x25519_key))
+        # self.assertNotEqual(hash(self.x25519_key), hash(self.ed448_key))
+
+
 class ImmutableMapTest(unittest.TestCase):
     """Tests for josepy.util.ImmutableMap."""
 

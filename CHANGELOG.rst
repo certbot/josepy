@@ -3,6 +3,11 @@ Changelog
 
 1.14.0 (master)
 ---------------
+* Added support for Ed25519, Ed448, X25519 and X448 keys (see `RFC 8037 <https://tools.ietf.org/html/rfc8037>`_).
+  These are also known as Bernstein curves.
+* Added support for signing with Ed25519, Ed448, X25519 and X448 keys
+  (see `RFC 8032 <https://datatracker.ietf.org/doc/html/rfc8032>`_). See JWA.
+* Minimum requirement of ``cryptography`` is now 2.6+.
 
 * Added support for Python 3.11.
 * Dropped support for Python 3.6.

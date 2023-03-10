@@ -1,5 +1,6 @@
 """JSON Web Key."""
 import abc
+import collections
 import json
 import logging
 import math
@@ -18,7 +19,16 @@ from typing import (
 import cryptography.exceptions
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import ec, rsa
+# TODO import with try/except as some curves may not be available
+# They do this in latchset/jwcrypto
+from cryptography.hazmat.primitives.asymmetric import (
+    ec,
+    ed448,
+    ed25519,
+    rsa,
+    x448,
+    x25519,
+)
 
 import josepy.util
 from josepy import errors, json_util, util
@@ -387,3 +397,112 @@ class JWKEC(JWK):
         else:
             key = self.key.public_numbers().public_key(default_backend())
         return type(self)(key=key)
+
+
+@JWK.register
+class JWKOKP(JWK):
+    """
+    Performs signing and verification operations using either
+    Ed25519, Ed448, X25519 or X448. See RFC 8037 and RFC 8032 for details about
+    the algorithms, and signing, respectively.
+
+    :ivar: :key :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey`
+        or :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey`
+    wrapped in :class:`~josepy.util.ComparableOKPKey`
+
+    This class requires ``cryptography>=2.6`` to be installed.
+    """
+    typ = "OKP"
+    __slots__ = ("key",)
+    cryptography_key_types = (
+        ed25519.Ed25519PrivateKey, ed25519.Ed25519PrivateKey,
+        ed448.Ed448PublicKey, ed448.Ed448PrivateKey,
+        x25519.X25519PrivateKey, x25519.X25519PublicKey,
+        x448.X448PrivateKey, x448.X448PublicKey,
+    )
+    required = ("crv", JWK.type_field_name, "x")
+    okp_curve = collections.namedtuple("okp_curve", "pubkey privkey")
+    crv_to_pub_priv = {
+        "Ed25519": okp_curve(pubkey=ed25519.Ed25519PublicKey, privkey=ed25519.Ed25519PrivateKey),
+        "Ed448": okp_curve(pubkey=ed448.Ed448PublicKey, privkey=ed448.Ed448PrivateKey),
+        "X25519": okp_curve(pubkey=x25519.X25519PublicKey, privkey=x25519.X25519PrivateKey),
+        "X448": okp_curve(pubkey=x448.X448PublicKey, privkey=x448.X448PrivateKey),
+    }
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        if 'key' in kwargs and not isinstance(kwargs['key'], util.ComparableOKPKey):
+            kwargs['key'] = util.ComparableOKPKey(kwargs['key'])
+        super().__init__(*args, **kwargs)
+
+    def public_key(self) -> "JWKOKP":
+        return self.key.__class__.public_key()
+
+    def _key_to_crv(self) -> str:
+        if isinstance(self.key._wrapped, (ed25519.Ed25519PublicKey, ed25519.Ed25519PrivateKey)):
+            return "Ed25519"
+        elif isinstance(self.key._wrapped, (ed448.Ed448PublicKey, ed448.Ed448PrivateKey)):
+            return "Ed448"
+        elif isinstance(self.key._wrapped, (x25519.X25519PublicKey, x25519.X25519PrivateKey)):
+            return "X25519"
+        elif isinstance(self.key._wrapped, (x448.X448PublicKey, x448.X448PrivateKey)):
+            return "X448"
+        return NotImplemented
+
+    def fields_to_partial_json(self) -> Dict[str, Any]:
+        params = {
+            "crv": self._key_to_crv(),
+            "kty": "OKP",
+        }
+        if hasattr(self.key._wrapped, "private_bytes"):
+            params['d'] = json_util.encode_b64jose(self.key.private_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PrivateFormat.Raw,
+                encryption_algorithm=serialization.NoEncryption(),
+            ))
+            params['x'] = json_util.encode_b64jose(self.key.public_key().public_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PublicFormat.Raw,
+            ))
+        else:
+            params['x'] = json_util.encode_b64jose(self.key.public_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PublicFormat.Raw,
+            ))
+        return params
+
+    @classmethod
+    def fields_from_json(cls, jobj: Mapping[str, Any]) -> "JWKOKP":
+        curve = jobj["crv"]
+        if curve not in cls.crv_to_pub_priv:
+            raise errors.DeserializationError(f"Invalid curve: {curve}")
+
+        if "x" not in jobj:
+            raise errors.DeserializationError('OKP should have "x" parameter')
+        x = json_util.decode_b64jose(jobj["x"])
+
+        try:
+            if "d" not in jobj:  # public key
+                pub_class: Type[Union[
+                    ed25519.Ed25519PublicKey,
+                    ed448.Ed448PublicKey,
+                    x25519.X25519PublicKey,
+                    x448.X448PublicKey,
+                ]] = cls.crv_to_pub_priv[curve].pubkey
+                return cls(key=pub_class.from_public_bytes(x))
+            else:  # private key
+                d = json_util.decode_b64jose(jobj["d"])
+                priv_key_class: Type[Union[
+                    ed25519.Ed25519PrivateKey,
+                    ed448.Ed448PrivateKey,
+                    x25519.X25519PrivateKey,
+                    x448.X448PrivateKey,
+                ]] = cls.crv_to_pub_priv[curve].privkey
+                return cls(key=priv_key_class.from_private_bytes(d))
+        except ValueError as err:
+            raise errors.DeserializationError("Invalid key parameter") from err

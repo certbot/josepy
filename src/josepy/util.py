@@ -6,7 +6,8 @@ from collections.abc import Hashable, Mapping
 from types import ModuleType
 from typing import Any, Callable, Iterator, List, Tuple, TypeVar, Union, cast
 
-from cryptography.hazmat.primitives.asymmetric import ec, rsa
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ec, ed448, ed25519, rsa
 from OpenSSL import crypto
 
 
@@ -69,16 +70,21 @@ class ComparableKey:
     """
     __hash__: Callable[[], int] = NotImplemented
 
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._wrapped, name)
+
     def __init__(self,
                  wrapped: Union[
                      rsa.RSAPrivateKeyWithSerialization,
                      rsa.RSAPublicKeyWithSerialization,
                      ec.EllipticCurvePrivateKeyWithSerialization,
-                     ec.EllipticCurvePublicKeyWithSerialization]):
+                     ec.EllipticCurvePublicKeyWithSerialization,
+                     ed25519.Ed25519PrivateKey,
+                     ed25519.Ed25519PublicKey,
+                     ed448.Ed448PrivateKey,
+                     ed448.Ed448PublicKey,
+                 ]):
         self._wrapped = wrapped
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self._wrapped, name)
 
     def __eq__(self, other: Any) -> bool:
         if (not isinstance(other, self.__class__) or
@@ -88,6 +94,26 @@ class ComparableKey:
             return self.private_numbers() == other.private_numbers()
         elif hasattr(self._wrapped, 'public_numbers'):
             return self.public_numbers() == other.public_numbers()
+        elif (isinstance(self._wrapped, (ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey)) and
+                isinstance(other._wrapped, (ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey))):
+            return self._wrapped.private_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PrivateFormat.Raw,
+                encryption_algorithm=serialization.NoEncryption(),
+            ) == other._wrapped.private_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PrivateFormat.Raw,
+                encryption_algorithm=serialization.NoEncryption(),
+            )
+        elif (isinstance(self._wrapped, (ed25519.Ed25519PublicKey, ed448.Ed448PublicKey)) and
+                isinstance(other._wrapped, (ed25519.Ed25519PublicKey, ed448.Ed448PublicKey))):
+            return self._wrapped.public_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PublicFormat.Raw,
+            ) == other._wrapped.public_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PublicFormat.Raw,
+            )
         else:
             return NotImplemented
 
@@ -96,8 +122,12 @@ class ComparableKey:
 
     def public_key(self) -> 'ComparableKey':
         """Get wrapped public key."""
-        if isinstance(self._wrapped, (rsa.RSAPublicKeyWithSerialization,
-                                      ec.EllipticCurvePublicKeyWithSerialization)):
+        if isinstance(self._wrapped, (
+            rsa.RSAPublicKeyWithSerialization,
+            ec.EllipticCurvePublicKeyWithSerialization,
+            ed25519.Ed25519PublicKey,
+            ed448.Ed448PublicKey,
+        )):
             return self
 
         return self.__class__(self._wrapped.public_key())
@@ -150,6 +180,36 @@ class ComparableECKey(ComparableKey):
 
 
 GenericImmutableMap = TypeVar('GenericImmutableMap', bound='ImmutableMap')
+
+
+class ComparableOKPKey(ComparableKey):
+    """Wrapper for ``cryptography`` OKP keys.
+
+    Wraps around any of these available with the compilation
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PublicKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.ed448.Ed448PrivateKey`
+
+    These are not yet supported
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PublicKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x25519.X25519PrivateKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PublicKey`
+    - :class:`~cryptography.hazmat.primitives.asymmetric.x448.X448PrivateKey`
+    """
+
+    def __hash__(self) -> int:
+        if isinstance(self._wrapped, (ed25519.Ed25519PublicKey, ed448.Ed448PublicKey)):
+            return hash(self._wrapped.public_bytes(
+                format=serialization.PublicFormat.Raw,
+                encoding=serialization.Encoding.Raw,
+            )[:32])
+        elif isinstance(self._wrapped, (ed25519.Ed25519PrivateKey, ed448.Ed448PrivateKey)):
+            return hash(self._wrapped.public_key().public_bytes(
+                format=serialization.PublicFormat.Raw,
+                encoding=serialization.Encoding.Raw,
+            )[:32])
+        return 0
 
 
 class ImmutableMap(Mapping, Hashable):

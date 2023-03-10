@@ -11,7 +11,7 @@ from OpenSSL import crypto
 
 import josepy.util
 from josepy import ComparableRSAKey, ComparableX509
-from josepy.util import ComparableECKey
+from josepy.util import ComparableECKey, ComparableOKPKey
 
 # This approach is based on the recommendation at
 # https://github.com/python/mypy/issues/1153#issuecomment-1207333806.
@@ -88,6 +88,15 @@ def load_ec_private_key(*names: str) -> josepy.util.ComparableECKey:
                            serialization.load_der_private_key)
     return ComparableECKey(loader(
         load_vector(*names), password=None, backend=default_backend()))
+
+
+def load_okp_private_key(*names):
+    """Load OKP private key."""
+    loader = _guess_loader(
+        names[-1], serialization.load_pem_private_key,
+        serialization.load_der_private_key,
+    )
+    return ComparableOKPKey(loader(load_vector(*names), password=None, backend=default_backend()))
 
 
 def load_pyopenssl_private_key(*names: str) -> crypto.PKey:

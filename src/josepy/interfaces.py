@@ -128,6 +128,7 @@ class JSONDeSerializable(metaclass=abc.ABCMeta):
         :returns: Fully serialized object.
 
         """
+
         def _serialize(obj: Any) -> Any:
             if isinstance(obj, JSONDeSerializable):
                 return _serialize(obj.to_partial_json())
@@ -140,8 +141,7 @@ class JSONDeSerializable(metaclass=abc.ABCMeta):
                 # unhashable list
                 return tuple(_serialize(subobj) for subobj in obj)
             elif isinstance(obj, Mapping):
-                return {_serialize(key): _serialize(value)
-                        for key, value in obj.items()}
+                return {_serialize(key): _serialize(value) for key, value in obj.items()}
             else:
                 return obj
 
@@ -167,8 +167,9 @@ class JSONDeSerializable(metaclass=abc.ABCMeta):
         return cls()
 
     @classmethod
-    def json_loads(cls: Type[GenericJSONDeSerializable],
-                   json_string: Union[str, bytes]) -> GenericJSONDeSerializable:
+    def json_loads(
+        cls: Type[GenericJSONDeSerializable], json_string: Union[str, bytes]
+    ) -> GenericJSONDeSerializable:
         """Deserialize from JSON document string."""
         try:
             loads = json.loads(json_string)
@@ -191,10 +192,10 @@ class JSONDeSerializable(metaclass=abc.ABCMeta):
         :rtype: str
 
         """
-        return self.json_dumps(sort_keys=True, indent=4, separators=(',', ': '))
+        return self.json_dumps(sort_keys=True, indent=4, separators=(",", ": "))
 
     @classmethod
-    def json_dump_default(cls, python_object: 'JSONDeSerializable') -> Any:
+    def json_dump_default(cls, python_object: "JSONDeSerializable") -> Any:
         """Serialize Python object.
 
         This function is meant to be passed as ``default`` to
@@ -210,4 +211,4 @@ class JSONDeSerializable(metaclass=abc.ABCMeta):
         if isinstance(python_object, JSONDeSerializable):
             return python_object.to_partial_json()
         else:  # this branch is necessary, cannot just "return"
-            raise TypeError(repr(python_object) + ' is not JSON serializable')
+            raise TypeError(repr(python_object) + " is not JSON serializable")

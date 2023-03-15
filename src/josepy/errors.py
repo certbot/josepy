@@ -10,8 +10,7 @@ class DeserializationError(Error):
     """JSON deserialization error."""
 
     def __str__(self) -> str:
-        return "Deserialization error: {0}".format(
-            super().__str__())
+        return "Deserialization error: {0}".format(super().__str__())
 
 
 class SerializationError(Error):
@@ -32,5 +31,4 @@ class UnrecognizedTypeError(DeserializationError):
         super().__init__(str(self))
 
     def __str__(self) -> str:
-        return '{0} was not recognized, full message: {1}'.format(
-            self.typ, self.jobj)
+        return "{0} was not recognized, full message: {1}".format(self.typ, self.jobj)

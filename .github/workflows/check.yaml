@@ -35,17 +35,8 @@ jobs:
             ${{ runner.os }}-
       - name: Install Poetry & Tox
         run: pip install poetry>1.0.0 tox>3.3.0
-      # TEST
-      - name: Run pytest and coverage
-        run: tox -e py
-      # STATIC CHECK
-      - name: Run mypy
-        run: tox -e mypy
-      # LINTING
-      - name: Run flake8 and isort
-        run: |
-          tox -e flake8
-          tox -e isort
+      - name: Run tox
+        run: tox
   # This job runs our tests like external parties such as packagers.
   external:
     runs-on: ubuntu-latest

@@ -31,7 +31,8 @@ class JWA(interfaces.JSONDeSerializable):
 
 class JWASignature(JWA, Hashable):
     """Base class for JSON Web Signature Algorithms."""
-    SIGNATURES: Dict[str, 'JWASignature'] = {}
+
+    SIGNATURES: Dict[str, "JWASignature"] = {}
     kty: Any
 
     def __init__(self, name: str) -> None:
@@ -46,7 +47,7 @@ class JWASignature(JWA, Hashable):
         return hash((self.__class__, self.name))
 
     @classmethod
-    def register(cls, signature_cls: 'JWASignature') -> 'JWASignature':
+    def register(cls, signature_cls: "JWASignature") -> "JWASignature":
         """Register class for JSON deserialization."""
         cls.SIGNATURES[signature_cls.name] = signature_cls
         return signature_cls
@@ -55,7 +56,7 @@ class JWASignature(JWA, Hashable):
         return self.name
 
     @classmethod
-    def from_json(cls, jobj: Any) -> 'JWASignature':
+    def from_json(cls, jobj: Any) -> "JWASignature":
         return cls.SIGNATURES[jobj]
 
     @abc.abstractmethod
@@ -124,7 +125,6 @@ class _JWARSA:
 
 
 class _JWARS(_JWARSA, JWASignature):
-
     def __init__(self, name: str, hash_: Callable[[], HashAlgorithm]) -> None:
         super().__init__(name)
         self.padding = padding.PKCS1v15()
@@ -132,12 +132,9 @@ class _JWARS(_JWARSA, JWASignature):
 
 
 class _JWAPS(_JWARSA, JWASignature):
-
     def __init__(self, name: str, hash_: Callable[[], HashAlgorithm]) -> None:
         super().__init__(name)
-        self.padding = padding.PSS(
-            mgf=padding.MGF1(hash_()),
-            salt_length=padding.PSS.MAX_LENGTH)
+        self.padding = padding.PSS(mgf=padding.MGF1(hash_()), salt_length=padding.PSS.MAX_LENGTH)
         self.hash = hash_()
 
 
@@ -153,15 +150,16 @@ class _JWAEC(JWASignature):
         sig = self._sign(key, msg)
         dr, ds = decode_dss_signature(sig)
         length = jwk.JWKEC.expected_length_for_curve(key.curve)
-        return (dr.to_bytes(length=length, byteorder='big') +
-                ds.to_bytes(length=length, byteorder='big'))
+        return dr.to_bytes(length=length, byteorder="big") + ds.to_bytes(
+            length=length, byteorder="big"
+        )
 
     def _sign(self, key: ec.EllipticCurvePrivateKey, msg: bytes) -> bytes:
         try:
             return key.sign(msg, ec.ECDSA(self.hash))
         except AttributeError as error:
             logger.debug(error, exc_info=True)
-            raise errors.Error('Public key cannot be used for signing')
+            raise errors.Error("Public key cannot be used for signing")
         except ValueError as error:  # digest too large
             logger.debug(error, exc_info=True)
             raise errors.Error(str(error))
@@ -173,8 +171,8 @@ class _JWAEC(JWASignature):
             # Format error - rfc7518 - 3.4 … MUST NOT be shortened to omit any leading zero octets
             return False
         asn1sig = encode_dss_signature(
-            int.from_bytes(sig[0:rlen], byteorder='big'),
-            int.from_bytes(sig[rlen:], byteorder='big')
+            int.from_bytes(sig[0:rlen], byteorder="big"),
+            int.from_bytes(sig[rlen:], byteorder="big"),
         )
         return self._verify(key, msg, asn1sig)
 
@@ -189,29 +187,29 @@ class _JWAEC(JWASignature):
 
 
 #: HMAC using SHA-256
-HS256 = JWASignature.register(_JWAHS('HS256', hashes.SHA256))
+HS256 = JWASignature.register(_JWAHS("HS256", hashes.SHA256))
 #: HMAC using SHA-384
-HS384 = JWASignature.register(_JWAHS('HS384', hashes.SHA384))
+HS384 = JWASignature.register(_JWAHS("HS384", hashes.SHA384))
 #: HMAC using SHA-512
-HS512 = JWASignature.register(_JWAHS('HS512', hashes.SHA512))
+HS512 = JWASignature.register(_JWAHS("HS512", hashes.SHA512))
 
 #: RSASSA-PKCS-v1_5 using SHA-256
-RS256 = JWASignature.register(_JWARS('RS256', hashes.SHA256))
+RS256 = JWASignature.register(_JWARS("RS256", hashes.SHA256))
 #: RSASSA-PKCS-v1_5 using SHA-384
-RS384 = JWASignature.register(_JWARS('RS384', hashes.SHA384))
+RS384 = JWASignature.register(_JWARS("RS384", hashes.SHA384))
 #: RSASSA-PKCS-v1_5 using SHA-512
-RS512 = JWASignature.register(_JWARS('RS512', hashes.SHA512))
+RS512 = JWASignature.register(_JWARS("RS512", hashes.SHA512))
 
 #: RSASSA-PSS using SHA-256 and MGF1 with SHA-256
-PS256 = JWASignature.register(_JWAPS('PS256', hashes.SHA256))
+PS256 = JWASignature.register(_JWAPS("PS256", hashes.SHA256))
 #: RSASSA-PSS using SHA-384 and MGF1 with SHA-384
-PS384 = JWASignature.register(_JWAPS('PS384', hashes.SHA384))
+PS384 = JWASignature.register(_JWAPS("PS384", hashes.SHA384))
 #: RSASSA-PSS using SHA-512 and MGF1 with SHA-512
-PS512 = JWASignature.register(_JWAPS('PS512', hashes.SHA512))
+PS512 = JWASignature.register(_JWAPS("PS512", hashes.SHA512))
 
 #: ECDSA using P-256 and SHA-256
-ES256 = JWASignature.register(_JWAEC('ES256', hashes.SHA256))
+ES256 = JWASignature.register(_JWAEC("ES256", hashes.SHA256))
 #: ECDSA using P-384 and SHA-384
-ES384 = JWASignature.register(_JWAEC('ES384', hashes.SHA384))
+ES384 = JWASignature.register(_JWAEC("ES384", hashes.SHA384))
 #: ECDSA using P-521 and SHA-512
-ES512 = JWASignature.register(_JWAEC('ES512', hashes.SHA512))
+ES512 = JWASignature.register(_JWAEC("ES512", hashes.SHA512))

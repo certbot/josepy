@@ -6,17 +6,17 @@ import pytest
 
 # https://en.wikipedia.org/wiki/Base64#Examples
 B64_PADDING_EXAMPLES = {
-    b'any carnal pleasure.': (b'YW55IGNhcm5hbCBwbGVhc3VyZS4', b'='),
-    b'any carnal pleasure': (b'YW55IGNhcm5hbCBwbGVhc3VyZQ', b'=='),
-    b'any carnal pleasur': (b'YW55IGNhcm5hbCBwbGVhc3Vy', b''),
-    b'any carnal pleasu': (b'YW55IGNhcm5hbCBwbGVhc3U', b'='),
-    b'any carnal pleas': (b'YW55IGNhcm5hbCBwbGVhcw', b'=='),
+    b"any carnal pleasure.": (b"YW55IGNhcm5hbCBwbGVhc3VyZS4", b"="),
+    b"any carnal pleasure": (b"YW55IGNhcm5hbCBwbGVhc3VyZQ", b"=="),
+    b"any carnal pleasur": (b"YW55IGNhcm5hbCBwbGVhc3Vy", b""),
+    b"any carnal pleasu": (b"YW55IGNhcm5hbCBwbGVhc3U", b"="),
+    b"any carnal pleas": (b"YW55IGNhcm5hbCBwbGVhcw", b"=="),
 }
 
 
 B64_URL_UNSAFE_EXAMPLES = {
-    bytes((251, 239)): b'--8',
-    bytes((255,)) * 2: b'__8',
+    bytes((251, 239)): b"--8",
+    bytes((255,)) * 2: b"__8",
 }
 
 
@@ -26,10 +26,11 @@ class B64EncodeTest:
     @classmethod
     def _call(cls, data: bytes) -> bytes:
         from josepy.b64 import b64encode
+
         return b64encode(data)
 
     def test_empty(self) -> None:
-        assert self._call(b'') == b''
+        assert self._call(b"") == b""
 
     def test_unsafe_url(self) -> None:
         for text, b64 in B64_URL_UNSAFE_EXAMPLES.items():
@@ -42,7 +43,7 @@ class B64EncodeTest:
     def test_unicode_fails_with_type_error(self) -> None:
         with pytest.raises(TypeError):
             # We're purposefully testing with the incorrect type here.
-            self._call(u'some unicode')  # type: ignore
+            self._call("some unicode")  # type: ignore
 
 
 class B64DecodeTest:
@@ -51,6 +52,7 @@ class B64DecodeTest:
     @classmethod
     def _call(cls, data: Union[bytes, str]) -> bytes:
         from josepy.b64 import b64decode
+
         return b64decode(data)
 
     def test_unsafe_url(self) -> None:
@@ -66,11 +68,11 @@ class B64DecodeTest:
             assert self._call(b64 + pad) == text
 
     def test_unicode_with_ascii(self) -> None:
-        assert self._call(u'YQ') == b'a'
+        assert self._call("YQ") == b"a"
 
     def test_non_ascii_unicode_fails(self) -> None:
         with pytest.raises(ValueError):
-            self._call(u'\u0105')
+            self._call("\u0105")
 
     def test_type_error_no_unicode_or_bytes(self) -> None:
         with pytest.raises(TypeError):
@@ -78,5 +80,5 @@ class B64DecodeTest:
             self._call(object())  # type: ignore
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

@@ -90,14 +90,14 @@ if __name__ == "__main__":
         print("> roundtrip >")
         print(as_jwk)
     else:
+        indented_cmd = (
+            "   python pem_conversion.py "
+            "/etc/letsencrypt/accounts/acme-v02.api.letsencrypt.org/"
+            "directory/##ACCOUNT##/private_key.json"
+        )
         print("Error.")
         print("Invoke this script with a single argument: the path to a certbot key.")
-        print(
-            "   python pem_conversion.py /etc/letsencrypt/accounts/acme-v02.api.letsencrypt.org/directory/##ACCOUNT##/private_key.json"
-        )
-        print(
-            "Optional: add the string 'roundtrip' after the key to perform a roundtrip"
-        )
-        print(
-            "   python pem_conversion.py /etc/letsencrypt/accounts/acme-v02.api.letsencrypt.org/directory/##ACCOUNT##/private_key.json roundtrip"
-        )
+        print(indented_cmd)
+        print("Optional: add the string 'roundtrip' after the key to perform a roundtrip")
+        # arguments to print are printed with a space between them by default
+        print(indented_cmd, "roundtrip")

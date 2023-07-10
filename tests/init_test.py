@@ -9,13 +9,13 @@ import josepy
 
 
 @pytest.mark.skipif(sys.version_info[:2] != (3, 7), reason="requires Python 3.7")
-def test_warns():
+def test_warns() -> None:
     with pytest.warns(DeprecationWarning, match=re.escape(r"Python 3.7 support")):
         importlib.reload(josepy)
 
 
 @pytest.mark.skipif(sys.version_info[:2] == (3, 7), reason="requires Python != 3.7")
-def test_does_not_warn():
+def test_does_not_warn() -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         importlib.reload(josepy)

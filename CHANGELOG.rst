@@ -5,6 +5,8 @@ Changelog
 ---------------
 
 * Added support for Python 3.11.
+* Support for Python 3.7 has been deprecated and will be removed in the next
+  scheduled release.
 * Dropped support for Python 3.6.
 * Added a new valid PGP key for signing our PyPI packages with the fingerprint
   F2871B4152AE13C49519111F447BF683AA3B26C3

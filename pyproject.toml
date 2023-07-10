@@ -22,7 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Topic :: Internet :: WWW/HTTP", 
+    "Topic :: Internet :: WWW/HTTP",
     "Topic :: Security",
 ]
 homepage = "https://github.com/certbot/josepy"
@@ -94,7 +94,8 @@ disallow_untyped_defs = true
 # Pytest tooling configuration
 
 [tool.pytest.ini_options]
-filterwarnings = ["error"]
+# We also ignore our own deprecation warning about dropping Python 3.7 support.
+filterwarnings = ["error", "ignore:Python 3.7 support will be dropped:DeprecationWarning"]
 norecursedirs = "*.egg .eggs dist build docs .tox"
 
 # Isort tooling configuration

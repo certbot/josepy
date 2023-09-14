@@ -41,12 +41,15 @@ python = "^3.7"
 # load_pem_private/public_key (>=0.6)
 # rsa_recover_prime_factors (>=0.8)
 # add sign() and verify() to asymetric keys (RSA >=1.4, ECDSA >=1.5)
-cryptography = ">=1.5"
+cryptography = ">=41.0.2"
 # Connection.set_tlsext_host_name (>=0.13)
 pyopenssl = ">=0.13"
 # >=4.3.0 is needed for Python 3.10 support
 sphinx = {version = ">=4.3.0", optional = true}
 sphinx-rtd-theme = {version = ">=1.0", optional = true}
+certifi = ">=2023.7.22"
+pygments = ">=2.15.0"
+requests = ">=2.31.0"
 
 [tool.poetry.dev-dependencies]
 # coverage[toml] extra is required to read the coverage config from pyproject.toml

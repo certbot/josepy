@@ -4,7 +4,7 @@ Changelog
 1.14.0 (master)
 ---------------
 
-* Added support for Python 3.11.
+* Added support for Python 3.11 and 3.12.
 * Support for Python 3.7 has been deprecated and will be removed in the next
   scheduled release.
 * Dropped support for Python 3.6.

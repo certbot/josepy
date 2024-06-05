@@ -1,8 +1,11 @@
 Changelog
 =========
 
-1.14.0 (master)
+1.15.0 (master)
 ---------------
+
+1.14.0 (2023-11-01)
+-------------------
 
 * Added support for Python 3.11 and 3.12.
 * Support for Python 3.7 has been deprecated and will be removed in the next

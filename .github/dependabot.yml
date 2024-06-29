@@ -1,0 +1,29 @@
+# for more information about the options in this file, see
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    reviewers:
+      - "certbot/eff-devs"
+    groups:
+      # one might want to only have dependabot open PRs for security updates,
+      # but in practice, that doesn't seem to work well because for security
+      # updates it tries to only update the vulnerable package which often
+      # causes version conflicts unless you also update the other packages.
+      # hopefully grouping dependabot updates together like this and coupling
+      # it with the update interval above makes this pretty painless
+      regular-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      # our pinnings in this repo are only used for our dev setup.
+      # additionally, as of writing this it is not currently possible for
+      # dependabot to group security updates and regular version updates in the
+      # same PR
+      security-updates-to-dev-pinnings:
+        applies-to: security-updates
+        patterns:
+          - "*"

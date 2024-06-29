@@ -1,4 +1,0 @@
-# We pin our dependencies with a constraints file for increased stability.
-
--c ../constraints.txt
--e .[docs]

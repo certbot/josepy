@@ -28,7 +28,7 @@ If you're reporting a bug in Certbot, please make sure to include:
 
 If you're a developer, we have some helpful information in our
 [Developer's Guide](https://certbot.eff.org/docs/contributing.html) to get you
-started. In particular, we recommend you read these sections 
+started. In particular, we recommend you read these sections
 
  - [Finding issues to work on](https://certbot.eff.org/docs/contributing.html#find-issues-to-work-on)
  - [Coding style](https://certbot.eff.org/docs/contributing.html#coding-style)
@@ -71,3 +71,10 @@ You can get a listing of the available tests by running
 ```bash
 $ tox -l
 ```
+
+## Updating dependencies
+
+Our poetry.lock file is only used during development so security
+vulnerabilities in the pinned packages are rarely relevant. With that said, if
+you want to update package versions, you can use the [`poetry update`
+command](https://python-poetry.org/docs/cli/#update).

@@ -9,10 +9,6 @@ JOSE protocol implementation in Python using cryptography
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
   :target: https://github.com/psf/black
 
-Originally developed as part of the ACME_ protocol implementation.
-
-.. _ACME: https://pypi.python.org/pypi/acme
-
-To learn how to contribute to this project, see CONTRIBUTING.md_.
+For more information about contributing to this project, see CONTRIBUTING.md_.
 
 .. _CONTRIBUTING.md: CONTRIBUTING.md

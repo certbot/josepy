@@ -1,63 +1,9 @@
 """JOSE utilities."""
-import abc
-import sys
-import warnings
-from collections.abc import Hashable, Mapping
-from types import ModuleType
-from typing import Any, Callable, Iterator, List, Tuple, TypeVar, Union, cast
+from __future__ import annotations
+from collections.abc import Hashable, Iterator, Mapping, Callable
+from typing import Any, TypeVar
 
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
-from OpenSSL import crypto
-
-
-# Deprecated. Please use built-in decorators @classmethod and abc.abstractmethod together instead.
-def abstractclassmethod(func: Callable) -> classmethod:
-    return classmethod(abc.abstractmethod(func))
-
-
-class ComparableX509:
-    """Wrapper for OpenSSL.crypto.X509** objects that supports __eq__.
-
-    :ivar wrapped: Wrapped certificate or certificate request.
-    :type wrapped: `OpenSSL.crypto.X509` or `OpenSSL.crypto.X509Req`.
-
-    """
-
-    def __init__(self, wrapped: Union[crypto.X509, crypto.X509Req]) -> None:
-        assert isinstance(wrapped, crypto.X509) or isinstance(wrapped, crypto.X509Req)
-        self.wrapped = wrapped
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.wrapped, name)
-
-    def _dump(self, filetype: int = crypto.FILETYPE_ASN1) -> bytes:
-        """Dumps the object into a buffer with the specified encoding.
-
-        :param int filetype: The desired encoding. Should be one of
-            `OpenSSL.crypto.FILETYPE_ASN1`,
-            `OpenSSL.crypto.FILETYPE_PEM`, or
-            `OpenSSL.crypto.FILETYPE_TEXT`.
-
-        :returns: Encoded X509 object.
-        :rtype: bytes
-
-        """
-        if isinstance(self.wrapped, crypto.X509):
-            return crypto.dump_certificate(filetype, self.wrapped)
-
-        # assert in __init__ makes sure this is X509Req
-        return crypto.dump_certificate_request(filetype, self.wrapped)
-
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, self.__class__):
-            return NotImplemented
-        return self._dump() == other._dump()
-
-    def __hash__(self) -> int:
-        return hash((self.__class__, self._dump()))
-
-    def __repr__(self) -> str:
-        return "<{0}({1!r})>".format(self.__class__.__name__, self.wrapped)
 
 
 class ComparableKey:
@@ -71,12 +17,11 @@ class ComparableKey:
 
     def __init__(
         self,
-        wrapped: Union[
-            rsa.RSAPrivateKeyWithSerialization,
-            rsa.RSAPublicKeyWithSerialization,
-            ec.EllipticCurvePrivateKeyWithSerialization,
+        wrapped:
+            rsa.RSAPrivateKeyWithSerialization |
+            rsa.RSAPublicKeyWithSerialization |
+            ec.EllipticCurvePrivateKeyWithSerialization |
             ec.EllipticCurvePublicKeyWithSerialization,
-        ],
     ):
         self._wrapped = wrapped
 
@@ -163,7 +108,7 @@ GenericImmutableMap = TypeVar("GenericImmutableMap", bound="ImmutableMap")
 class ImmutableMap(Mapping, Hashable):
     """Immutable key to value mapping with attribute access."""
 
-    __slots__: Tuple[str, ...] = ()
+    __slots__: tuple[str, ...] = ()
     """Must be overridden in subclasses."""
 
     def __init__(self, **kwargs: Any) -> None:
@@ -234,7 +179,7 @@ class frozendict(Mapping, Hashable):
     def __len__(self) -> int:
         return len(self._items)
 
-    def _sorted_items(self) -> Tuple[Tuple[str, Any], ...]:
+    def _sorted_items(self) -> tuple[tuple[str, Any], ...]:
         return tuple((key, self[key]) for key in self._keys)
 
     def __hash__(self) -> int:
@@ -253,40 +198,3 @@ class frozendict(Mapping, Hashable):
         return "frozendict({0})".format(
             ", ".join("{0}={1!r}".format(key, value) for key, value in self._sorted_items())
         )
-
-
-# This class takes a similar approach to the cryptography project to deprecate attributes
-# in public modules. See the _ModuleWithDeprecation class here:
-# https://github.com/pyca/cryptography/blob/91105952739442a74582d3e62b3d2111365b0dc7/src/cryptography/utils.py#L129
-class _UtilDeprecationModule:
-    """
-    Internal class delegating to a module, and displaying warnings when attributes
-    related to the deprecated "abstractclassmethod" attributes in the josepy.util module.
-    """
-
-    def __init__(self, module: ModuleType) -> None:
-        self.__dict__["_module"] = module
-
-    def __getattr__(self, attr: str) -> Any:
-        if attr == "abstractclassmethod":
-            warnings.warn(
-                "The abstractclassmethod attribute in josepy.util is deprecated and will "
-                "be removed soon. Please use the built-in decorators @classmethod and "
-                "@abc.abstractmethod together instead.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-        return getattr(self._module, attr)
-
-    def __setattr__(self, attr: str, value: Any) -> None:  # pragma: no cover
-        setattr(self._module, attr, value)
-
-    def __delattr__(self, attr: str) -> None:  # pragma: no cover
-        delattr(self._module, attr)
-
-    def __dir__(self) -> List[str]:  # pragma: no cover
-        return ["_module"] + dir(self._module)
-
-
-# Patching ourselves to warn about deprecation and planned removal of some elements in the module.
-sys.modules[__name__] = cast(ModuleType, _UtilDeprecationModule(sys.modules[__name__]))

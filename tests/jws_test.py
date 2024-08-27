@@ -4,14 +4,15 @@ import sys
 import unittest
 from unittest import mock
 
-import OpenSSL
 import pytest
-import test_util
+from test_util import vector_path, load_vector
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization
 
 from josepy import errors, json_util, jwa, jwk
 
-CERT = test_util.load_comparable_cert("cert.pem")
-KEY = jwk.JWKRSA.load(test_util.load_vector("rsa512_key.pem"))
+CERT = x509.load_pem_x509_certificate(load_vector("cert.pem"))
+KEY = jwk.JWKRSA.load(load_vector("rsa512_key.pem"))
 
 
 class MediaTypeTest(unittest.TestCase):
@@ -71,8 +72,8 @@ class HeaderTest(unittest.TestCase):
 
         header = Header(x5c=(CERT, CERT))
         jobj = header.to_partial_json()
-        assert isinstance(CERT.wrapped, OpenSSL.crypto.X509)
-        cert_asn1 = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_ASN1, CERT.wrapped)
+        assert isinstance(CERT, x509.Certificate)
+        cert_asn1 = CERT.public_bytes(serialization.Encoding.DER)
         cert_b64 = base64.b64encode(cert_asn1)
         assert jobj == {"x5c": [cert_b64, cert_b64]}
         assert header == Header.from_json(jobj)
@@ -220,7 +221,7 @@ class JWSTest(unittest.TestCase):
 
 class CLITest(unittest.TestCase):
     def setUp(self) -> None:
-        self.key_path = test_util.vector_path("rsa512_key.pem")
+        self.key_path = vector_path("rsa512_key.pem")
 
     def test_unverified(self) -> None:
         from josepy.jws import CLI

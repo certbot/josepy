@@ -53,7 +53,7 @@ if [ "$RELEASE_GPG_KEY" = "" ]; then
         F2871B4152AE13C49519111F447BF683AA3B26C3
     "
     for key in $TRUSTED_KEYS; do
-        if gpg2 --with-colons --card-status | grep -q "$key"; then
+        if gpg --with-colons --card-status | grep -q "$key"; then
             RELEASE_GPG_KEY="$key"
             break
         fi
@@ -106,7 +106,7 @@ poetry build
 echo "Signing josepy"
 for x in dist/*.tar.gz dist/*.whl
 do
-  gpg2 -u "$RELEASE_GPG_KEY" --detach-sign --armor --sign --digest-algo sha256 $x
+  gpg -u "$RELEASE_GPG_KEY" --detach-sign --armor --sign --digest-algo sha256 $x
 done
 
 mkdir "dist.$version"

@@ -72,13 +72,5 @@ from josepy.util import (
     ComparableECKey,
     ComparableKey,
     ComparableRSAKey,
-    ComparableX509,
     ImmutableMap,
 )
-
-if sys.version_info[:2] == (3, 7):
-    warnings.warn(
-        "Python 3.7 support will be dropped in the next scheduled release of "
-        "josepy. Please upgrade your Python version.",
-        DeprecationWarning,
-    )

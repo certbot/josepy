@@ -7,10 +7,9 @@ from typing import Any
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
-from OpenSSL import crypto
 
 import josepy.util
-from josepy import ComparableRSAKey, ComparableX509
+from josepy import ComparableRSAKey
 from josepy.util import ComparableECKey
 
 # This approach is based on the recommendation at
@@ -50,28 +49,6 @@ def _guess_loader(filename: str, loader_pem: Any, loader_der: Any) -> Any:
         raise ValueError("Loader could not be recognized based on extension")
 
 
-def load_cert(*names: str) -> crypto.X509:
-    """Load certificate."""
-    loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
-    return crypto.load_certificate(loader, load_vector(*names))
-
-
-def load_comparable_cert(*names: str) -> josepy.util.ComparableX509:
-    """Load ComparableX509 cert."""
-    return ComparableX509(load_cert(*names))
-
-
-def load_csr(*names: str) -> crypto.X509Req:
-    """Load certificate request."""
-    loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
-    return crypto.load_certificate_request(loader, load_vector(*names))
-
-
-def load_comparable_csr(*names: str) -> josepy.util.ComparableX509:
-    """Load ComparableX509 certificate request."""
-    return ComparableX509(load_csr(*names))
-
-
 def load_rsa_private_key(*names: str) -> josepy.util.ComparableRSAKey:
     """Load RSA private key."""
     loader = _guess_loader(
@@ -86,9 +63,3 @@ def load_ec_private_key(*names: str) -> josepy.util.ComparableECKey:
         names[-1], serialization.load_pem_private_key, serialization.load_der_private_key
     )
     return ComparableECKey(loader(load_vector(*names), password=None, backend=default_backend()))
-
-
-def load_pyopenssl_private_key(*names: str) -> crypto.PKey:
-    """Load pyOpenSSL private key."""
-    loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
-    return crypto.load_privatekey(loader, load_vector(*names))

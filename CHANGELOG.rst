@@ -1,8 +1,16 @@
 Changelog
 =========
 
-1.15.0 (master)
+2.0.0 (master)
 ---------------
+
+* Remove support for Python 3.7.
+* Class `josepy.ComparableX509` is removed, please use `cryptography` APIs instead
+  (`cryptography.x509.Certificate` and `cryptography.x509.CertificateSigningRequest`).
+* Methods `josepy.decode_cert` and `josepy.encode_cert` now return/accept an instance
+  of `cryptography.x509.Certificate`.
+* Methods `josepy.decode_csr` and `josepy.encode_csr` now return/accept an instance
+  of `cryptography.x509.CertificateSigningRequest`.
 
 1.14.0 (2023-11-01)
 -------------------

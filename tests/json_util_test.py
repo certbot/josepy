@@ -6,12 +6,13 @@ from typing import Any, Dict, Mapping
 from unittest import mock
 
 import pytest
-import test_util
+from test_util import load_vector
+from cryptography import x509
 
 from josepy import errors, interfaces, util
 
-CERT = test_util.load_comparable_cert("cert.pem")
-CSR = test_util.load_comparable_csr("csr.pem")
+CERT = x509.load_pem_x509_certificate(load_vector("cert.pem"))
+CSR = x509.load_pem_x509_csr(load_vector("csr.pem"))
 
 
 class FieldTest(unittest.TestCase):
@@ -326,7 +327,7 @@ class DeEncodersTest(unittest.TestCase):
         from josepy.json_util import decode_cert
 
         cert = decode_cert(self.b64_cert)
-        assert isinstance(cert, util.ComparableX509)
+        assert isinstance(cert, x509.Certificate)
         assert cert == CERT
         with pytest.raises(errors.DeserializationError):
             decode_cert("")
@@ -340,7 +341,7 @@ class DeEncodersTest(unittest.TestCase):
         from josepy.json_util import decode_csr
 
         csr = decode_csr(self.b64_csr)
-        assert isinstance(csr, util.ComparableX509)
+        assert isinstance(csr, x509.CertificateSigningRequest)
         assert csr == CSR
         with pytest.raises(errors.DeserializationError):
             decode_csr("")

@@ -96,7 +96,11 @@ disallow_untyped_defs = true
 
 [tool.pytest.ini_options]
 # We also ignore our own deprecation warning about dropping Python 3.7 support.
-filterwarnings = ["error", "ignore:Python 3.7 support will be dropped:DeprecationWarning"]
+filterwarnings = [
+    "error",
+    "ignore:Python 3.7 support will be dropped:DeprecationWarning",
+    "ignore:CSR support in pyOpenSSL is deprecated:DeprecationWarning",
+]
 norecursedirs = "*.egg .eggs dist build docs .tox"
 
 # Isort tooling configuration

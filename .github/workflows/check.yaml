@@ -12,8 +12,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      TOXENV: mypy
     strategy:
       fail-fast: false
       matrix:

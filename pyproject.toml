@@ -17,7 +17,6 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -38,7 +37,7 @@ include = [
 [tool.poetry.dependencies]
 # This should be kept in sync with the value of target-version in our
 # configuration for black below.
-python = "^3.7"
+python = "^3.8"
 # load_pem_private/public_key (>=0.6)
 # rsa_recover_prime_factors (>=0.8)
 # add sign() and verify() to asymetric keys (RSA >=1.4, ECDSA >=1.5)
@@ -95,10 +94,8 @@ disallow_untyped_defs = true
 # Pytest tooling configuration
 
 [tool.pytest.ini_options]
-# We also ignore our own deprecation warning about dropping Python 3.7 support.
 filterwarnings = [
     "error",
-    "ignore:Python 3.7 support will be dropped:DeprecationWarning",
     "ignore:CSR support in pyOpenSSL is deprecated:DeprecationWarning",
 ]
 norecursedirs = "*.egg .eggs dist build docs .tox"

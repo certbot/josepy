@@ -1,4 +1,5 @@
 """Tests for josepy.errors."""
+
 import sys
 import unittest
 

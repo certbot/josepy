@@ -1,4 +1,5 @@
 """Tests for josepy.interfaces."""
+
 import sys
 import unittest
 from typing import Any, Dict, List

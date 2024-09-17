@@ -1,4 +1,5 @@
 """Tests for josepy.json_util."""
+
 import itertools
 import sys
 import unittest

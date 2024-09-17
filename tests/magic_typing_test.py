@@ -1,4 +1,5 @@
 """Tests for josepy.magic_typing."""
+
 import sys
 import warnings
 from unittest import mock

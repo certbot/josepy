@@ -10,6 +10,7 @@
    standard library.
 
 """
+
 import base64
 from typing import Union
 

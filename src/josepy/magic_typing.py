@@ -1,4 +1,5 @@
 """Shim class to not have to depend on typing module in prod."""
+
 # mypy: ignore-errors
 import sys
 import warnings

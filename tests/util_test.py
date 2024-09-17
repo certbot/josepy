@@ -1,4 +1,5 @@
 """Tests for josepy.util."""
+
 import functools
 import sys
 import unittest

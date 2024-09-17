@@ -1,4 +1,5 @@
 """JOSE errors."""
+
 from typing import Any
 
 

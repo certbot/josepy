@@ -3,6 +3,7 @@
 https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
 
 """
+
 import abc
 import logging
 from collections.abc import Hashable

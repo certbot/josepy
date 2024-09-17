@@ -1,4 +1,5 @@
 """Tests for josepy.b64."""
+
 import sys
 from typing import Union
 

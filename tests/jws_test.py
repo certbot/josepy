@@ -1,4 +1,5 @@
 """Tests for josepy.jws."""
+
 import base64
 import sys
 import unittest

@@ -1,4 +1,5 @@
 """JSON Web Key."""
+
 import abc
 import json
 import logging

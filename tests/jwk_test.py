@@ -1,4 +1,5 @@
 """Tests for josepy.jwk."""
+
 import binascii
 import sys
 import unittest

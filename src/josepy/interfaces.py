@@ -1,4 +1,5 @@
 """JOSE interfaces."""
+
 import abc
 import json
 from collections.abc import Mapping, Sequence

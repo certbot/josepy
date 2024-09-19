@@ -1,4 +1,5 @@
 """JSON Web Signature."""
+
 import argparse
 import base64
 import sys

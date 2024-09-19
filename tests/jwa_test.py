@@ -1,4 +1,5 @@
 """Tests for josepy.jwa."""
+
 import sys
 import unittest
 from typing import Any

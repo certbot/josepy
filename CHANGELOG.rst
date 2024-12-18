@@ -3,6 +3,7 @@ Changelog
 
 1.15.0 (master)
 ---------------
+* Added support for Python 3.13.
 * Dropped support for Python 3.7.
 
 1.14.0 (2023-11-01)

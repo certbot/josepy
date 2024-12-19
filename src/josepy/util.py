@@ -6,14 +6,22 @@ import sys
 import warnings
 from collections.abc import Hashable, Mapping
 from types import ModuleType
-from typing import Any, Callable, Iterator, List, Tuple, TypeVar, Union, cast
-import warnings
-
-from OpenSSL import crypto
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Iterator,
+    List,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
 from cryptography.hazmat.primitives.serialization import Encoding
+from OpenSSL import crypto
 
 
 def warn_deprecated(message: str) -> None:
@@ -91,12 +99,20 @@ class ComparableX509:
                 )
             else:
                 raise ValueError("no compatible legacy object")
+        if TYPE_CHECKING:
+            # mypy is detecting an `object` from the `x509.CertificateSigningRequest` block
+            assert (
+                isinstance(self._wrapped_legacy, (crypto.X509, crypto.X509Req))
+                or self._wrapped_legacy is None
+            )
         return self._wrapped_legacy
 
     def __getattr__(self, name: str) -> Any:
         if name == "has_expired":
-            # a unittest addresses this
+            # a unittest addresses this attribute
             # x509.CertificateSigningRequest does not have this attribute
+            # ideally this function would be deprecated and users should
+            # address the `wrapped` item directly.
             if isinstance(self.wrapped, x509.Certificate):
                 return (
                     lambda: datetime.datetime.now(datetime.timezone.utc)

@@ -5,10 +5,9 @@ import sys
 import unittest
 import warnings
 
-from OpenSSL import crypto
 import pytest
-
 import test_util
+from OpenSSL import crypto
 
 
 class ComparableX509Test(unittest.TestCase):

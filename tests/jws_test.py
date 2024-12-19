@@ -5,15 +5,12 @@ import sys
 import unittest
 from unittest import mock
 
+import pytest
+import test_util
 from cryptography import x509
 from cryptography.hazmat.primitives.serialization import Encoding
 
 from josepy import errors, json_util, jwa, jwk
-
-import pytest
-
-import test_util
-
 
 CERT = test_util.load_comparable_cert("cert.pem")
 KEY = jwk.JWKRSA.load(test_util.load_vector("rsa512_key.pem"))

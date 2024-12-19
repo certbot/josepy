@@ -5,11 +5,10 @@ import unittest
 from typing import Any
 from unittest import mock
 
-from josepy import errors
-
 import pytest
-
 import test_util
+
+from josepy import errors
 
 RSA256_KEY = test_util.load_rsa_private_key("rsa256_key.pem")
 RSA512_KEY = test_util.load_rsa_private_key("rsa512_key.pem")

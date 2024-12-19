@@ -1,14 +1,32 @@
 """JOSE utilities."""
 
 import abc
+import datetime
 import sys
 import warnings
 from collections.abc import Hashable, Mapping
 from types import ModuleType
-from typing import Any, Callable, Iterator, List, Tuple, TypeVar, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Iterator,
+    List,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 
+from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
+from cryptography.hazmat.primitives.serialization import Encoding
 from OpenSSL import crypto
+
+
+def warn_deprecated(message: str) -> None:
+    # used to warn for deprecation
+    warnings.warn(message, DeprecationWarning, stacklevel=2)
 
 
 # Deprecated. Please use built-in decorators @classmethod and abc.abstractmethod together instead.
@@ -17,18 +35,89 @@ def abstractclassmethod(func: Callable) -> classmethod:
 
 
 class ComparableX509:
-    """Wrapper for OpenSSL.crypto.X509** objects that supports __eq__.
+    """Originally a wrapper for OpenSSL.crypto.X509** objects that supports __eq__.
+
+    This still accepts crypto.X509, but uses cryptography.x509 objects
 
     :ivar wrapped: Wrapped certificate or certificate request.
-    :type wrapped: `OpenSSL.crypto.X509` or `OpenSSL.crypto.X509Req`.
+    :type wrapped: `Cryptography.x509.Certificate` or
+        `Cryptography.x509.CertificateSigningRequest`
 
+
+    :ivar wrapped_legacy: Legacy Wrapped certificate or certificate request.
+        This attribute will be removed when `OpenSSL.crypto` support is fully
+        dropped.  This attribute is only meant to aid in migration to the
+        new Cryptography backend.
+    :type wrapped_legacy: `OpenSSL.crypto.X509` or `OpenSSL.crypto.X509Req`
     """
 
-    def __init__(self, wrapped: Union[crypto.X509, crypto.X509Req]) -> None:
-        assert isinstance(wrapped, crypto.X509) or isinstance(wrapped, crypto.X509Req)
+    #
+    wrapped: Union[x509.Certificate, x509.CertificateSigningRequest]
+    _wrapped_legacy: Union[crypto.X509, crypto.X509Req, None] = None
+
+    def __init__(
+        self,
+        wrapped: Union[
+            crypto.X509, crypto.X509Req, x509.Certificate, x509.CertificateSigningRequest
+        ],
+    ) -> None:
+        assert isinstance(
+            wrapped, (crypto.X509, crypto.X509Req, x509.Certificate, x509.CertificateSigningRequest)
+        )
+        if isinstance(wrapped, (crypto.X509, crypto.X509Req)):
+            warn_deprecated(
+                "`OpenSSL.crypto` objects are deprecated and support will be "
+                "removed in a future verison of josepy. The `wrapped` attribute "
+                "now contains a `Cryptography.x509` object."
+            )
+            # stash for legacy operations
+            self._wrapped_legacy = wrapped
+            # convert to Cryptography.x509
+            der: bytes
+            if isinstance(wrapped, crypto.X509):
+                der = crypto.dump_certificate(crypto.FILETYPE_ASN1, wrapped)
+                wrapped = x509.load_der_x509_certificate(der)
+
+            elif isinstance(wrapped, crypto.X509Req):
+                der = crypto.dump_certificate_request(crypto.FILETYPE_ASN1, wrapped)
+                wrapped = x509.load_der_x509_csr(der)
+
         self.wrapped = wrapped
 
+    @property
+    def wrapped_legacy(self) -> Union[crypto.X509, crypto.X509Req, None]:
+        # migration layer to the new Cryptography backend
+        # this function is deprecated and will be removed asap
+        if self._wrapped_legacy is not None:
+            if isinstance(self.wrapped, x509.Certificate):
+                self._wrapped_legacy = crypto.load_certificate(
+                    crypto.FILETYPE_ASN1, self.wrapped.public_bytes(Encoding.DER)
+                )
+            elif isinstance(self.wrapped, x509.CertificateSigningRequest):
+                self._wrapped_legacy = crypto.load_certificate_request(
+                    crypto.FILETYPE_ASN1, self.wrapped.public_bytes(Encoding.DER)
+                )
+            else:
+                raise ValueError("no compatible legacy object")
+        if TYPE_CHECKING:
+            # mypy is detecting an `object` from the `x509.CertificateSigningRequest` block
+            assert (
+                isinstance(self._wrapped_legacy, (crypto.X509, crypto.X509Req))
+                or self._wrapped_legacy is None
+            )
+        return self._wrapped_legacy
+
     def __getattr__(self, name: str) -> Any:
+        if name == "has_expired":
+            # a unittest addresses this attribute
+            # x509.CertificateSigningRequest does not have this attribute
+            # ideally this function would be deprecated and users should
+            # address the `wrapped` item directly.
+            if isinstance(self.wrapped, x509.Certificate):
+                return (
+                    lambda: datetime.datetime.now(datetime.timezone.utc)
+                    > self.wrapped.not_valid_after_utc
+                )
         return getattr(self.wrapped, name)
 
     def _dump(self, filetype: int = crypto.FILETYPE_ASN1) -> bytes:
@@ -43,11 +132,11 @@ class ComparableX509:
         :rtype: bytes
 
         """
-        if isinstance(self.wrapped, crypto.X509):
-            return crypto.dump_certificate(filetype, self.wrapped)
-
-        # assert in __init__ makes sure this is X509Req
-        return crypto.dump_certificate_request(filetype, self.wrapped)
+        if filetype not in (crypto.FILETYPE_ASN1, crypto.FILETYPE_PEM):
+            raise ValueError("filetype `%s` is deprecated")
+        if filetype == crypto.FILETYPE_ASN1:
+            return self.wrapped.public_bytes(Encoding.DER)
+        return self.wrapped.public_bytes(Encoding.PEM)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, self.__class__):

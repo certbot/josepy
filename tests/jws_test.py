@@ -5,11 +5,15 @@ import sys
 import unittest
 from unittest import mock
 
-import OpenSSL
-import pytest
-import test_util
+from cryptography import x509
+from cryptography.hazmat.primitives.serialization import Encoding
 
 from josepy import errors, json_util, jwa, jwk
+
+import pytest
+
+import test_util
+
 
 CERT = test_util.load_comparable_cert("cert.pem")
 KEY = jwk.JWKRSA.load(test_util.load_vector("rsa512_key.pem"))
@@ -72,8 +76,8 @@ class HeaderTest(unittest.TestCase):
 
         header = Header(x5c=(CERT, CERT))
         jobj = header.to_partial_json()
-        assert isinstance(CERT.wrapped, OpenSSL.crypto.X509)
-        cert_asn1 = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_ASN1, CERT.wrapped)
+        assert isinstance(CERT.wrapped, x509.Certificate)
+        cert_asn1 = CERT.wrapped.public_bytes(Encoding.DER)
         cert_b64 = base64.b64encode(cert_asn1)
         assert jobj == {"x5c": [cert_b64, cert_b64]}
         assert header == Header.from_json(jobj)

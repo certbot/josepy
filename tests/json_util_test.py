@@ -6,10 +6,11 @@ import unittest
 from typing import Any, Dict, Mapping
 from unittest import mock
 
-import pytest
-import test_util
-
 from josepy import errors, interfaces, util
+
+import pytest
+
+import test_util
 
 CERT = test_util.load_comparable_cert("cert.pem")
 CSR = test_util.load_comparable_csr("csr.pem")

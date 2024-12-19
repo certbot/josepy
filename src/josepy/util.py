@@ -44,7 +44,7 @@ class ComparableX509:
     """
 
     #
-    wrapped: Union[crypto.X509, crypto.X509Req, x509.Certificate, x509.CertificateSigningRequest]
+    wrapped: Union[x509.Certificate, x509.CertificateSigningRequest]
     _wrapped_legacy: Union[crypto.X509, crypto.X509Req, None] = None
 
     def __init__(
@@ -77,7 +77,7 @@ class ComparableX509:
         self.wrapped = wrapped
 
     @property
-    def wrapped_legacy(self) -> Union[crypto.X509, crypto.X509Req]:
+    def wrapped_legacy(self) -> Union[crypto.X509, crypto.X509Req, None]:
         # migration layer to the new Cryptography backend
         # this function is deprecated and will be removed asap
         if self._wrapped_legacy is not None:

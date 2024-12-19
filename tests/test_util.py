@@ -98,3 +98,28 @@ def load_pyopenssl_private_key(*names: str) -> crypto.PKey:
     """Load pyOpenSSL private key."""
     loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
     return crypto.load_privatekey(loader, load_vector(*names))
+
+
+# legacy testing support
+
+
+def load_cert__pyopenssl(*names: str) -> crypto.X509:
+    """Load certificate."""
+    loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
+    return crypto.load_certificate(loader, load_vector(*names))
+
+
+def load_comparable_cert__pyopenssl(*names: str) -> josepy.util.ComparableX509:
+    """Load ComparableX509 cert."""
+    return ComparableX509(load_cert__pyopenssl(*names))
+
+
+def load_csr__pyopenssl(*names: str) -> crypto.X509Req:
+    """Load certificate request."""
+    loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
+    return crypto.load_certificate_request(loader, load_vector(*names))
+
+
+def load_comparable_csr__pyopenssl(*names: str) -> josepy.util.ComparableX509:
+    """Load ComparableX509 certificate request."""
+    return ComparableX509(load_csr__pyopenssl(*names))

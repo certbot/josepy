@@ -5,10 +5,12 @@ import sys
 import unittest
 from typing import TYPE_CHECKING
 
+from josepy import errors, json_util, util
+
 import pytest
+
 import test_util
 
-from josepy import errors, json_util, util
 
 # The approach used here and below is based on
 # https://github.com/certbot/certbot/pull/8748.

@@ -8,7 +8,6 @@ import warnings
 from types import ModuleType
 from typing import Optional
 
-from OpenSSL import crypto
 import pytest
 
 import test_util

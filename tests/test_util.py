@@ -121,4 +121,3 @@ if crypto:
     def load_comparable_csr__pyopenssl(*names: str) -> josepy.util.ComparableX509:
         """Load ComparableX509 certificate request."""
         return ComparableX509(load_csr__pyopenssl(*names))
-

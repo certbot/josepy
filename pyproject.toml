@@ -43,11 +43,11 @@ python = "^3.8"
 # add sign() and verify() to asymetric keys (RSA >=1.4, ECDSA >=1.5)
 # add not_valid_after_utc()
 cryptography = ">=42.0.0"
-# Connection.set_tlsext_host_name (>=0.13)
-pyopenssl = ">=0.13"
 # >=4.3.0 is needed for Python 3.10 support
 sphinx = {version = ">=4.3.0", optional = true}
 sphinx-rtd-theme = {version = ">=1.0", optional = true}
+# poetry add "pyopenssl[legacy]>=23.2.0"
+pyopenssl = {version = ">=23.2.0", optional=true}
 
 [tool.poetry.dev-dependencies]
 # coverage[toml] extra is required to read the coverage config from pyproject.toml
@@ -72,6 +72,9 @@ twine = "*"
 docs = [
     "sphinx",
     "sphinx-rtd-theme",
+]
+legacy = [
+    "pyopenssl",
 ]
 
 [tool.poetry.scripts]

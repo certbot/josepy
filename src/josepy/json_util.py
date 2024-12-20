@@ -470,7 +470,7 @@ def decode_csr(b64der: str) -> util.ComparableX509:
     """Decode JOSE Base-64 DER-encoded CSR.
 
     :param unicode b64der:
-    :rtype: `OpenSSL.crypto.X509Req` wrapped in `.ComparableX509`
+    :rtype: `cryptography.x509.CertificateSigningRequest` wrapped in `.ComparableX509`
 
     """
     try:

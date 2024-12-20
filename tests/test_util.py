@@ -4,16 +4,24 @@ import atexit
 import contextlib
 import os
 import sys
-from typing import Any
+from types import ModuleType
+from typing import Any, Optional
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
-from OpenSSL import crypto
 
 import josepy.util
 from josepy import ComparableRSAKey, ComparableX509
 from josepy.util import ComparableECKey
+
+# conditional import
+crypto: Optional[ModuleType] = None
+try:
+    from OpenSSL import crypto
+except (ImportError, ModuleNotFoundError):
+    pass
+
 
 # This approach is based on the recommendation at
 # https://github.com/python/mypy/issues/1153#issuecomment-1207333806.
@@ -92,32 +100,24 @@ def load_ec_private_key(*names: str) -> josepy.util.ComparableECKey:
     return ComparableECKey(loader(load_vector(*names), password=None, backend=default_backend()))
 
 
-def load_pyopenssl_private_key(*names: str) -> crypto.PKey:
-    """Load pyOpenSSL private key."""
-    loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
-    return crypto.load_privatekey(loader, load_vector(*names))
+if crypto:
 
+    # legacy testing support
 
-# legacy testing support
+    def load_cert__pyopenssl(*names: str) -> crypto.X509:
+        """Load certificate."""
+        loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
+        return crypto.load_certificate(loader, load_vector(*names))
 
+    def load_comparable_cert__pyopenssl(*names: str) -> josepy.util.ComparableX509:
+        """Load ComparableX509 cert."""
+        return ComparableX509(load_cert__pyopenssl(*names))
 
-def load_cert__pyopenssl(*names: str) -> crypto.X509:
-    """Load certificate."""
-    loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
-    return crypto.load_certificate(loader, load_vector(*names))
+    def load_csr__pyopenssl(*names: str) -> crypto.X509Req:
+        """Load certificate request."""
+        loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
+        return crypto.load_certificate_request(loader, load_vector(*names))
 
-
-def load_comparable_cert__pyopenssl(*names: str) -> josepy.util.ComparableX509:
-    """Load ComparableX509 cert."""
-    return ComparableX509(load_cert__pyopenssl(*names))
-
-
-def load_csr__pyopenssl(*names: str) -> crypto.X509Req:
-    """Load certificate request."""
-    loader = _guess_loader(names[-1], crypto.FILETYPE_PEM, crypto.FILETYPE_ASN1)
-    return crypto.load_certificate_request(loader, load_vector(*names))
-
-
-def load_comparable_csr__pyopenssl(*names: str) -> josepy.util.ComparableX509:
-    """Load ComparableX509 certificate request."""
-    return ComparableX509(load_csr__pyopenssl(*names))
+    def load_comparable_csr__pyopenssl(*names: str) -> josepy.util.ComparableX509:
+        """Load ComparableX509 certificate request."""
+        return ComparableX509(load_csr__pyopenssl(*names))

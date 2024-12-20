@@ -993,7 +993,7 @@ windows-terminal = ["colorama (>=0.4.6)"]
 name = "pyopenssl"
 version = "24.3.0"
 description = "Python wrapper module around the OpenSSL library"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "pyOpenSSL-24.3.0-py3-none-any.whl", hash = "sha256:e474f5a473cd7f92221cc04976e48f4d11502804657a08a989fb3be5514c904a"},
@@ -1618,8 +1618,9 @@ type = ["pytest-mypy"]
 
 [extras]
 docs = ["sphinx", "sphinx-rtd-theme"]
+legacy = ["pyopenssl"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "c90881d5e5142f55db7c3e732f7f098c707162ec2957f7a3bb93973e0643c7a1"
+content-hash = "d5599353cbbf1b674b54e7b08b471fbca467b1c6907369b341c759c21a3e0c53"

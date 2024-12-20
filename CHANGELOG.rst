@@ -3,6 +3,7 @@ Changelog
 
 1.15.0 (master)
 ---------------
+* Added support for Python 3.13.
 * Dropped support for Python 3.7.
 * Deprecated pyOpenSSL in favor of Cryptography and removed the required
   dependency. The underlying storage format of the `josepy.util.ComparableX509`

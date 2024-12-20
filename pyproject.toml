@@ -22,6 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Security",
 ]
@@ -85,7 +86,7 @@ jws = "josepy.jws:CLI.run"
 line-length = 100
 # This should be kept in sync with the version of Python specified in poetry's
 # dependencies above.
-target-version = ['py37', 'py38', 'py39', 'py310', 'py311', 'py312']
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312', 'py313']
 
 # Mypy tooling configuration
 

@@ -106,6 +106,8 @@ disallow_untyped_defs = true
 filterwarnings = [
     "error",
     "ignore:CSR support in pyOpenSSL is deprecated:DeprecationWarning",
+    # We ignore our own warning about dropping Python 3.8 support.
+    "ignore:Python 3.8 support will be dropped:DeprecationWarning",
 ]
 norecursedirs = "*.egg .eggs dist build docs .tox"
 

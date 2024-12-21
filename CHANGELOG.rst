@@ -5,6 +5,8 @@ Changelog
 ---------------
 * Added support for Python 3.13.
 * Dropped support for Python 3.7.
+* Support for Python 3.8 has been deprecated and will be removed in the next
+  scheduled release.
 * Deprecated pyOpenSSL in favor of Cryptography and removed the required
   dependency. The underlying storage format of the `josepy.util.ComparableX509`
   has been switched to `cryptography.x509` objects, and the
@@ -20,7 +22,6 @@ Changelog
   Please note, due to the removal of `X509_V_FLAG_NOTIFY_POLICY` in pyOpenSSL
   `23.2.0`, projects migrating to the new backend may experience a version
   conflict during the code transition.
-
 
 1.14.0 (2023-11-01)
 -------------------

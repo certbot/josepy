@@ -5,6 +5,8 @@ Changelog
 ---------------
 * Added support for Python 3.13.
 * Dropped support for Python 3.7.
+* Support for Python 3.8 has been deprecated and will be removed in the next
+  scheduled release.
 
 1.14.0 (2023-11-01)
 -------------------

@@ -1,6 +1,9 @@
 Changelog
 =========
 
+2.0.0 (master)
+* Dropped support for pyOpenSSL in favor of Cryptography
+
 1.15.0 (master)
 ---------------
 * Added support for Python 3.13.

@@ -1,14 +1,26 @@
 """JOSE utilities."""
 
 import abc
+import datetime
 import sys
 import warnings
 from collections.abc import Hashable, Mapping
 from types import ModuleType
-from typing import Any, Callable, Iterator, List, Tuple, TypeVar, Union, cast
+from typing import (
+    Any,
+    Callable,
+    Iterator,
+    List,
+    Literal,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 
+from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
-from OpenSSL import crypto
+from cryptography.hazmat.primitives.serialization import Encoding
 
 
 # Deprecated. Please use built-in decorators @classmethod and abc.abstractmethod together instead.
@@ -17,37 +29,51 @@ def abstractclassmethod(func: Callable) -> classmethod:
 
 
 class ComparableX509:
-    """Wrapper for OpenSSL.crypto.X509** objects that supports __eq__.
+    """Wraps cryptography.x509 objects objects to support __eq__ operations.
 
     :ivar wrapped: Wrapped certificate or certificate request.
-    :type wrapped: `OpenSSL.crypto.X509` or `OpenSSL.crypto.X509Req`.
-
+    :type wrapped: `Cryptography.x509.Certificate` or
+        `Cryptography.x509.CertificateSigningRequest`
     """
 
-    def __init__(self, wrapped: Union[crypto.X509, crypto.X509Req]) -> None:
-        assert isinstance(wrapped, crypto.X509) or isinstance(wrapped, crypto.X509Req)
+    #
+    wrapped: Union[x509.Certificate, x509.CertificateSigningRequest]
+
+    def __init__(
+        self,
+        wrapped: Union[x509.Certificate, x509.CertificateSigningRequest],
+    ) -> None:
+        # conditional runtime inputs
+        assert isinstance(wrapped, (x509.Certificate, x509.CertificateSigningRequest))
         self.wrapped = wrapped
 
     def __getattr__(self, name: str) -> Any:
+        if name == "has_expired":
+            # a unittest addresses this attribute
+            # x509.CertificateSigningRequest does not have this attribute
+            # ideally this function would be deprecated and users should
+            # address the `wrapped` item directly.
+            if isinstance(self.wrapped, x509.Certificate):
+                return (
+                    lambda: datetime.datetime.now(datetime.timezone.utc)
+                    > self.wrapped.not_valid_after_utc
+                )
         return getattr(self.wrapped, name)
 
-    def _dump(self, filetype: int = crypto.FILETYPE_ASN1) -> bytes:
+    def _dump(self, filetype: Literal[Encoding.DER, Encoding.PEM] = Encoding.DER) -> bytes:
         """Dumps the object into a buffer with the specified encoding.
 
         :param int filetype: The desired encoding. Should be one of
-            `OpenSSL.crypto.FILETYPE_ASN1`,
-            `OpenSSL.crypto.FILETYPE_PEM`, or
-            `OpenSSL.crypto.FILETYPE_TEXT`.
+            `Encoding.DER`,
+            `Encoding.PEM`,
 
         :returns: Encoded X509 object.
         :rtype: bytes
 
         """
-        if isinstance(self.wrapped, crypto.X509):
-            return crypto.dump_certificate(filetype, self.wrapped)
-
-        # assert in __init__ makes sure this is X509Req
-        return crypto.dump_certificate_request(filetype, self.wrapped)
+        if filetype == Encoding.DER:
+            return self.wrapped.public_bytes(Encoding.DER)
+        return self.wrapped.public_bytes(Encoding.PEM)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, self.__class__):

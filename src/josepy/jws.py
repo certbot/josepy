@@ -15,7 +15,8 @@ from typing import (
     cast,
 )
 
-from OpenSSL import crypto
+from cryptography import x509
+from cryptography.hazmat.primitives.serialization import Encoding
 
 import josepy
 from josepy import b64, errors, json_util, jwa
@@ -138,21 +139,17 @@ class Header(json_util.JSONObjectWithFields):
 
     @x5c.encoder  # type: ignore
     def x5c(value):
-        return [
-            base64.b64encode(crypto.dump_certificate(crypto.FILETYPE_ASN1, cert.wrapped))
-            for cert in value
-        ]
+        return [base64.b64encode(cert.wrapped.public_bytes(Encoding.DER)) for cert in value]
 
     @x5c.decoder  # type: ignore
     def x5c(value):
         try:
             return tuple(
-                util.ComparableX509(
-                    crypto.load_certificate(crypto.FILETYPE_ASN1, base64.b64decode(cert))
-                )
+                util.ComparableX509(x509.load_der_x509_certificate(base64.b64decode(cert)))
                 for cert in value
             )
-        except crypto.Error as error:
+
+        except Exception as error:
             raise errors.DeserializationError(error)
 
 

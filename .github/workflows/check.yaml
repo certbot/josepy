@@ -6,8 +6,6 @@ on:
       - master
   push:
   schedule:
-    # Run at 4pm UTC or 9am PST
-    - cron: "0 16 * * *"
 
 jobs:
   build:

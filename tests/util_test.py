@@ -3,6 +3,7 @@
 import functools
 import sys
 import unittest
+import warnings
 
 import pytest
 import test_util

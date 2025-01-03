@@ -24,7 +24,8 @@ class ComparableX509Test(unittest.TestCase):
 
     def test_getattr_proxy(self) -> None:
         with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', message='datetime.datetime.utcnow() is deprecated')
+            warnings.filterwarnings('ignore', category=DeprecationWarning,
+                message='.*Use timezone-aware objects to represent datetimes')
             assert self.cert1.has_expired() is True
 
     def test_eq(self) -> None:

@@ -3,6 +3,7 @@
 import functools
 import sys
 import unittest
+import warnings
 
 import pytest
 import test_util
@@ -22,7 +23,13 @@ class ComparableX509Test(unittest.TestCase):
         self.cert_other = test_util.load_comparable_cert("cert-san.pem")
 
     def test_getattr_proxy(self) -> None:
-        assert self.cert1.has_expired() is True
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                category=DeprecationWarning,
+                message=".*Use timezone-aware objects to represent datetimes",
+            )
+            assert self.cert1.has_expired() is True
 
     def test_eq(self) -> None:
         assert self.req1 == self.req2

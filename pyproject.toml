@@ -82,6 +82,10 @@ legacy = [
 jws = "josepy.jws:CLI.run"
 
 # Black tooling configuration
+
+[tool.poetry.group.dev.dependencies]
+pyopenssl = ">=23.2.0"
+
 [tool.black]
 line-length = 100
 # This should be kept in sync with the version of Python specified in poetry's

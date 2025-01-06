@@ -993,7 +993,7 @@ windows-terminal = ["colorama (>=0.4.6)"]
 name = "pyopenssl"
 version = "24.3.0"
 description = "Python wrapper module around the OpenSSL library"
-optional = true
+optional = false
 python-versions = ">=3.7"
 files = [
     {file = "pyOpenSSL-24.3.0-py3-none-any.whl", hash = "sha256:e474f5a473cd7f92221cc04976e48f4d11502804657a08a989fb3be5514c904a"},
@@ -1623,4 +1623,4 @@ legacy = ["pyopenssl"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "d5599353cbbf1b674b54e7b08b471fbca467b1c6907369b341c759c21a3e0c53"
+content-hash = "e561f96799ce63a00112b0911daa292b6f80bff61e9f1fd762da17c944561eb4"

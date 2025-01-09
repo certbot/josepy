@@ -8,9 +8,11 @@ from types import ModuleType
 from typing import Any, Optional
 
 from cryptography import x509
+from cryptography.hazmat.primitives import serialization
 
 import josepy.util
-from josepy import ComparableX509
+from josepy import ComparableRSAKey, ComparableX509
+from josepy.util import ComparableECKey
 
 # conditional import
 crypto: Optional[ModuleType] = None
@@ -78,6 +80,22 @@ def load_csr(*names: str) -> x509.CertificateSigningRequest:
 def load_comparable_csr(*names: str) -> josepy.util.ComparableX509:
     """Load ComparableX509 certificate request."""
     return ComparableX509(load_csr(*names))
+
+
+def load_rsa_private_key(*names: str) -> josepy.util.ComparableRSAKey:
+    """Load RSA private key."""
+    loader = _guess_loader(
+        names[-1], serialization.load_pem_private_key, serialization.load_der_private_key
+    )
+    return ComparableRSAKey(loader(load_vector(*names), password=None))
+
+
+def load_ec_private_key(*names: str) -> josepy.util.ComparableECKey:
+    """Load EC private key."""
+    loader = _guess_loader(
+        names[-1], serialization.load_pem_private_key, serialization.load_der_private_key
+    )
+    return ComparableECKey(loader(load_vector(*names), password=None))
 
 
 if crypto:

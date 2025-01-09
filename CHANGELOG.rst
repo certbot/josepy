@@ -7,6 +7,21 @@ Changelog
 * Dropped support for Python 3.7.
 * Support for Python 3.8 has been deprecated and will be removed in the next
   scheduled release.
+* Deprecated pyOpenSSL in favor of Cryptography and removed the required
+  dependency. The underlying storage format of the `josepy.util.ComparableX509`
+  has been switched to `cryptography.x509` objects, and the
+  `josepy.util.ComparableX509.wrapped` attribute will now be either a
+  `cryptography.x509.Certificate` or `cryptography.x509.CertificateSigningRequest`
+  - objects from the `opensssl.crypto` package will be automatically transcoded
+  to their Cryptography counterparts on initialization.  A new convenience
+  attribute, `josepy.util.ComparableX509.wrapped_legacy` will return an
+  `opensssl.crypto` object for affected projects that are unable to immediately
+  migrate code to the Cryptography objects. This is offered as a minimally
+  breaking change to aid in migration to Cryptography. Affected projects should
+  either pin to `1.14.0` or utilize the new attribute in a "hotfix" release.
+  Please note, due to the removal of `X509_V_FLAG_NOTIFY_POLICY` in pyOpenSSL
+  `23.2.0`, projects migrating to the new backend may experience a version
+  conflict during the code transition.
 
 1.14.0 (2023-11-01)
 -------------------

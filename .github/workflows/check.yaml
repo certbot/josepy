@@ -11,11 +11,13 @@ on:
 
 jobs:
   build:
+    name: test-${{ matrix.python }}-${{ matrix.build-type }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        build-type: ["noopenssl", "legacy"]
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python
@@ -34,7 +36,7 @@ jobs:
       - name: Install Poetry & Tox
         run: pip install poetry>1.0.0 tox>3.3.0
       - name: Run tox
-        run: tox
+        run: tox -e github-${{ matrix.build-type }}
   # This job runs our tests like external parties such as packagers.
   external:
     runs-on: ubuntu-latest

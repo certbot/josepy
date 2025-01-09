@@ -1,12 +1,27 @@
 """Tests for josepy.util."""
 
 import functools
+import os
 import sys
 import unittest
 import warnings
+from types import ModuleType
+from typing import Optional
 
 import pytest
 import test_util
+
+import josepy.util
+
+# conditional import
+crypto: Optional[ModuleType] = None
+try:
+    from OpenSSL import crypto
+except (ImportError, ModuleNotFoundError):
+    pass
+
+
+JOSEPY_EXPECT_OPENSSL = bool(int(os.getenv("JOSEPY_EXPECT_OPENSSL", "0")))
 
 
 class ComparableX509Test(unittest.TestCase):
@@ -53,6 +68,41 @@ class ComparableX509Test(unittest.TestCase):
     def test_repr(self) -> None:
         for x509 in self.req1, self.cert1:
             assert repr(x509) == "<ComparableX509({0!r})>".format(x509.wrapped)
+
+
+class ComparableX509LegacyTest(unittest.TestCase):
+
+    def _check_loading_warns(self, warnlist: list) -> bool:
+        _found = False
+        for w in warnlist:
+            if isinstance(w.message, DeprecationWarning):
+                if isinstance(w.message.args[0], str):
+                    if w.message.args[0].startswith("`OpenSSL.crypto` objects are deprecated"):
+                        _found = True
+                        break
+        return _found
+
+    """Legacy tests for josepy.util.ComparableX509."""
+
+    @unittest.skipUnless(JOSEPY_EXPECT_OPENSSL, "only run in legacy mode")
+    def test_legacy(self) -> None:
+
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter("always")
+            cert1 = test_util.load_comparable_cert__pyopenssl("cert.pem")
+            assert self._check_loading_warns(warns) is True
+            assert isinstance(cert1.wrapped_legacy, crypto.X509)
+
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter("always")
+            csr1 = test_util.load_comparable_csr__pyopenssl("csr.pem")
+            assert self._check_loading_warns(warns) is True
+            assert isinstance(csr1.wrapped_legacy, crypto.X509Req)
+
+    @unittest.skipUnless(JOSEPY_EXPECT_OPENSSL, "only run in legacy mode")
+    def test_filetype_compat(self) -> None:
+        assert josepy.util.FILETYPE_ASN1 == crypto.FILETYPE_ASN1
+        assert josepy.util.FILETYPE_PEM == crypto.FILETYPE_PEM
 
 
 class ComparableRSAKeyTest(unittest.TestCase):

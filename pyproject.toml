@@ -58,9 +58,6 @@ coverage = {version = ">=4.0", extras = ["toml"]}
 # introduced the functionality we are using. See
 # https://github.com/python/importlib_resources/tree/7f4fbb5ee026d7610636d5ece18b09c64aa0c893#compatibility.
 importlib_resources = {version = ">=1.3", python = "<3.9"}
-legacy = [
-    "pyopenssl",
-]
 mypy = "*"
 types-pyOpenSSL = "*"
 types-pyRFC3339 = "*"
@@ -77,6 +74,9 @@ twine = "*"
 docs = [
     "sphinx",
     "sphinx-rtd-theme",
+]
+legacy = [
+    "pyopenssl",
 ]
 
 [tool.poetry.scripts]

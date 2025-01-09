@@ -1,6 +1,7 @@
 """JOSE utilities."""
 
 import abc
+import datetime
 import sys
 import warnings
 from collections.abc import Hashable, Mapping
@@ -132,6 +133,16 @@ class ComparableX509:
         return self._wrapped_legacy
 
     def __getattr__(self, name: str) -> Any:
+        if name == "has_expired":
+            # a unittest addresses this attribute
+            # x509.CertificateSigningRequest does not have this attribute
+            # ideally this function would be deprecated and users should
+            # address the `wrapped` item directly.
+            if isinstance(self.wrapped, x509.Certificate):
+                return (
+                    lambda: datetime.datetime.now(datetime.timezone.utc)
+                    > self.wrapped.not_valid_after_utc
+                )
         return getattr(self.wrapped, name)
 
     def _dump(self, filetype: int = FILETYPE_ASN1) -> bytes:

@@ -9,7 +9,6 @@ from types import ModuleType
 from typing import Optional
 
 import pytest
-
 import test_util
 
 import josepy.util

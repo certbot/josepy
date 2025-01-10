@@ -434,10 +434,10 @@ def encode_cert(cert: util.ComparableX509) -> str:
     :rtype: unicode
 
     """
-    if isinstance(cert.wrapped, x509.CertificateSigningRequest):
+    if isinstance(cert._wrapped_new, x509.CertificateSigningRequest):
         raise ValueError("Error input is actually a certificate request.")
 
-    return encode_b64jose(cert.wrapped.public_bytes(Encoding.DER))
+    return encode_b64jose(cert._wrapped_new.public_bytes(Encoding.DER))
 
 
 def decode_cert(b64der: str) -> util.ComparableX509:
@@ -460,10 +460,10 @@ def encode_csr(csr: util.ComparableX509) -> str:
     :rtype: unicode
 
     """
-    if isinstance(csr.wrapped, x509.Certificate):
+    if isinstance(csr._wrapped_new, x509.Certificate):
         raise ValueError("Error input is actually a certificate.")
 
-    return encode_b64jose(csr.wrapped.public_bytes(Encoding.DER))
+    return encode_b64jose(csr._wrapped_new.public_bytes(Encoding.DER))
 
 
 def decode_csr(b64der: str) -> util.ComparableX509:

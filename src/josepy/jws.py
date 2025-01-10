@@ -139,7 +139,7 @@ class Header(json_util.JSONObjectWithFields):
 
     @x5c.encoder  # type: ignore
     def x5c(value):
-        return [base64.b64encode(cert.wrapped.public_bytes(Encoding.DER)) for cert in value]
+        return [base64.b64encode(cert._wrapped_new.public_bytes(Encoding.DER)) for cert in value]
 
     @x5c.decoder  # type: ignore
     def x5c(value):

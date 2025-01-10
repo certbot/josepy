@@ -110,7 +110,7 @@ class ComparableX509:
             else:
                 # this is a x509 AND we have pyOpenSSL installed
                 # as an interim bridge, create a legacy version
-                _wrapped_legacy: Union[crypto.X509, crypto.X509Req]
+                _wrapped_legacy: Union["OpenSSL.crypto.X509", "OpenSSL.crypto.X509Req"]
                 if isinstance(wrapped, x509.Certificate):
                     _wrapped_legacy = crypto.load_certificate(
                         crypto.FILETYPE_ASN1, wrapped.public_bytes(Encoding.DER)
@@ -155,11 +155,15 @@ class ComparableX509:
                 )
             else:
                 raise ValueError("no compatible legacy object")
-        if TYPE_CHECKING:
-            assert isinstance(self._wrapped_legacy, (crypto.X509, crypto.X509Req))
         return self._wrapped_legacy
 
     def __getattr__(self, name: str) -> Any:
+        if self._wrapped_legacy:
+            try:
+                return getattr(self._wrapped_legacy, name)
+            except Exception:
+                pass
+        # fallback to compat and _wrapped_new
         if name == "has_expired":
             # a unittest addresses this attribute
             # x509.CertificateSigningRequest does not have this attribute

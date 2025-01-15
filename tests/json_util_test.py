@@ -338,9 +338,9 @@ class DeEncodersTest(unittest.TestCase):
         with warnings.catch_warnings():
             # DEPRECATED
             warnings.filterwarnings("ignore", category=DeprecationWarning)
-            cert = decode_cert(self.b64_cert)
-            assert isinstance(cert, util.ComparableX509)
-            assert cert == COMPARABLE_CERT
+            cert_legacy = decode_cert(self.b64_cert)
+            assert isinstance(cert_legacy, util.ComparableX509)
+            assert cert_legacy == COMPARABLE_CERT
             with pytest.raises(errors.DeserializationError):
                 decode_cert("")
 
@@ -366,9 +366,9 @@ class DeEncodersTest(unittest.TestCase):
         with warnings.catch_warnings():
             # DEPRECATED
             warnings.filterwarnings("ignore", category=DeprecationWarning)
-            csr = decode_csr(self.b64_csr)
-            assert isinstance(csr, util.ComparableX509)
-            assert csr == COMPARABLE_CSR
+            csr_legacy = decode_csr(self.b64_csr)
+            assert isinstance(csr_legacy, util.ComparableX509)
+            assert csr_legacy == COMPARABLE_CSR
             with pytest.raises(errors.DeserializationError):
                 decode_csr("")
 

@@ -3,16 +3,20 @@
 import itertools
 import sys
 import unittest
+import warnings
 from typing import Any, Dict, Mapping
 from unittest import mock
 
 import pytest
 import test_util
+from cryptography import x509
 
 from josepy import errors, interfaces, util
 
 CERT = test_util.load_comparable_cert("cert.pem")
 CSR = test_util.load_comparable_csr("csr.pem")
+CERT_CRYPTOGRAPHY = test_util.load_cert_cryptography("cert.pem")
+CSR_CRYPTOGRAPHY = test_util.load_csr_cryptography("csr.pem")
 
 
 class FieldTest(unittest.TestCase):
@@ -321,30 +325,61 @@ class DeEncodersTest(unittest.TestCase):
     def test_encode_cert(self) -> None:
         from josepy.json_util import encode_cert
 
-        assert self.b64_cert == encode_cert(CERT)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            assert self.b64_cert == encode_cert(CERT)
+
+        assert self.b64_cert == encode_cert(CERT_CRYPTOGRAPHY)
 
     def test_decode_cert(self) -> None:
-        from josepy.json_util import decode_cert
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            from josepy.json_util import decode_cert
 
-        cert = decode_cert(self.b64_cert)
-        assert isinstance(cert, util.ComparableX509)
-        assert cert == CERT
+            cert = decode_cert(self.b64_cert)
+            assert isinstance(cert, util.ComparableX509)
+            assert cert == CERT
+            with pytest.raises(errors.DeserializationError):
+                decode_cert("")
+
+    def test_decode_cert_cryptography(self) -> None:
+        from josepy.json_util import decode_cert_cryptography
+
+        cert = decode_cert_cryptography(self.b64_cert)
+        assert isinstance(cert, x509.Certificate)
+        assert cert == CERT_CRYPTOGRAPHY
         with pytest.raises(errors.DeserializationError):
-            decode_cert("")
+            decode_cert_cryptography("")
 
     def test_encode_csr(self) -> None:
         from josepy.json_util import encode_csr
 
-        assert self.b64_csr == encode_csr(CSR)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            assert self.b64_csr == encode_csr(CSR)
+
+        assert self.b64_csr == encode_csr(CSR_CRYPTOGRAPHY)
 
     def test_decode_csr(self) -> None:
         from josepy.json_util import decode_csr
 
-        csr = decode_csr(self.b64_csr)
-        assert isinstance(csr, util.ComparableX509)
-        assert csr == CSR
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+            csr = decode_csr(self.b64_csr)
+            assert isinstance(csr, util.ComparableX509)
+            assert csr == CSR
+            with pytest.raises(errors.DeserializationError):
+                decode_csr("")
+
+    def test_decode_csr_cryptography(self) -> None:
+        from josepy.json_util import decode_csr_cryptography
+
+        csr = decode_csr_cryptography(self.b64_csr)
+        assert isinstance(csr, x509.CertificateSigningRequest)
+        assert csr == CSR_CRYPTOGRAPHY
         with pytest.raises(errors.DeserializationError):
-            decode_csr("")
+            decode_csr_cryptography("")
 
 
 class TypedJSONObjectWithFieldsTest(unittest.TestCase):

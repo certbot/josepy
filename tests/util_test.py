@@ -1,28 +1,14 @@
 """Tests for josepy.util."""
 
 import functools
-import os
 import sys
 import unittest
 import warnings
-from types import ModuleType
-from typing import Optional
 
 import pytest
 import test_util
 from cryptography import x509
-
-import josepy.util
-
-# conditional import
-crypto: Optional[ModuleType] = None
-try:
-    from OpenSSL import crypto
-except (ImportError, ModuleNotFoundError):
-    pass
-
-
-JOSEPY_EXPECT_OPENSSL = bool(int(os.getenv("JOSEPY_EXPECT_OPENSSL", "0")))
+from OpenSSL import crypto
 
 
 class ComparableX509Test(unittest.TestCase):
@@ -68,35 +54,21 @@ class ComparableX509Test(unittest.TestCase):
 
     def test_repr(self) -> None:
         for cert in (self.req1, self.cert1):
-            assert repr(cert) == "<ComparableX509({0!r})>".format(cert._wrapped_new)
+            assert repr(cert) == "<ComparableX509({0!r})>".format(cert.wrapped_new)
 
     def test_legacy_cert(self) -> None:
-        if crypto:
-            # check explicit
-            assert isinstance(self.cert1.wrapped_legacy, crypto.X509)
-            assert isinstance(self.cert1.wrapped_new, x509.Certificate)
-            # check default
-            assert isinstance(self.cert1.wrapped, crypto.X509)
-        else:
-            # check explicit
-            assert self.cert1.wrapped_legacy is None
-            assert isinstance(self.cert1.wrapped_new, x509.Certificate)
-            # check default
-            assert isinstance(self.cert1.wrapped, x509.Certificate)
+        # check default
+        assert isinstance(self.cert1.wrapped, crypto.X509)
+        # check explicit
+        assert isinstance(self.cert1._wrapped_legacy, crypto.X509)
+        assert isinstance(self.cert1.wrapped_new, x509.Certificate)
 
     def test_legacy_csr(self) -> None:
-        if crypto:
-            # check explicit
-            assert isinstance(self.req1.wrapped_legacy, crypto.X509Req)
-            assert isinstance(self.req1.wrapped_new, x509.CertificateSigningRequest)
-            # check default
-            assert isinstance(self.req1.wrapped, crypto.X509Req)
-        else:
-            # check explicit
-            assert self.cert1.wrapped_legacy is None
-            assert isinstance(self.req1.wrapped_new, x509.CertificateSigningRequest)
-            # check default
-            assert isinstance(self.req1.wrapped, x509.CertificateSigningRequest)
+        # check default first, as it will populate
+        assert isinstance(self.req1.wrapped, crypto.X509Req)
+        # check explicit
+        assert isinstance(self.req1._wrapped_legacy, crypto.X509Req)
+        assert isinstance(self.req1.wrapped_new, x509.CertificateSigningRequest)
 
 
 class ComparableX509LegacyTest(unittest.TestCase):
@@ -106,39 +78,45 @@ class ComparableX509LegacyTest(unittest.TestCase):
         for w in warnlist:
             if isinstance(w.message, DeprecationWarning):
                 if isinstance(w.message.args[0], str):
-                    if w.message.args[0].startswith("`OpenSSL.crypto` objects are deprecated"):
+                    if w.message.args[0].startswith(
+                        "`josepy.util.ComparableX509` objects are deprecated"
+                    ):
                         _found = True
                         break
         return _found
 
     """Legacy tests for josepy.util.ComparableX509."""
 
-    @unittest.skipUnless(JOSEPY_EXPECT_OPENSSL, "only run in legacy mode")
     def test_legacy(self) -> None:
 
         with warnings.catch_warnings(record=True) as warns:
             warnings.simplefilter("always")
+
+            # load pyopenssl
             cert1 = test_util.load_comparable_cert__pyopenssl("cert.pem")
             assert self._check_loading_warns(warns) is True
-            # check explicit
-            assert isinstance(cert1.wrapped_legacy, crypto.X509)
-            # check default
             assert isinstance(cert1.wrapped, crypto.X509)
+            assert isinstance(cert1.wrapped_new, x509.Certificate)
+
+            # load cryptography
+            cert2 = test_util.load_comparable_cert("cert.pem")
+            assert self._check_loading_warns(warns) is True
+            assert isinstance(cert2.wrapped, crypto.X509)
+            assert isinstance(cert2.wrapped_new, x509.Certificate)
 
         with warnings.catch_warnings(record=True) as warns:
             warnings.simplefilter("always")
+
+            # load pyopenssl
             csr1 = test_util.load_comparable_csr__pyopenssl("csr.pem")
             assert self._check_loading_warns(warns) is True
-            # check explicit
-            assert isinstance(csr1.wrapped_legacy, crypto.X509Req)
-            # check default
             assert isinstance(csr1.wrapped, crypto.X509Req)
+            assert isinstance(csr1.wrapped_new, x509.CertificateSigningRequest)
 
-    @unittest.skipUnless(JOSEPY_EXPECT_OPENSSL, "only run in legacy mode")
-    def test_filetype_compat(self) -> None:
-        assert josepy.util.FILETYPE_ASN1 == crypto.FILETYPE_ASN1
-        assert josepy.util.FILETYPE_PEM == crypto.FILETYPE_PEM
-        assert josepy.util.FILETYPE_TEXT == crypto.FILETYPE_TEXT
+            csr2 = test_util.load_comparable_csr("csr.pem")
+            assert self._check_loading_warns(warns) is True
+            assert isinstance(csr2.wrapped, crypto.X509Req)
+            assert isinstance(csr2.wrapped_new, x509.CertificateSigningRequest)
 
 
 class ComparableRSAKeyTest(unittest.TestCase):

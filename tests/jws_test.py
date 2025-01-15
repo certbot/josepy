@@ -3,6 +3,7 @@
 import base64
 import sys
 import unittest
+import warnings
 from unittest import mock
 
 import pytest
@@ -12,7 +13,8 @@ from cryptography.hazmat.primitives.serialization import Encoding
 
 from josepy import errors, json_util, jwa, jwk
 
-CERT = test_util.load_comparable_cert("cert.pem")
+COMPARABLE_CERT = test_util.load_comparable_cert("cert.pem")
+CERT = test_util.load_cert("cert.pem")
 KEY = jwk.JWKRSA.load(test_util.load_vector("rsa512_key.pem"))
 
 
@@ -71,16 +73,33 @@ class HeaderTest(unittest.TestCase):
     def test_x5c_decoding(self) -> None:
         from josepy.jws import Header
 
-        header = Header(x5c=(CERT, CERT))
-        jobj = header.to_partial_json()
-        assert isinstance(CERT._wrapped_new, x509.Certificate)
-        cert_asn1 = CERT._wrapped_new.public_bytes(Encoding.DER)
-        cert_b64 = base64.b64encode(cert_asn1)
-        assert jobj == {"x5c": [cert_b64, cert_b64]}
-        assert header == Header.from_json(jobj)
-        jobj["x5c"][0] = base64.b64encode(b"xxx" + cert_asn1)
-        with pytest.raises(errors.DeserializationError):
-            Header.from_json(jobj)
+        with warnings.catch_warnings(record=True) as warns:  # noqa: F841
+            warnings.simplefilter("always")
+
+            # the new way
+            header = Header(x5c=(CERT, CERT))
+            jobj = header.to_partial_json()
+            assert isinstance(CERT, x509.Certificate)
+            cert_asn1 = CERT.public_bytes(Encoding.DER)
+            cert_b64 = base64.b64encode(cert_asn1)
+            assert jobj == {"x5c": [cert_b64, cert_b64]}
+            assert header == Header.from_json(jobj)
+            jobj["x5c"][0] = base64.b64encode(b"xxx" + cert_asn1)
+            with pytest.raises(errors.DeserializationError):
+                Header.from_json(jobj)
+
+            # legacy
+            header_legacy = Header(x5c=(COMPARABLE_CERT, COMPARABLE_CERT))
+            jobj = header_legacy.to_partial_json()
+            assert isinstance(COMPARABLE_CERT.wrapped_new, x509.Certificate)
+            cert_asn1 = COMPARABLE_CERT.wrapped_new.public_bytes(Encoding.DER)
+            cert_b64 = base64.b64encode(cert_asn1)
+            assert jobj == {"x5c": [cert_b64, cert_b64]}
+            # comparing the NEW header to the object
+            assert header == Header.from_json(jobj)
+            jobj["x5c"][0] = base64.b64encode(b"xxx" + cert_asn1)
+            with pytest.raises(errors.DeserializationError):
+                Header.from_json(jobj)
 
     def test_find_key(self) -> None:
         assert "foo" == self.header1.find_key()

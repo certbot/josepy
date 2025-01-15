@@ -12,6 +12,7 @@ from typing import (
     Optional,
     Tuple,
     Type,
+    Union,
     cast,
 )
 
@@ -81,7 +82,10 @@ class Header(json_util.JSONObjectWithFields):
     )
     kid: Optional[str] = json_util.field("kid", omitempty=True)
     x5u: Optional[bytes] = json_util.field("x5u", omitempty=True)
-    x5c: Tuple[util.ComparableX509, ...] = json_util.field("x5c", omitempty=True, default=())
+    x5c: Union[
+        Tuple[util.ComparableX509, ...],
+        Tuple[x509.Certificate, ...],
+    ] = json_util.field("x5c", omitempty=True, default=())
     x5t: Optional[bytes] = json_util.field("x5t", decoder=json_util.decode_b64jose, omitempty=True)
     x5tS256: Optional[bytes] = json_util.field(
         "x5t#S256", decoder=json_util.decode_b64jose, omitempty=True
@@ -139,15 +143,20 @@ class Header(json_util.JSONObjectWithFields):
 
     @x5c.encoder  # type: ignore
     def x5c(value):
-        return [base64.b64encode(cert._wrapped_new.public_bytes(Encoding.DER)) for cert in value]
+        # DEPRECATE `cert.wrapped_new`
+        return [
+            (
+                base64.b64encode(cert.wrapped_new.public_bytes(Encoding.DER))
+                if isinstance(cert, util.ComparableX509)
+                else base64.b64encode(cert.public_bytes(Encoding.DER))
+            )
+            for cert in value
+        ]
 
     @x5c.decoder  # type: ignore
     def x5c(value):
         try:
-            return tuple(
-                util.ComparableX509(x509.load_der_x509_certificate(base64.b64decode(cert)))
-                for cert in value
-            )
+            return tuple(x509.load_der_x509_certificate(base64.b64decode(cert)) for cert in value)
         except Exception as error:
             raise errors.DeserializationError(error)
 

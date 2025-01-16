@@ -3,7 +3,7 @@ name: Python Tests for Josepy
 on:
   pull_request:
     branches:
-      - master
+      - main
   push:
   schedule:
     # Run at 4pm UTC or 9am PST
@@ -50,8 +50,8 @@ jobs:
         run: pytest tests
   notify:
     # Only notify about failed builds, do not notify about failed builds for
-    # PRs, and only notify about failed pushes to master.
-    if: ${{ failure() && github.event_name != 'pull_request' && (github.event_name != 'push' || github.ref == 'refs/heads/master') }}
+    # PRs, and only notify about failed pushes to main.
+    if: ${{ failure() && github.event_name != 'pull_request' && (github.event_name != 'push' || github.ref == 'refs/heads/main') }}
     needs: [build, external]
     runs-on: ubuntu-20.04
     steps:
@@ -59,6 +59,6 @@ jobs:
         run: |
           WORKFLOW_RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           echo "{\"text\":\"** :warning: $GITHUB_REPOSITORY: Build failed :warning: ** | [(see details)]($WORKFLOW_RUN_URL) \"}" > mattermost.json
-      - uses: mattermost/action-mattermost-notify@master
+      - uses: mattermost/action-mattermost-notify@main
         env:
           MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}

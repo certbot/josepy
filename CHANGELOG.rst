@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.15.0 (master)
+1.15.0 (main)
 ---------------
 * Added support for Python 3.13.
 * Dropped support for Python 3.7.

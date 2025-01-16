@@ -10,6 +10,7 @@ The framework presented here is somewhat based on `Go's "json" package`_
 import abc
 import binascii
 import logging
+import warnings
 from typing import (
     Any,
     Callable,
@@ -433,6 +434,12 @@ def encode_cert(cert: util.ComparableX509) -> str:
     :rtype: unicode
 
     """
+    warnings.warn(
+        "The next major josepy release will deprecate the use of PyOpenSSL in favor of "
+        "cryptography, including in method signatures. This will be a breaking change. To avoid "
+        "breakage, pin josepy < 2.0.0.",
+        DeprecationWarning,
+    )
     if isinstance(cert.wrapped, crypto.X509Req):
         raise ValueError("Error input is actually a certificate request.")
 
@@ -446,6 +453,12 @@ def decode_cert(b64der: str) -> util.ComparableX509:
     :rtype: `OpenSSL.crypto.X509` wrapped in `.ComparableX509`
 
     """
+    warnings.warn(
+        "The next major josepy release will deprecate the use of PyOpenSSL in favor of "
+        "cryptography, including in method signatures. This will be a breaking change. To avoid "
+        "breakage, pin josepy < 2.0.0.",
+        DeprecationWarning,
+    )
     try:
         return util.ComparableX509(
             crypto.load_certificate(crypto.FILETYPE_ASN1, decode_b64jose(b64der))
@@ -461,6 +474,12 @@ def encode_csr(csr: util.ComparableX509) -> str:
     :rtype: unicode
 
     """
+    warnings.warn(
+        "The next major josepy release will deprecate the use of PyOpenSSL in favor of "
+        "cryptography, including in method signatures. This will be a breaking change. To avoid "
+        "breakage, pin josepy < 2.0.0.",
+        DeprecationWarning,
+    )
     if isinstance(csr.wrapped, crypto.X509):
         raise ValueError("Error input is actually a certificate.")
 
@@ -474,6 +493,12 @@ def decode_csr(b64der: str) -> util.ComparableX509:
     :rtype: `OpenSSL.crypto.X509Req` wrapped in `.ComparableX509`
 
     """
+    warnings.warn(
+        "The next major josepy release will deprecate the use of PyOpenSSL in favor of "
+        "cryptography, including in method signatures. This will be a breaking change. To avoid "
+        "breakage, pin josepy < 2.0.0.",
+        DeprecationWarning,
+    )
     try:
         return util.ComparableX509(
             crypto.load_certificate_request(crypto.FILETYPE_ASN1, decode_b64jose(b64der))

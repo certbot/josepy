@@ -100,6 +100,8 @@ filterwarnings = [
     "ignore:CSR support in pyOpenSSL is deprecated:DeprecationWarning",
     # We ignore our own warning about dropping Python 3.8 support.
     "ignore:Python 3.8 support will be dropped:DeprecationWarning",
+    # We ignore our own warning about breaking changes in 2.0.
+    "ignore:The next major josepy release will deprecate:DeprecationWarning",
 ]
 norecursedirs = "*.egg .eggs dist build docs .tox"
 

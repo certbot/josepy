@@ -25,6 +25,12 @@ class ComparableX509:
     """
 
     def __init__(self, wrapped: Union[crypto.X509, crypto.X509Req]) -> None:
+        warnings.warn(
+            "The next major josepy release will deprecate the use of PyOpenSSL in favor of "
+            "cryptography, including in method signatures. This will be a breaking change. "
+            "To avoid breakage, pin josepy < 2.0.0.",
+            DeprecationWarning,
+        )
         assert isinstance(wrapped, crypto.X509) or isinstance(wrapped, crypto.X509Req)
         self.wrapped = wrapped
 

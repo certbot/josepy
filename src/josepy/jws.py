@@ -3,6 +3,7 @@
 import argparse
 import base64
 import sys
+import warnings
 from typing import (
     Any,
     Dict,
@@ -138,6 +139,12 @@ class Header(json_util.JSONObjectWithFields):
 
     @x5c.encoder  # type: ignore
     def x5c(value):
+        warnings.warn(
+            "The next major josepy release will deprecate the use of PyOpenSSL in favor of "
+            "cryptography, including in method signatures. This will be a breaking change. "
+            "To avoid breakage, pin josepy < 2.0.0.",
+            DeprecationWarning,
+        )
         return [
             base64.b64encode(crypto.dump_certificate(crypto.FILETYPE_ASN1, cert.wrapped))
             for cert in value
@@ -145,6 +152,12 @@ class Header(json_util.JSONObjectWithFields):
 
     @x5c.decoder  # type: ignore
     def x5c(value):
+        warnings.warn(
+            "The next major josepy release will deprecate the use of PyOpenSSL in favor of "
+            "cryptography, including in method signatures. This will be a breaking change. "
+            "To avoid breakage, pin josepy < 2.0.0.",
+            DeprecationWarning,
+        )
         try:
             return tuple(
                 util.ComparableX509(

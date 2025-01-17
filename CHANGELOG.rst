@@ -4,7 +4,7 @@ Changelog
 1.15.0 (main)
 ---------------
 
-* Added deprecation warnings about future backwards incompatible changes. The
+* Added a deprecation warning about future backwards incompatible changes. The
   text of that warning is "The next major version of josepy will remove
   josepy.util.ComparableX509 and all uses of it as part of removing our
   dependency on PyOpenSSL. This includes modifying any functions with

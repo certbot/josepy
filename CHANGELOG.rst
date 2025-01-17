@@ -3,6 +3,14 @@ Changelog
 
 1.15.0 (main)
 ---------------
+
+* Added deprecation warnings about future backwards incompatible changes. The
+  text of that warning is "The next major version of josepy will remove
+  josepy.util.ComparableX509 and all uses of it as part of removing our
+  dependency on PyOpenSSL. This includes modifying any functions with
+  ComparableX509 parameters or return values. This will be a breaking change.
+  To avoid breakage, we recommend pinning josepy < 2.0.0 until josepy 2.0.0 is
+  out and you've had time to update your code."
 * Added support for Python 3.13.
 * Dropped support for Python 3.7.
 * Support for Python 3.8 has been deprecated and will be removed in the next

@@ -22,6 +22,7 @@ class ComparableX509:
     :ivar wrapped: Wrapped certificate or certificate request.
     :type wrapped: `OpenSSL.crypto.X509` or `OpenSSL.crypto.X509Req`.
 
+    .. deprecated:: 1.15.0
     """
 
     def __init__(self, wrapped: Union[crypto.X509, crypto.X509Req]) -> None:

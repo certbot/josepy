@@ -22,9 +22,19 @@ class ComparableX509:
     :ivar wrapped: Wrapped certificate or certificate request.
     :type wrapped: `OpenSSL.crypto.X509` or `OpenSSL.crypto.X509Req`.
 
+    .. deprecated:: 1.15.0
     """
 
     def __init__(self, wrapped: Union[crypto.X509, crypto.X509Req]) -> None:
+        warnings.warn(
+            "The next major version of josepy will remove josepy.util.ComparableX509 and all "
+            "uses of it as part of removing our dependency on PyOpenSSL. This includes "
+            "modifying any functions with ComparableX509 parameters or return values. This "
+            "will be a breaking change. To avoid breakage, we recommend pinning josepy < 2.0.0 "
+            "until josepy 2.0.0 is out and you've had time to update your code.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         assert isinstance(wrapped, crypto.X509) or isinstance(wrapped, crypto.X509Req)
         self.wrapped = wrapped
 

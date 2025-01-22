@@ -89,8 +89,8 @@ git checkout "$RELEASE_BRANCH"
 SetVersion() {
     ver="$1"
     short_ver=$(echo "$ver" | cut -d. -f1,2)
-    sed -i "s/^release.*/release = u'$ver'/" docs/conf.py
-    sed -i "s/^version.*/version = u'$short_ver'/" docs/conf.py
+    sed -i "s/^release.*/release = '$ver'/" docs/conf.py
+    sed -i "s/^version.*/version = '$short_ver'/" docs/conf.py
     poetry version "$ver"
 
     # interactive user input

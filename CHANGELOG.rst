@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.15.0 (main)
----------------
+1.15.0 (2025-01-22)
+-------------------
 
 * Added a deprecation warning about future backwards incompatible changes. The
   text of that warning is "The next major version of josepy will remove

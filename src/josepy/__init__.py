@@ -73,7 +73,6 @@ from josepy.util import (
     ComparableECKey,
     ComparableKey,
     ComparableRSAKey,
-    ComparableX509,
     ImmutableMap,
 )
 

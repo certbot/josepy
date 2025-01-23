@@ -8,67 +8,11 @@ from types import ModuleType
 from typing import Any, Callable, Iterator, List, Tuple, TypeVar, Union, cast
 
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
-from OpenSSL import crypto
 
 
 # Deprecated. Please use built-in decorators @classmethod and abc.abstractmethod together instead.
 def abstractclassmethod(func: Callable) -> classmethod:
     return classmethod(abc.abstractmethod(func))
-
-
-class ComparableX509:
-    """Wrapper for OpenSSL.crypto.X509** objects that supports __eq__.
-
-    :ivar wrapped: Wrapped certificate or certificate request.
-    :type wrapped: `OpenSSL.crypto.X509` or `OpenSSL.crypto.X509Req`.
-
-    .. deprecated:: 1.15.0
-    """
-
-    def __init__(self, wrapped: Union[crypto.X509, crypto.X509Req]) -> None:
-        warnings.warn(
-            "The next major version of josepy will remove josepy.util.ComparableX509 and all "
-            "uses of it as part of removing our dependency on PyOpenSSL. This includes "
-            "modifying any functions with ComparableX509 parameters or return values. This "
-            "will be a breaking change. To avoid breakage, we recommend pinning josepy < 2.0.0 "
-            "until josepy 2.0.0 is out and you've had time to update your code.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        assert isinstance(wrapped, crypto.X509) or isinstance(wrapped, crypto.X509Req)
-        self.wrapped = wrapped
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.wrapped, name)
-
-    def _dump(self, filetype: int = crypto.FILETYPE_ASN1) -> bytes:
-        """Dumps the object into a buffer with the specified encoding.
-
-        :param int filetype: The desired encoding. Should be one of
-            `OpenSSL.crypto.FILETYPE_ASN1`,
-            `OpenSSL.crypto.FILETYPE_PEM`, or
-            `OpenSSL.crypto.FILETYPE_TEXT`.
-
-        :returns: Encoded X509 object.
-        :rtype: bytes
-
-        """
-        if isinstance(self.wrapped, crypto.X509):
-            return crypto.dump_certificate(filetype, self.wrapped)
-
-        # assert in __init__ makes sure this is X509Req
-        return crypto.dump_certificate_request(filetype, self.wrapped)
-
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, self.__class__):
-            return NotImplemented
-        return self._dump() == other._dump()
-
-    def __hash__(self) -> int:
-        return hash((self.__class__, self._dump()))
-
-    def __repr__(self) -> str:
-        return "<{0}({1!r})>".format(self.__class__.__name__, self.wrapped)
 
 
 class ComparableKey:

@@ -3,6 +3,18 @@ Changelog
 
 2.0.0 (main)
 -------------------
+* Breaking Change: PyOpenSSL has been fully removed.
+  - Dropped objects:
+    `josepy.util.ComparableX509`
+  - Functions now expect `cryptography.x509` objects:
+    `josepy.json_util.encode_cert`
+    `josepy.json_util.encode_csr`
+    `josepy.jws.Header.x5c.encoder`
+  - Functions now return `cryptography.x509` objects:
+    `josepy.json_util.decode_cert`
+    `josepy.json_util.decode_csr`
+    `josepy.jws.Header.x5c.decoder`
+
 
 1.15.0 (2025-01-22)
 -------------------

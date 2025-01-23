@@ -3,56 +3,9 @@
 import functools
 import sys
 import unittest
-import warnings
 
 import pytest
 import test_util
-
-
-class ComparableX509Test(unittest.TestCase):
-    """Tests for josepy.util.ComparableX509."""
-
-    def setUp(self) -> None:
-        # test_util.load_comparable_{csr,cert} return ComparableX509
-        self.req1 = test_util.load_comparable_csr("csr.pem")
-        self.req2 = test_util.load_comparable_csr("csr.pem")
-        self.req_other = test_util.load_comparable_csr("csr-san.pem")
-
-        self.cert1 = test_util.load_comparable_cert("cert.pem")
-        self.cert2 = test_util.load_comparable_cert("cert.pem")
-        self.cert_other = test_util.load_comparable_cert("cert-san.pem")
-
-    def test_getattr_proxy(self) -> None:
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                category=DeprecationWarning,
-                message=".*Use timezone-aware objects to represent datetimes",
-            )
-            assert self.cert1.has_expired() is True
-
-    def test_eq(self) -> None:
-        assert self.req1 == self.req2
-        assert self.cert1 == self.cert2
-
-    def test_ne(self) -> None:
-        assert self.req1 != self.req_other
-        assert self.cert1 != self.cert_other
-
-    def test_ne_wrong_types(self) -> None:
-        assert self.req1 != 5
-        assert self.cert1 != 5
-
-    def test_hash(self) -> None:
-        assert hash(self.req1) == hash(self.req2)
-        assert hash(self.req1) != hash(self.req_other)
-
-        assert hash(self.cert1) == hash(self.cert2)
-        assert hash(self.cert1) != hash(self.cert_other)
-
-    def test_repr(self) -> None:
-        for x509 in self.req1, self.cert1:
-            assert repr(x509) == "<ComparableX509({0!r})>".format(x509.wrapped)
 
 
 class ComparableRSAKeyTest(unittest.TestCase):

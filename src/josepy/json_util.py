@@ -22,7 +22,8 @@ from typing import (
     TypeVar,
 )
 
-from OpenSSL import crypto
+from cryptography import x509
+from cryptography.hazmat.primitives.serialization import Encoding
 
 from josepy import b64, errors, interfaces, util
 
@@ -426,59 +427,65 @@ def decode_hex16(value: str, size: Optional[int] = None, minimum: bool = False) 
         raise errors.DeserializationError(error)
 
 
-def encode_cert(cert: util.ComparableX509) -> str:
+def encode_cert(cert: x509.Certificate) -> str:
     """Encode certificate as JOSE Base-64 DER.
 
-    :type cert: `OpenSSL.crypto.X509` wrapped in `.ComparableX509`
+    :type cert: `cryptography.x509.Certificate`
     :rtype: unicode
 
+    .. versionchanged:: 2.0.0
+       The `cert` parameter is now `cryptography.x509.Certificate`.
+       Previously this was an `josepy.util.ComparableX509` object, which wrapped
+       an `OpenSSL.crypto.X509` object.
     """
-    if isinstance(cert.wrapped, crypto.X509Req):
-        raise ValueError("Error input is actually a certificate request.")
-
-    return encode_b64jose(crypto.dump_certificate(crypto.FILETYPE_ASN1, cert.wrapped))
+    return encode_b64jose(cert.public_bytes(Encoding.DER))
 
 
-def decode_cert(b64der: str) -> util.ComparableX509:
+def decode_cert(b64der: str) -> x509.Certificate:
     """Decode JOSE Base-64 DER-encoded certificate.
 
     :param unicode b64der:
-    :rtype: `OpenSSL.crypto.X509` wrapped in `.ComparableX509`
+    :rtype: `cryptography.x509.Certificate`
 
+    .. versionchanged:: 2.0.0
+       The returned object is now a `cryptography.x509.Certificate`.
+       Previously this was an `josepy.util.ComparableX509` object, which wrapped
+       an `OpenSSL.crypto.X509` object.
     """
     try:
-        return util.ComparableX509(
-            crypto.load_certificate(crypto.FILETYPE_ASN1, decode_b64jose(b64der))
-        )
-    except crypto.Error as error:
+        return x509.load_der_x509_certificate(decode_b64jose(b64der))
+    except ValueError as error:
         raise errors.DeserializationError(error)
 
 
-def encode_csr(csr: util.ComparableX509) -> str:
+def encode_csr(csr: x509.CertificateSigningRequest) -> str:
     """Encode CSR as JOSE Base-64 DER.
 
-    :type csr: `OpenSSL.crypto.X509Req` wrapped in `.ComparableX509`
+    :type csr: `cryptography.x509.CertificateSigningRequest`
     :rtype: unicode
 
+    .. versionchanged:: 2.0.0
+       The `cert` parameter is now `cryptography.x509.CertificateSigningRequest`.
+       Previously this was an `josepy.util.ComparableX509` object, which wrapped
+       an `OpenSSL.crypto.X509Req` object.
     """
-    if isinstance(csr.wrapped, crypto.X509):
-        raise ValueError("Error input is actually a certificate.")
-
-    return encode_b64jose(crypto.dump_certificate_request(crypto.FILETYPE_ASN1, csr.wrapped))
+    return encode_b64jose(csr.public_bytes(Encoding.DER))
 
 
-def decode_csr(b64der: str) -> util.ComparableX509:
+def decode_csr(b64der: str) -> x509.CertificateSigningRequest:
     """Decode JOSE Base-64 DER-encoded CSR.
 
     :param unicode b64der:
-    :rtype: `OpenSSL.crypto.X509Req` wrapped in `.ComparableX509`
+    :rtype: `cryptography.x509.CertificateSigningRequest`
 
+    .. versionchanged:: 2.0.0
+       The returned object is now a `cryptography.x509.CertificateSigningRequest`.
+       Previously this was an `josepy.util.ComparableX509` object, which wrapped
+       an `OpenSSL.crypto.X509Req` object.
     """
     try:
-        return util.ComparableX509(
-            crypto.load_certificate_request(crypto.FILETYPE_ASN1, decode_b64jose(b64der))
-        )
-    except crypto.Error as error:
+        return x509.load_der_x509_csr(decode_b64jose(b64der))
+    except ValueError as error:
         raise errors.DeserializationError(error)
 
 

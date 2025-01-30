@@ -438,9 +438,6 @@ def encode_cert(cert: x509.Certificate) -> str:
        Previously this was an `josepy.util.ComparableX509` object, which wrapped
        an `OpenSSL.crypto.X509` object.
     """
-    if isinstance(cert, x509.CertificateSigningRequest):
-        raise ValueError("Error input is actually a certificate request.")
-
     return encode_b64jose(cert.public_bytes(Encoding.DER))
 
 
@@ -457,7 +454,7 @@ def decode_cert(b64der: str) -> x509.Certificate:
     """
     try:
         return x509.load_der_x509_certificate(decode_b64jose(b64der))
-    except Exception as error:
+    except ValueError as error:
         raise errors.DeserializationError(error)
 
 
@@ -472,9 +469,6 @@ def encode_csr(csr: x509.CertificateSigningRequest) -> str:
        Previously this was an `josepy.util.ComparableX509` object, which wrapped
        an `OpenSSL.crypto.X509Req` object.
     """
-    if isinstance(csr, x509.Certificate):
-        raise ValueError("Error input is actually a certificate.")
-
     return encode_b64jose(csr.public_bytes(Encoding.DER))
 
 
@@ -491,7 +485,7 @@ def decode_csr(b64der: str) -> x509.CertificateSigningRequest:
     """
     try:
         return x509.load_der_x509_csr(decode_b64jose(b64der))
-    except Exception as error:
+    except ValueError as error:
         raise errors.DeserializationError(error)
 
 

@@ -156,7 +156,7 @@ class Header(json_util.JSONObjectWithFields):
         """
         try:
             return tuple(x509.load_der_x509_certificate(base64.b64decode(cert)) for cert in value)
-        except Exception as error:
+        except ValueError as error:
             raise errors.DeserializationError(error)
 
 

@@ -3,6 +3,7 @@ Changelog
 
 2.0.0 (main)
 -------------------
+
 * Breaking Change: PyOpenSSL has been fully removed.
   - Dropped objects:
     `josepy.util.ComparableX509`
@@ -14,6 +15,7 @@ Changelog
     `josepy.json_util.decode_cert`
     `josepy.json_util.decode_csr`
     `josepy.jws.Header.x5c.decoder`
+* Dropped support for Python 3.8.
 
 
 1.15.0 (2025-01-22)

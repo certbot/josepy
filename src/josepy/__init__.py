@@ -26,9 +26,6 @@ Originally developed as part of the ACME_ protocol implementation.
 
 """
 
-import sys
-import warnings
-
 # flake8: noqa
 from josepy.b64 import b64decode, b64encode
 from josepy.errors import (
@@ -75,10 +72,3 @@ from josepy.util import (
     ComparableRSAKey,
     ImmutableMap,
 )
-
-if sys.version_info[:2] == (3, 8):
-    warnings.warn(
-        "Python 3.8 support will be dropped in the next scheduled release of "
-        "josepy. Please upgrade your Python version.",
-        DeprecationWarning,
-    )

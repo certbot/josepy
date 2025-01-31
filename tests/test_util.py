@@ -2,8 +2,8 @@
 
 import atexit
 import contextlib
+import importlib.resources
 import os
-import sys
 from typing import Any
 
 from cryptography import x509
@@ -14,14 +14,7 @@ import josepy.util
 from josepy import ComparableRSAKey
 from josepy.util import ComparableECKey
 
-# This approach is based on the recommendation at
-# https://github.com/python/mypy/issues/1153#issuecomment-1207333806.
-if sys.version_info >= (3, 9):
-    import importlib.resources as importlib_resources
-else:
-    import importlib_resources
-
-TESTDATA = importlib_resources.files("testdata")
+TESTDATA = importlib.resources.files("testdata")
 
 
 def vector_path(*names: str) -> str:
@@ -33,7 +26,7 @@ def vector_path(*names: str) -> str:
     ref = TESTDATA.joinpath(*names)
     # We convert the value to str here because some of the calling code doesn't
     # work with pathlib objects.
-    return str(file_manager.enter_context(importlib_resources.as_file(ref)))
+    return str(file_manager.enter_context(importlib.resources.as_file(ref)))
 
 
 def load_vector(*names: str) -> bytes:

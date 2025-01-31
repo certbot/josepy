@@ -1,0 +1,20 @@
+name: Merge Event
+
+on:
+  pull_request_target:
+    types:
+      - closed
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - uses: mattermost/action-mattermost-notify@master
+      with:
+        MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_MERGE_WEBHOOK }}
+        TEXT: >
+          [${{ github.repository }}] |
+          [${{ github.event.pull_request.title }}
+          #${{ github.event.number }}](https://github.com/${{ github.repository }}/pull/${{ github.event.number }})
+          was merged into main by ${{ github.actor }}

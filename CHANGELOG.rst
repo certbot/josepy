@@ -1,8 +1,13 @@
 Changelog
 =========
 
-2.0.0 (main)
--------------------
+2.1.0 (main)
+------------
+
+*
+
+2.0.0 (2025-02-10)
+------------------
 
 * Breaking Change: PyOpenSSL has been fully removed.
   - Dropped objects:

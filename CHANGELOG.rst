@@ -4,7 +4,7 @@ Changelog
 2.1.0 (main)
 ------------
 
-*
+* Added support for Python 3.14.
 
 2.0.0 (2025-02-10)
 ------------------

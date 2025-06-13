@@ -37,7 +37,12 @@ include = [
 [tool.poetry.dependencies]
 # This should be kept in sync with the value of target-version in our
 # configuration for black below.
-python = "^3.9"
+#
+# python 3.9.2 is used as a lower bound here because newer versions of
+# cryptography dropped support for python 3.9.0 and 3.9.1. see
+# https://github.com/pyca/cryptography/pull/12045. when we drop support for
+# python 3.9 altogether, this line can be changed to the simpler 'python = "^3.10"'.
+python = ">=3.9.2,<4.0"
 # load_pem_private/public_key (>=0.6)
 # rsa_recover_prime_factors (>=0.8)
 # add sign() and verify() to asymetric keys (RSA >=1.4, ECDSA >=1.5)

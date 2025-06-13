@@ -4,7 +4,9 @@ Changelog
 2.1.0 (main)
 ------------
 
-*
+* Dropped support for Python 3.9.0 and 3.9.1 for compatibility with newer
+  versions of the cryptography Python package. Python 3.9.2+ is still
+  supported.
 
 2.0.0 (2025-02-10)
 ------------------

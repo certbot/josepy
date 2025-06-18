@@ -239,12 +239,14 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
                     # Error out if it is not the case.
                     if "__annotations__" in namespace:
                         annotations = namespace["__annotations__"]
-                    elif sys.version_info >= (3, 14) and (
-                        annotate := annotationlib.get_annotate_from_class_namespace(namespace)
-                    ):
-                        annotations = annotationlib.call_annotate_function(
-                            annotate, format=annotationlib.Format.FORWARDREF
-                        )
+                    elif sys.version_info >= (3, 14):
+                        annotate = annotationlib.get_annotate_from_class_namespace(namespace)
+                        if annotate:
+                            annotations = annotationlib.call_annotate_function(
+                                annotate, format=annotationlib.Format.FORWARDREF
+                            )
+                        else:
+                            annotations = {}
                     else:
                         annotations = {}
                     if key not in annotations:

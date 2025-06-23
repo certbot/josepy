@@ -10,6 +10,7 @@ The framework presented here is somewhat based on `Go's "json" package`_
 import abc
 import binascii
 import logging
+import sys
 from typing import (
     Any,
     Callable,
@@ -26,6 +27,9 @@ from cryptography import x509
 from cryptography.hazmat.primitives.serialization import Encoding
 
 from josepy import b64, errors, interfaces, util
+
+if sys.version_info >= (3, 14):
+    import annotationlib
 
 logger = logging.getLogger(__name__)
 
@@ -233,7 +237,19 @@ class JSONObjectWithFieldsMeta(abc.ABCMeta):
                 if isinstance(value, _TypedField):
                     # Ensure the type annotation has been set for the field.
                     # Error out if it is not the case.
-                    if key not in namespace.get("__annotations__", {}):
+                    if "__annotations__" in namespace:
+                        annotations = namespace["__annotations__"]
+                    elif sys.version_info >= (3, 14):
+                        annotate = annotationlib.get_annotate_from_class_namespace(namespace)
+                        if annotate:
+                            annotations = annotationlib.call_annotate_function(
+                                annotate, format=annotationlib.Format.FORWARDREF
+                            )
+                        else:
+                            annotations = {}
+                    else:
+                        annotations = {}
+                    if key not in annotations:
                         raise ValueError(
                             f"Field `{key}` in JSONObject `{name}` has no type annotation."
                         )

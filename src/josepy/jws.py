@@ -396,8 +396,8 @@ class CLI:
     @classmethod
     def sign(cls, args: argparse.Namespace) -> None:
         """Sign."""
-        key = args.alg.kty.load(args.key.read())
-        args.key.close()
+        with open(args.key, "rb") as fp:
+            key = args.alg.kty.load(fp.read())
         if args.protect is None:
             args.protect = []
         if args.compact:
@@ -426,8 +426,8 @@ class CLI:
 
         if args.key is not None:
             assert args.kty is not None
-            key = args.kty.load(args.key.read()).public_key()
-            args.key.close()
+            with open(args.key, "rb") as fp:
+                key = args.kty.load(fp.read()).public_key()
         else:
             key = None
 
@@ -459,13 +459,13 @@ class CLI:
         subparsers = parser.add_subparsers()
         parser_sign = subparsers.add_parser("sign")
         parser_sign.set_defaults(func=cls.sign)
-        parser_sign.add_argument("-k", "--key", type=argparse.FileType("rb"), required=True)
+        parser_sign.add_argument("-k", "--key", required=True)
         parser_sign.add_argument("-a", "--alg", type=cls._alg_type, default=jwa.RS256)
         parser_sign.add_argument("-p", "--protect", action="append", type=cls._header_type)
 
         parser_verify = subparsers.add_parser("verify")
         parser_verify.set_defaults(func=cls.verify)
-        parser_verify.add_argument("-k", "--key", type=argparse.FileType("rb"), required=False)
+        parser_verify.add_argument("-k", "--key", required=False)
         parser_verify.add_argument("--kty", type=cls._kty_type, required=False)
 
         parsed = parser.parse_args(args)

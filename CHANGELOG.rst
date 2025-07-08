@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.1.0 (main)
+2.1.0 (2025-07-08)
 ------------
 
 * Added support for Python 3.14.

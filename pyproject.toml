@@ -30,9 +30,10 @@ homepage = "https://github.com/certbot/josepy"
 authors = ["Certbot Project <certbot-dev@eff.org>"]
 readme = "README.rst"
 include = [
-    "CHANGELOG.rst",
-    "CONTRIBUTING.md",
-    "docs", "tests",
+    {path = "CHANGELOG.rst", format = "sdist"},
+    {path = "CONTRIBUTING.md", format = "sdist"},
+    {path = "docs", format = "sdist"},
+    {path = "tests", format = "sdist"},
 ]
 
 [tool.poetry.dependencies]

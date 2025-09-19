@@ -80,8 +80,7 @@ jws = "josepy.jws:CLI.run"
 line-length = 100
 # This should be kept in sync with the version of Python specified in poetry's
 # dependencies above.
-# TODO add 'py314' once black supports it, see #232 for details
-target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
+target-version = ['py39', 'py310', 'py311', 'py312', 'py313', 'py314']
 
 # Mypy tooling configuration
 

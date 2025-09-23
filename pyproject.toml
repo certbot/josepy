@@ -1,34 +1,40 @@
 # PEP-517 build
 
 [build-system]
-requires = ["poetry_core>=1.0.8"]
+requires = ["poetry_core>=2.2.0"]
 build-backend = "poetry.core.masonry.api"
 
-# Poetry tooling configuration
-
-[tool.poetry]
+[project]
 name = "josepy"
 version = "2.2.0.dev0"
+license = "Apache-2.0"
+license-files = ["LICENSE.txt"]
 description = "JOSE protocol implementation in Python"
-license = "Apache License 2.0"
+readme = "README.rst"
+authors = [{ name = "Certbot Project", email = "certbot-dev@eff.org" }]
+# python 3.9.2 is used as a lower bound here because newer versions of
+# cryptography dropped support for python 3.9.0 and 3.9.1. see
+# https://github.com/pyca/cryptography/pull/12045. when we drop support for
+# python 3.9 altogether, this line can be changed to the simpler 'python = "^3.10"'.
+requires-python = ">=3.9.2"
+dynamic = ["classifiers", "dependencies"]
+
+[project.urls]
+Homepage = "https://github.com/certbot/josepy"
+
+# Poetry tooling configuration
+[tool.poetry]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    # Version specific classifiers are added automatically based on requires-python.
+    # Except for 3.9 since the lower bound is 3.9.2 currently.
     "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Security",
 ]
-homepage = "https://github.com/certbot/josepy"
-authors = ["Certbot Project <certbot-dev@eff.org>"]
-readme = "README.rst"
 include = [
     "CHANGELOG.rst",
     "CONTRIBUTING.md",
@@ -39,11 +45,6 @@ include = [
 # This should be kept in sync with the value of target-version in our
 # configuration for black below.
 #
-# python 3.9.2 is used as a lower bound here because newer versions of
-# cryptography dropped support for python 3.9.0 and 3.9.1. see
-# https://github.com/pyca/cryptography/pull/12045. when we drop support for
-# python 3.9 altogether, this line can be changed to the simpler 'python = "^3.10"'.
-python = ">=3.9.2,<4.0"
 # load_pem_private/public_key (>=0.6)
 # rsa_recover_prime_factors (>=0.8)
 # add sign() and verify() to asymetric keys (RSA >=1.4, ECDSA >=1.5)
@@ -78,10 +79,6 @@ jws = "josepy.jws:CLI.run"
 # Black tooling configuration
 [tool.black]
 line-length = 100
-# This should be kept in sync with the version of Python specified in poetry's
-# dependencies above.
-# TODO add 'py314' once black supports it, see #232 for details
-target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
 
 # Mypy tooling configuration
 

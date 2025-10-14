@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "josepy"
-version = "2.2.0.dev0"
+version = "2.3.0.dev0"
 license = "Apache-2.0"
 license-files = ["LICENSE.txt"]
 description = "JOSE protocol implementation in Python"

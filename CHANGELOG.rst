@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.2.0 (main)
-------------
+2.2.0 (2025-10-14)
+------------------
 
 * Support for Python 3.9 has been deprecated and will be removed in the next
   scheduled release.

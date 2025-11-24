@@ -8,7 +8,7 @@ on:
   schedule:
     # Run at 4pm UTC or 9am PST
     - cron: "0 16 * * *"
-
+permissions: {}  # let's not use any permissions we don't need here
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -64,6 +64,9 @@ jobs:
         run: |
           WORKFLOW_RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           echo "{\"text\":\"** :warning: $GITHUB_REPOSITORY: Build failed :warning: ** | [(see details)]($WORKFLOW_RUN_URL) \"}" > mattermost.json
-      - uses: mattermost/action-mattermost-notify@main
+      # we pin this action to a version tested and audited by certbot's
+      # maintainers for extra security. the full hash is used as doing so is
+      # recommended by zizmor
+      - uses: mattermost/action-mattermost-notify@b7d118e440bf2749cd18a4a8c88e7092e696257a
         env:
           MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}

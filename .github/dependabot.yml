@@ -25,3 +25,14 @@ updates:
         applies-to: security-updates
         patterns:
           - "*"
+    cooldown:
+      # as recommended by zizmor at https://docs.zizmor.sh/audits/#dependabot-cooldown, we give our
+      # dependencies a bit of bake time after they're released before we have dependabot suggest we
+      # update to them
+      #
+      # note that as described at
+      # https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#cooldown-,
+      # this setting only applies to regular version updates and not security updates so if a brand
+      # new version of a dependency of ours is needed to resolve a security vulnerability,
+      # depandabot will still suggest we update to it
+      default-days: 7

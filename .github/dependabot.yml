@@ -35,5 +35,4 @@ updates:
       # this setting only applies to regular version updates and not security updates so if a brand
       # new version of a dependency of ours is needed to resolve a security vulnerability,
       # depandabot will still suggest we update to it
-      https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#cooldown-
       default-days: 7

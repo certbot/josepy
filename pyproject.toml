@@ -11,7 +11,7 @@ license = "Apache-2.0"
 license-files = ["LICENSE.txt"]
 description = "JOSE protocol implementation in Python"
 readme = "README.rst"
-authors = [{ name = "Certbot Project", email = "certbot-dev@eff.org" }]
+authors = [{ name = "Certbot Project"}]
 # python 3.9.2 is used as a lower bound here because newer versions of
 # cryptography dropped support for python 3.9.0 and 3.9.1. see
 # https://github.com/pyca/cryptography/pull/12045. when we drop support for

@@ -15,7 +15,7 @@ authors = [{ name = "Certbot Project"}]
 # python 3.9.2 is used as a lower bound here because newer versions of
 # cryptography dropped support for python 3.9.0 and 3.9.1. see
 # https://github.com/pyca/cryptography/pull/12045
-requires-python = ">=3.9.2,<4.0"
+requires-python = ">=3.9.2"
 dynamic = ["classifiers", "dependencies"]
 
 [project.urls]

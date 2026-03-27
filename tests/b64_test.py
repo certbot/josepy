@@ -81,6 +81,14 @@ class B64DecodeTest(unittest.TestCase):
             # We're purposefully testing with the incorrect type here.
             self._call(object())  # type: ignore
 
+    def test_non_urlsafe(self) -> None:
+        with pytest.raises(ValueError):
+            self._call("+/8")
+
+    def test_non_base64_chars(self) -> None:
+        with pytest.raises(ValueError):
+            self._call("*&$")
+
 
 if __name__ == "__main__":
     sys.exit(pytest.main(sys.argv[1:] + [__file__]))  # pragma: no cover

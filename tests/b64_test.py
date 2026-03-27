@@ -1,6 +1,7 @@
 """Tests for josepy.b64."""
 
 import sys
+import unittest
 from typing import Union
 
 import pytest
@@ -21,7 +22,7 @@ B64_URL_UNSAFE_EXAMPLES = {
 }
 
 
-class B64EncodeTest:
+class B64EncodeTest(unittest.TestCase):
     """Tests for josepy.b64.b64encode."""
 
     @classmethod
@@ -47,7 +48,7 @@ class B64EncodeTest:
             self._call("some unicode")  # type: ignore
 
 
-class B64DecodeTest:
+class B64DecodeTest(unittest.TestCase):
     """Tests for josepy.b64.b64decode."""
 
     @classmethod

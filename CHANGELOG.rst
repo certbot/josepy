@@ -4,6 +4,8 @@ Changelog
 2.3.0 (main)
 ------------
 
+* Dropped support for Python 3.9.
+
 2.2.0 (2025-10-14)
 ------------------
 

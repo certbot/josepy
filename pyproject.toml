@@ -12,10 +12,7 @@ license-files = ["LICENSE.txt"]
 description = "JOSE protocol implementation in Python"
 readme = "README.rst"
 authors = [{ name = "Certbot Project"}]
-# python 3.9.2 is used as a lower bound here because newer versions of
-# cryptography dropped support for python 3.9.0 and 3.9.1. see
-# https://github.com/pyca/cryptography/pull/12045
-requires-python = ">=3.9.2"
+requires-python = ">=3.10"
 dynamic = ["classifiers", "dependencies"]
 
 [project.urls]
@@ -28,9 +25,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    # Version specific classifiers are added automatically based on requires-python.
-    # Except for 3.9 since the lower bound is 3.9.2 currently.
-    "Programming Language :: Python :: 3.9",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Security",
 ]
@@ -89,8 +83,6 @@ disallow_untyped_defs = true
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
-    # We ignore our own warning about dropping Python 3.9 support.
-    "ignore:Python 3.9 support will be dropped:DeprecationWarning",
 ]
 norecursedirs = "*.egg .eggs dist build docs .tox"
 

@@ -6,7 +6,7 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    versioning-strategy: "widen"
+    versioning-strategy: "lockfile-only"
     groups:
       # one might want to only have dependabot open PRs for security updates,
       # but in practice, that doesn't seem to work well because for security

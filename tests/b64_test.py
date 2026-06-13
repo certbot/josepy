@@ -1,6 +1,7 @@
 """Tests for josepy.b64."""
 
 import sys
+import unittest
 from typing import Union
 
 import pytest
@@ -21,7 +22,7 @@ B64_URL_UNSAFE_EXAMPLES = {
 }
 
 
-class B64EncodeTest:
+class B64EncodeTest(unittest.TestCase):
     """Tests for josepy.b64.b64encode."""
 
     @classmethod
@@ -47,7 +48,7 @@ class B64EncodeTest:
             self._call("some unicode")  # type: ignore
 
 
-class B64DecodeTest:
+class B64DecodeTest(unittest.TestCase):
     """Tests for josepy.b64.b64decode."""
 
     @classmethod
@@ -79,6 +80,14 @@ class B64DecodeTest:
         with pytest.raises(TypeError):
             # We're purposefully testing with the incorrect type here.
             self._call(object())  # type: ignore
+
+    def test_non_urlsafe(self) -> None:
+        with pytest.raises(ValueError):
+            self._call("+/8")
+
+    def test_non_base64_chars(self) -> None:
+        with pytest.raises(ValueError):
+            self._call("*&$")
 
 
 if __name__ == "__main__":

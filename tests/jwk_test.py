@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 else:
     Protocol = object
 
-DSA_PEM = test_util.load_vector("dsa512_key.pem")
+DSA_PEM = test_util.load_vector("dsa1024_key.pem")
 RSA256_KEY = test_util.load_rsa_private_key("rsa256_key.pem")
 RSA512_KEY = test_util.load_rsa_private_key("rsa512_key.pem")
 EC_P256_KEY = test_util.load_ec_private_key("ec_p256_key.pem")

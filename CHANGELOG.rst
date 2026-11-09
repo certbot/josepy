@@ -5,6 +5,8 @@ Changelog
 ------------
 
 * Dropped support for Python 3.9.
+* Support for Python 3.10 has been deprecated and will be removed in the next
+  scheduled release.
 
 2.2.0 (2025-10-14)
 ------------------

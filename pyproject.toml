@@ -83,6 +83,8 @@ disallow_untyped_defs = true
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
+    # We ignore our own warning about dropping Python 3.10 support.
+    "ignore:Python 3.10 support will be dropped:DeprecationWarning",
 ]
 norecursedirs = "*.egg .eggs dist build docs .tox"
 

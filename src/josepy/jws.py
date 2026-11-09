@@ -3,6 +3,7 @@
 import argparse
 import base64
 import sys
+from collections.abc import Sequence
 from typing import (
     Any,
     Dict,
@@ -137,7 +138,7 @@ class Header(json_util.JSONObjectWithFields):
     # x5c does NOT use JOSE Base64 (4.1.6)
 
     @x5c.encoder  # type: ignore
-    def x5c(value):
+    def x5c(value: Sequence[x509.Certificate]) -> list[bytes]:
         """
         .. versionchanged:: 2.0.0
            The values are now `cryptography.x509.Certificate` objects.
@@ -147,7 +148,7 @@ class Header(json_util.JSONObjectWithFields):
         return [base64.b64encode(cert.public_bytes(Encoding.DER)) for cert in value]
 
     @x5c.decoder  # type: ignore
-    def x5c(value):
+    def x5c(value: Sequence[str]) -> tuple[x509.Certificate, ...]:
         """
         .. versionchanged:: 2.0.0
            The values are now `cryptography.x509.Certificate` objects.

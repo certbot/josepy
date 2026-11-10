@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.3.0 (main)
-------------
+2.3.0 (2026-11-10)
+------------------
 
 * Dropped support for Python 3.9.
 * Support for Python 3.10 has been deprecated and will be removed in the next

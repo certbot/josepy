@@ -12,7 +12,7 @@ license-files = ["LICENSE.txt"]
 description = "JOSE protocol implementation in Python"
 readme = "README.rst"
 authors = [{ name = "Certbot Project"}]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dynamic = ["classifiers", "dependencies"]
 
 [project.urls]
@@ -83,8 +83,6 @@ disallow_untyped_defs = true
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
-    # We ignore our own warning about dropping Python 3.10 support.
-    "ignore:Python 3.10 support will be dropped:DeprecationWarning",
 ]
 norecursedirs = "*.egg .eggs dist build docs .tox"
 

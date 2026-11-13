@@ -12,7 +12,12 @@
 """
 
 import base64
-from typing import Union
+import string
+from typing import Final, Union
+
+VALID_B64_CHARS: Final[frozenset[int]] = frozenset(
+    string.ascii_letters.encode("ascii") + string.digits.encode("ascii") + b"-_="
+)
 
 
 def b64encode(data: bytes) -> bytes:
@@ -53,5 +58,8 @@ def b64decode(data: Union[bytes, str]) -> bytes:
             raise ValueError("unicode argument should contain only ASCII characters")
     elif not isinstance(data, bytes):
         raise TypeError("argument should be a str or unicode")
+
+    if any(c not in VALID_B64_CHARS for c in data):
+        raise ValueError("argument should contain only valid Base64 characters")
 
     return base64.urlsafe_b64decode(data + b"=" * (4 - (len(data) % 4)))

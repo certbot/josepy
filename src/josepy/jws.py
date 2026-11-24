@@ -45,8 +45,8 @@ class MediaType:
         """Encoder."""
         # 4.1.10
         if ";" not in value:
-            assert value.startswith(cls.PREFIX)
-            return value[len(cls.PREFIX) :]
+            assert "/" in value
+            return value.removeprefix(cls.PREFIX)
         return value
 
 

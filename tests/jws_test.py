@@ -45,6 +45,12 @@ class HeaderTest(unittest.TestCase):
         self.crit = Header(crit=("a", "b"))
         self.empty = Header()
 
+    def test_non_application_media_types(self) -> None:
+        from josepy.jws import Header
+
+        fields = {"typ": "image/png", "cty": "text/plain"}
+        assert Header.from_json(fields).to_json() == fields
+
     def test_add_non_empty(self) -> None:
         from josepy.jws import Header
 

@@ -3,6 +3,7 @@ Changelog
 
 2.4.0 (main)
 ------------
+* Fixed JSON serialization of non-application media types in ``typ`` and ``cty`` headers.
 * Dropped support for Python 3.10.
 
 2.3.0 (2026-11-10)

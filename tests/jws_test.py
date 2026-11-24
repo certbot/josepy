@@ -75,10 +75,11 @@ class HeaderTest(unittest.TestCase):
         jobj = header.to_partial_json()
         assert isinstance(CERT, x509.Certificate)
         cert_asn1 = CERT.public_bytes(Encoding.DER)
-        cert_b64 = base64.b64encode(cert_asn1)
+        cert_b64 = base64.b64encode(cert_asn1).decode("ascii")
         assert jobj == {"x5c": [cert_b64, cert_b64]}
         assert header == Header.from_json(jobj)
-        jobj["x5c"][0] = base64.b64encode(b"xxx" + cert_asn1)
+        assert Header.json_loads(header.json_dumps()) == header
+        jobj["x5c"][0] = base64.b64encode(b"xxx" + cert_asn1).decode("ascii")
         with pytest.raises(errors.DeserializationError):
             Header.from_json(jobj)
 

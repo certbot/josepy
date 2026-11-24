@@ -4,6 +4,7 @@ Changelog
 2.4.0 (main)
 ------------
 * Dropped support for Python 3.10.
+* Fixed JSON serialization of JWS headers containing an ``x5c`` certificate chain.
 
 2.3.0 (2026-11-10)
 ------------------

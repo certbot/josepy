@@ -138,14 +138,14 @@ class Header(json_util.JSONObjectWithFields):
     # x5c does NOT use JOSE Base64 (4.1.6)
 
     @x5c.encoder  # type: ignore
-    def x5c(value: Sequence[x509.Certificate]) -> list[bytes]:
+    def x5c(value: Sequence[x509.Certificate]) -> list[str]:
         """
         .. versionchanged:: 2.0.0
            The values are now `cryptography.x509.Certificate` objects.
            Previously these were `josepy.util.ComparableX509` objects, which wrapped
            `OpenSSL.crypto.X509` objects.
         """
-        return [base64.b64encode(cert.public_bytes(Encoding.DER)) for cert in value]
+        return [base64.b64encode(cert.public_bytes(Encoding.DER)).decode("ascii") for cert in value]
 
     @x5c.decoder  # type: ignore
     def x5c(value: Sequence[str]) -> tuple[x509.Certificate, ...]:
